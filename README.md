@@ -22,9 +22,9 @@ pip install https://github.com/danleyb2/Instagram-API/archive/pip_package.zip
 ```
 
 ### Why did i do the API?
-For me,
-*i love writing code*,
-for him
+For me,  
+*i love writing code*,  
+for him  
 *Unfortunately WhatsApp blocked me (Yes, WhatsApp, _sigh..._) and my UUID, so they blocked me the use of any account on my mobile phone. There was a way to bypass it, but it was not a final solution, so I decided to do this.*
 
 ### What is Instagram?
