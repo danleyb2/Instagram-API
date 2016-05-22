@@ -484,7 +484,7 @@ class Instagram:
 
     def configureVideo(self, upload_id, video, caption=''):
 
-        self.uploadPhoto(video, '', upload_id)
+        self.uploadPhoto(video, caption, upload_id)
         size = Image.open(video).size[0]
 
         post = json.dumps(
