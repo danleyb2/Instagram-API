@@ -1061,16 +1061,24 @@ class Instagram:
 
         return timeline
 
-    def getUserFeed(self, usernameId):
+    def getUserFeed(self, usernameId, maxid=None,count=None):
         """
         Get user feed.
         :type usernameId: str
         :param usernameId: Username id
+        :type maxid: str
+        :param maxid: Max Id
+        :type count: str
+        :param count: Count
         :rtype: object
         :return: User feed data
+        :raises: InstagramException
         """
-        userFeed = self.request("feed/user/" + usernameId + "/?rank_token=" \
-                                + self.rank_token + "&ranked_content=true&")[1]
+        userFeed = self.request("feed/user/" + usernameId + "/?rank_token=" + self.rank_token + "&"\
+                                + (("&max_id="+str(maxid)) if maxid is not None else '')\
+                                + (("&count="+str(maxid)) if count is not None else '')\
+                                + "ranked_content=true&"
+                                )[1]
 
         if userFeed['status'] != 'ok':
             raise InstagramException(userFeed['message'] + "\n")
