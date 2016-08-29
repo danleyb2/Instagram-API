@@ -1074,7 +1074,7 @@ class Instagram:
         :return: User feed data
         :raises: InstagramException
         """
-        userFeed = self.request("feed/user/" + usernameId + "/?rank_token=" + self.rank_token + "&"\
+        userFeed = self.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token + "&"\
                                 + (("&max_id="+str(maxid)) if maxid is not None else '')\
                                 + (("&count="+str(maxid)) if count is not None else '')\
                                 + "ranked_content=true&"
