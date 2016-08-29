@@ -904,7 +904,7 @@ class Instagram:
         :rtype: object
         :return: user tags data
         """
-        tags = self.request("usertags/" + usernameId + "/feed/?rank_token=" + self.rank_token
+        tags = self.request("usertags/" + str(usernameId) + "/feed/?rank_token=" + self.rank_token
                             + "&ranked_content=true&")[1]
         if tags['status'] != 'ok':
             raise InstagramException(tags['message'] + "\n")
@@ -956,7 +956,7 @@ class Instagram:
         :rtype: object
         :return: Geo Media data
         """
-        locations = self.request("maps/user/" + usernameId + "/")[1]
+        locations = self.request("maps/user/" + str(usernameId) + "/")[1]
 
         if locations['status'] != 'ok':
             raise InstagramException(locations['message'] + "\n")
