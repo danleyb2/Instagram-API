@@ -831,7 +831,7 @@ class Instagram:
                 ('external_url', url),
                 ('phone_number', phone),
                 ('username', self.username),
-                ('full_name', first_name),
+                ('first_name', first_name),
                 ('biography', biography),
                 ('email', email),
                 ('gender', gender)
