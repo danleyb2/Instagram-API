@@ -18,6 +18,9 @@ Instagram's private API.
 ### Installation
 
 ```sh
+pip install instagram-python
+
+## or from source
 pip install https://github.com/danleyb2/Instagram-API/archive/pip_package.zip
 ```
 
