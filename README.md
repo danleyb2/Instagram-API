@@ -21,6 +21,12 @@ Instagram's private API.
 pip install https://github.com/danleyb2/Instagram-API/archive/pip_package.zip
 ```
 
+### Dependencies
+
+`curl`, `gd` and `ffmpeg`
+
+For more info: https://github.com/danleyb2/Instagram-API/wiki/Dependencies
+
 ### Why did i do the API?
 For me,  
 *i love writing code*,  
