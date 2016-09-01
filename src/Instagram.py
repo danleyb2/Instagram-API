@@ -840,6 +840,18 @@ class Instagram:
 
         return self.request('accounts/edit_profile/', self.generateSignature(data))[1]
 
+    def setNamePhoneAndEmail(self, name, phone, email):
+        """
+        Set name and phone
+        :type name: str
+        :param name:
+        :type phone: str
+        :param phone:
+        :rtype: object
+        :return: Set status data
+        """
+        return self.editProfile('', phone, name, '', email, 1)
+
     def getUsernameInfo(self, usernameId):
         """
         Get username info.
@@ -1257,27 +1269,7 @@ class Instagram:
         """
         return self.request("media/" + mediaId + "/comments/?")[1]
 
-    def setNameAndPhone(self, name='', phone=''):
-        """
-        Set name and phone (Optional).
-        :type name: str
-        :param name:
-        :type phone: str
-        :param phone:
-        :rtype: object
-        :return: Set status data
-        """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('first_name', name),
-                ('phone_number', phone),
-                ('_csrftoken', self.token)
-            ])
-        )
 
-        return self.request("accounts/set_phone_and_name/", self.generateSignature(data))[1]
 
     def getDirectShare(self):
         """
