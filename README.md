@@ -11,6 +11,8 @@ Instagram's private API.
 **Read the [wiki](https://github.com/danleyb2/Instagram-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.  
 **Wiki for the PHP code should be 90% applicable too because the code is just translated, not transformed**
 
+**Frequently Asked Questions:** [F.A.Q.](https://github.com/danleyb2/Instagram-API/wiki/FAQ)
+
 **Do you like this project? Support it by donating**
  - To the [PHP](https://github.com/mgp25/Instagram-API) repo
 
