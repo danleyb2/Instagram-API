@@ -484,7 +484,7 @@ class Instagram:
 
     def configureVideo(self, upload_id, video, caption=''):
 
-        self.uploadPhoto(video, '', upload_id)
+        self.uploadPhoto(video, caption, upload_id)
         size = Image.open(video).size[0]
 
         post = json.dumps(
@@ -655,7 +655,7 @@ class Instagram:
         )
         return self.request("media/" + mediaId + "/comment/", self.generateSignature(data))[1]
 
-    def deleteComment(self, mediaId, commentId):
+    def deleteComment(self, mediaId, captionText, commentId):
         """
         Delete Comment.
         :type mediaId: str
@@ -831,7 +831,7 @@ class Instagram:
                 ('external_url', url),
                 ('phone_number', phone),
                 ('username', self.username),
-                ('full_name', first_name),
+                ('first_name', first_name),
                 ('biography', biography),
                 ('email', email),
                 ('gender', gender)
@@ -847,7 +847,7 @@ class Instagram:
         :rtype: object
         :return: Username data
         """
-        return self.request("users/" + usernameId + "/info/")[1]
+        return self.request("users/" + str(usernameId) + "/info/")[1]
 
     def getSelfUsernameInfo(self):
         """
@@ -904,7 +904,7 @@ class Instagram:
         :rtype: object
         :return: user tags data
         """
-        tags = self.request("usertags/" + usernameId + "/feed/?rank_token=" + self.rank_token
+        tags = self.request("usertags/" + str(usernameId) + "/feed/?rank_token=" + self.rank_token
                             + "&ranked_content=true&")[1]
         if tags['status'] != 'ok':
             raise InstagramException(tags['message'] + "\n")
@@ -956,7 +956,7 @@ class Instagram:
         :rtype: object
         :return: Geo Media data
         """
-        locations = self.request("maps/user/" + usernameId + "/")[1]
+        locations = self.request("maps/user/" + str(usernameId) + "/")[1]
 
         if locations['status'] != 'ok':
             raise InstagramException(locations['message'] + "\n")
@@ -1061,16 +1061,24 @@ class Instagram:
 
         return timeline
 
-    def getUserFeed(self, usernameId):
+    def getUserFeed(self, usernameId, maxid=None, minTimestamp=None):
         """
         Get user feed.
         :type usernameId: str
         :param usernameId: Username id
+        :type maxid: str
+        :param maxid: Max Id
+        :type minTimestamp: str
+        :param minTimestamp: Min timestamp
         :rtype: object
         :return: User feed data
+        :raises: InstagramException
         """
-        userFeed = self.request("feed/user/" + usernameId + "/?rank_token=" \
-                                + self.rank_token + "&ranked_content=true&")[1]
+        userFeed = self.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token + "&"\
+                                + (("&max_id="+str(maxid)) if maxid is not None else '')\
+                                + (("&minTimestamp="+str(minTimestamp)) if minTimestamp is not None else '')\
+                                + "&ranked_content=true"
+                                )[1]
 
         if userFeed['status'] != 'ok':
             raise InstagramException(userFeed['message'] + "\n")
@@ -1382,6 +1390,27 @@ class Instagram:
         )
 
         return self.request("friendships/unblock/" + userId + "/", self.generateSignature(data))[1]
+
+    def userFriendship(self, userId):
+        """
+        Show User Friendship.
+
+        :type userId: str
+        :param userId:
+        :rtype: object
+        :return: Friendship relationship data
+        """
+
+        data = json.dumps(
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('user_id', userId),
+                    ('_csrftoken', self.token)
+                ])
+        )
+
+        return self.request("friendships/show/" + userId + "/", self.generateSignature(data))[1]
 
     def getLikedMedia(self):
         """

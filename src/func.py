@@ -14,6 +14,13 @@ def exec2(cmd):
 
 
 def getSeconds(file):
+    """
+    Length of the file in Seconds
+
+    :type file: str
+    :param file: path to the file name
+    :return: length of the file in seconds
+    """
     ffmpeg = checkFFMPEG()
     if ffmpeg:
         time = exec2([ffmpeg, '-i', file, '2>&1', '|', 'grep', 'Duration', '|', 'cut', '-d', '-f', '4'])[1]
@@ -25,6 +32,12 @@ def getSeconds(file):
 
 
 def checkFFMPEG():
+    """
+    Check for ffmpeg/avconv dependencies
+
+    :rtype: str/bool
+    :return: name of the library if present, false otherwise
+    """
     try:
         return_value = exec2(['ffmpeg', '-version', '2>&1'])[0]
         if return_value == 0: return "ffmpeg"
@@ -38,6 +51,14 @@ def checkFFMPEG():
 
 
 def createVideoIcon(file):
+    """
+    Creating a video icon/thumbnail
+
+    :type file: str
+    :param file: path to the file name
+    :rtype: image
+    :return: icon/thumbnail for the video
+    """
     # should install ffmpeg for the method to work successfully
     ffmpeg = checkFFMPEG()
 
@@ -55,6 +76,14 @@ def createVideoIcon(file):
 
 
 def createIconGD(file, size=100, raw=True):
+    """
+    Implements the actual logic behind creating the icon/thumbnail
+
+    :type file: str
+    :param file: path to the file name
+    :rtype: image
+    :return: icon/thumbnail for the video
+    """
     image = Image.open(file)
     width, height = image.size
 

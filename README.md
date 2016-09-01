@@ -1,4 +1,4 @@
-*just a translated Python implementation of this PHP [repository](https://github.com/mgp25/Instagram-php)*
+*just a translated Python implementation of this PHP [repository](https://github.com/mgp25/Instagram-API)*
 
 # ![logo](/examples/assets/instagram.png) Instagram Python [![License](https://poser.pugx.org/mgp25/instagram-php/license)](https://packagist.org/packages/mgp25/instagram-php)
 
@@ -12,7 +12,7 @@ Instagram's private API.
 **Wiki for the PHP code should be 90% applicable too because the code is just translated, not transformed**
 
 **Do you like this project? Support it by donating**
- - To the [PHP](https://github.com/mgp25/Instagram-php) repo
+ - To the [PHP](https://github.com/mgp25/Instagram-API) repo
 
 ----------
 ### Installation
@@ -23,6 +23,12 @@ pip install instagram-python
 ## or from source
 pip install https://github.com/danleyb2/Instagram-API/archive/pip_package.zip
 ```
+
+### Dependencies
+
+`curl`, `gd` and `ffmpeg`
+
+For more info: https://github.com/danleyb2/Instagram-API/wiki/Dependencies
 
 ### Why did i do the API?
 For me,  
@@ -50,4 +56,4 @@ MIT
 This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Instagram or any of its affiliates or subsidiaries. This is an independent and unofficial API. Use at your own risk.
 
 ### Contributing
-**If you have any suggestions,contributions or improvements, (unless it should only be applied on this side) please make them to the php [repo](https://github.com/mgp25/Instagram-php) if you can so i can replicate them to this side**
+**If you have any suggestions,contributions or improvements, (unless it should only be applied on this side) please make them to the php [repo](https://github.com/mgp25/Instagram-API) if you can so i can replicate them to this side**
