@@ -1391,6 +1391,27 @@ class Instagram:
 
         return self.request("friendships/unblock/" + userId + "/", self.generateSignature(data))[1]
 
+    def userFriendship(self, userId):
+        """
+        Show User Friendship.
+
+        :type userId: str
+        :param userId:
+        :rtype: object
+        :return: Friendship relationship data
+        """
+
+        data = json.dumps(
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('user_id', userId),
+                    ('_csrftoken', self.token)
+                ])
+        )
+
+        return self.request("friendships/show/" + userId + "/", self.generateSignature(data))[1]
+
     def getLikedMedia(self):
         """
         Get liked media.
