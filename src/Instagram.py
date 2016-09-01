@@ -601,7 +601,7 @@ class Instagram:
 
     def mediaInfo(self, mediaId):
         """
-        Delete photo or video.
+        Media info
         :type mediaId: str
         :param mediaId: Media id
         :rtype: object
