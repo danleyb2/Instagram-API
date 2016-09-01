@@ -655,7 +655,7 @@ class Instagram:
         )
         return self.request("media/" + mediaId + "/comment/", self.generateSignature(data))[1]
 
-    def deleteComment(self, mediaId, commentId):
+    def deleteComment(self, mediaId, captionText, commentId):
         """
         Delete Comment.
         :type mediaId: str
