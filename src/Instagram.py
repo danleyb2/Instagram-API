@@ -263,7 +263,6 @@ class Instagram:
         resp = buffer.getvalue()
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
         ch.close()
-
         header = resp[0: header_len]
         upload = json.loads(resp[header_len:])
 
@@ -685,6 +684,7 @@ class Instagram:
             print ("Photo not valid")
             return
 
+        photoData = file_get_contents(photo)
         uData = json.dumps(
             OrderedDict([
                 ('_csrftoken', self.token),
@@ -707,7 +707,7 @@ class Instagram:
             OrderedDict([
                 ('type', 'form-data'),
                 ('name', 'profile_pic'),
-                ('data', file_get_contents(photo)),
+                ('data', photoData),
                 ('filename', 'profile_pic'),
                 ('headers', [
                     'Content-type: application/octet-stream',
@@ -737,17 +737,21 @@ class Instagram:
         ch.setopt(pycurl.SSL_VERIFYPEER, False)
         ch.setopt(pycurl.SSL_VERIFYHOST, False)
         ch.setopt(pycurl.HTTPHEADER, headers)
-        ch.setopt(pycurl.COOKIEFILE, self.IGDataPath + "self.username-cookies.dat")
-        ch.setopt(pycurl.COOKIEJAR, self.IGDataPath + "self.username-cookies.dat")
+        ch.setopt(pycurl.COOKIEFILE, self.IGDataPath + self.username + "-cookies.dat")
+        ch.setopt(pycurl.COOKIEJAR, self.IGDataPath + self.username + "-cookies.dat")
         ch.setopt(pycurl.POST, True)
         ch.setopt(pycurl.POSTFIELDS, data)
-        ch.perform()
 
+        ch.perform()
         resp = buffer.getvalue()
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
-        header = resp[:header_len]
-        upload = json.loads(resp[header_len:])
-
+        try:
+            upload = json.loads(resp[header_len:])
+            header = resp[0:header_len]
+        except ValueError:
+            print 'json can\'t be parsed'
+        if self.debug:
+            print 'RESPONSE: ' + resp[header_len:] + "\n"
         ch.close()
 
     def removeProfilePicture(self):
