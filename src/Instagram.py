@@ -1417,14 +1417,15 @@ class Instagram:
 
         return self.request("friendships/show/" + userId + "/", self.generateSignature(data))[1]
 
-    def getLikedMedia(self):
+    def getLikedMedia(self, maxid=None):
         """
         Get liked media.
 
         :rtype: object
         :return: Liked media data
         """
-        return self.request('feed/liked/?')[1]
+        endpoint = 'feed/liked/?'+(('max_id='+str(maxid)+'&') if maxid is not None else '')
+        return self.request(endpoint)[1]
 
     def generateSignature(self, data):
         hash = hmac.new(Constants.IG_SIG_KEY, data, hashlib.sha256).hexdigest()
