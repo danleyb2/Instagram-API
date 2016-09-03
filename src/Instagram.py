@@ -414,7 +414,7 @@ class Instagram:
         for recipient in recipients:
             string.append('"' + recipient + '"')
 
-        recipeint_users = ','.join(string)
+        recipient_users = ','.join(string)
 
         endpoint = Constants.API_URL + 'direct_v2/threads/broadcast/media_share/?media_type=photo'
         boundary = self.uuid
@@ -427,7 +427,7 @@ class Instagram:
             OrderedDict([
                 ('type', 'form-data'),
                 ('name', 'recipient_users'),
-                ('data', "[[" + recimient_users + "]]")  ##todo possible bug
+                ('data', "[[" + recipient_users + "]]")
             ]),
 
             OrderedDict([
