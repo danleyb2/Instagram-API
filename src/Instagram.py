@@ -167,7 +167,7 @@ class Instagram:
 
     def logout(self):
         """
-        Login to Instagram.
+        Logout of Instagram.
 
         :rtype: bool
         :return: Returns true if logged out correctly
