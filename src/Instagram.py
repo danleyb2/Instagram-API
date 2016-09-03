@@ -979,6 +979,7 @@ class Instagram:
         :rtype: object
         :return: query data
         """
+        query = urllib.quote(query)
         query = self.request("fbsearch/topsearch/?context=blended&query=" + query + "&rank_token=" + self.rank_token)[1]
 
         if query['status'] != 'ok':
@@ -1115,6 +1116,7 @@ class Instagram:
         :rtype: object
         :return: Location location data
         """
+        query = urllib.quote(query)
         endpoint = "fbsearch/places/?rank_token=" + self.rank_token + "&query=" + query
 
         locationFeed = self.request(endpoint)[1]
