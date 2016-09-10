@@ -1,10 +1,10 @@
-from src.InstagramRegistration import InstagramRegistration
+import InstagramAPI
 
 # // NOTE: THIS IS A CLI TOOL
 # /// DEBUG MODE ///
 debug = False
 
-r = InstagramRegistration(debug)
+r = InstagramAPI.InstagramRegistration(debug)
 
 print "###########################"
 print "#                         #"

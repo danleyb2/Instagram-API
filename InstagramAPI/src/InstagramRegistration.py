@@ -12,8 +12,8 @@ try:
 except ImportError:
     from io import BytesIO
 
-from src import Constants
-from php import *
+from Constants import Constants
+from Utils import *
 
 
 class InstagramRegistration(object):

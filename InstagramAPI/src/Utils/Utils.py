@@ -4,7 +4,7 @@ from tempfile import mkdtemp
 
 from PIL import Image
 
-from src.php import *
+from php import *
 
 
 def exec2(cmd):
