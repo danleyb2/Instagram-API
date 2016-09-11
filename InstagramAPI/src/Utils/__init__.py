@@ -1,2 +1,2 @@
-from Utils import *
+from Utils import Utils
 from php import *

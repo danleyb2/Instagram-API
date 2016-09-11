@@ -11,6 +11,7 @@ import hashlib
 from collections import OrderedDict
 import os
 from PIL import Image
+
 try:
     from io import BytesIO
 except ImportError:
@@ -20,6 +21,7 @@ from InstagramException import InstagramException
 from Constants import Constants
 
 from Utils import *
+from http import HttpInterface
 
 locale.setlocale(locale.LC_NUMERIC, '')
 
@@ -47,15 +49,18 @@ class Instagram:
         self.isLoggedIn = False  # // Session status
         self.rank_token = None  # // Rank token
         self.IGDataPath = None  # // Data storage path
+        self.http = None
 
         self.debug = debug
         self.device_id = self.generateDeviceId(hashlib.md5(username + password))
+        self.http = HttpInterface(self)
+
         if IGDataPath is not None:
             self.IGDataPath = IGDataPath
         else:
             self.IGDataPath = os.path.join(
-                os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
-                ''
+                    os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
+                    ''
             )
 
         self.setUser(username, password)
@@ -97,7 +102,8 @@ class Instagram:
         :rtype List:
         """
         if (not self.isLoggedIn) or force:
-            fetch = self.request('si/fetch_headers/?challenge_type=signup&guid=' + self.generateUUID(False), None, True)
+            fetch = self.http.request('si/fetch_headers/?challenge_type=signup&guid=' + self.generateUUID(False), None,
+                                      True)
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', fetch[0], re.MULTILINE)
             if match:
                 self.token = match.group(1)
@@ -110,7 +116,7 @@ class Instagram:
                 ('login_attempt_count', 0)
             ])
 
-            login = self.request('accounts/login/', self.generateSignature(json.dumps(data)), True)
+            login = self.http.request('accounts/login/', self.generateSignature(json.dumps(data)), True)
             if login[1]['status'] == 'fail': raise InstagramException(login[1]['message'])
             self.isLoggedIn = True
             self.username_id = str(login[1]['logged_in_user']['pk'])
@@ -137,36 +143,36 @@ class Instagram:
 
     def syncFeatures(self):
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('id', self.username_id),
-                ('_csrftoken', self.token),
-                ('experiments', Constants.EXPERIMENTS)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('id', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('experiments', Constants.EXPERIMENTS)
+                ])
         )
-        return self.request('qe/sync/', self.generateSignature(data))[1]
+        return self.http.request('qe/sync/', self.generateSignature(data))[1]
 
     def autoCompleteUserList(self):
-        return self.request('friendships/autocomplete_user_list/')[1]
+        return self.http.request('friendships/autocomplete_user_list/')[1]
 
     def timelineFeed(self):
-        return self.request('feed/timeline/')[1]
+        return self.http.request('feed/timeline/')[1]
 
     def megaphoneLog(self):
-        return self.request('megaphone/log/')[1]
+        return self.http.request('megaphone/log/')[1]
 
     def expose(self):
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('id', self.username_id),
-                ('_csrftoken', self.token),
-                ('experiment', 'ig_android_profile_contextual_feed')
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('id', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('experiment', 'ig_android_profile_contextual_feed')
+                ])
         )
-        return self.request('qe/expose/', self.generateSignature(data))[1]
+        return self.http.request('qe/expose/', self.generateSignature(data))[1]
 
     def logout(self):
         """
@@ -175,7 +181,7 @@ class Instagram:
         :rtype: bool
         :return: Returns true if logged out correctly
         """
-        logout = self.request('accounts/logout/')
+        logout = self.http.request('accounts/logout/')
         return True if logout == 'ok' else False
 
     def uploadPhoto(self, photo, caption=None, upload_id=None):
@@ -189,225 +195,20 @@ class Instagram:
         :rtype: object
         :return: Upload data
         """
-        endpoint = Constants.API_URL + 'upload/photo/'
-        boundary = self.uuid
-
-        if upload_id is not None:
-            fileToUpload = createVideoIcon(photo)
-        else:
-            upload_id = locale.format("%.*f", (0, round(float('%.2f' % time.time()) * 1000)), grouping=False)
-            fileToUpload = file_get_contents(photo)
-
-        bodies = [
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', 'upload_id'),
-                ('data', upload_id)
-            ]),
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', '_uuid'),
-                ('data', self.uuid)
-            ]),
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', '_csrftoken'),
-                ('data', self.token)
-            ]),
-
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', 'image_compression'),
-                ('data', '{"lib_name":"jt","lib_version":"1.3.0","quality":"70"}')
-            ]),
-
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', 'photo'),
-                ('data', fileToUpload),
-                ('filename', 'pending_media_' + locale.format("%.*f", (0, round(float('%.2f' % time.time()) * 1000)),
-                                                              grouping=False) + '.jpg'),
-                ('headers', [
-                    'Content-Transfer-Encoding: binary',
-                    'Content-type: application/octet-stream',
-                ])
-            ]),
-        ]
-
-        data = self.buildBody(bodies, boundary)
-        headers = [
-            'Connection: close',
-            'Accept: */*',
-            'Content-type: multipart/form-data; boundary=' + boundary,
-            'Content-Length: ' + str(len(data)),
-            'Cookie2: $Version=1',
-            'Accept-Language: en-US',
-            'Accept-Encoding: gzip',
-        ]
-
-        buffer = BytesIO()
-        ch = pycurl.Curl()
-
-        ch.setopt(pycurl.URL, endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
-        ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
-        ch.setopt(pycurl.FOLLOWLOCATION, True)
-        ch.setopt(pycurl.HEADER, True)
-        ch.setopt(pycurl.VERBOSE, self.debug)
-        ch.setopt(pycurl.SSL_VERIFYPEER, False)
-        ch.setopt(pycurl.SSL_VERIFYHOST, False)
-        ch.setopt(pycurl.HTTPHEADER, headers)
-        ch.setopt(pycurl.COOKIEFILE, self.IGDataPath + self.username + "-cookies.dat")
-        ch.setopt(pycurl.COOKIEJAR, self.IGDataPath + self.username + "-cookies.dat")
-        ch.setopt(pycurl.POST, True)
-        ch.setopt(pycurl.POSTFIELDS, data)
-
-        ch.perform()
-        resp = buffer.getvalue()
-        header_len = ch.getinfo(pycurl.HEADER_SIZE)
-        ch.close()
-
-        header = resp[0: header_len]
-        upload = json.loads(resp[header_len:])
-
-        if upload['status'] == 'fail':
-            raise InstagramException(upload['message'])
-
-        if self.debug:
-            print 'RESPONSE: ' + resp[header_len:] + "\n"
-
-        configure = self.configure(upload['upload_id'], photo, caption)
-        self.expose()
-
-        return configure
+        return self.http.uploadPhoto(photo, caption, upload_id)
 
     def uploadVideo(self, video, caption=None):
+        """
+        Upload video to Instagram.
 
-        videoData = file_get_contents(video)
-
-        endpoint = Constants.API_URL + 'upload/video/'
-        boundary = self.uuid
-        upload_id = round(float('%.2f' % time.time()) * 1000)
-        bodies = [
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', 'upload_id'),
-                ('data', upload_id)
-            ]),
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', '_csrftoken'),
-                ('data', self.token)
-            ]),
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', 'media_type'),
-                ('data', 2)
-            ]),
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', '_uuid'),
-                ('data', self.uuid)
-            ]),
-        ]
-
-        data = self.buildBody(bodies, boundary)
-        headers = [
-            'Connection: close',
-            'Accept: */*',
-            'Host: i.instagram.com',
-            'Content-type: multipart/form-data; boundary=' + boundary,
-            'Accept-Language: en-en',
-        ]
-
-        buffer = BytesIO()
-        ch = pycurl.Curl()
-        ch.setopt(pycurl.URL, endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
-        ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
-        ch.setopt(pycurl.FOLLOWLOCATION, True)
-        ch.setopt(pycurl.HEADER, True)
-        ch.setopt(pycurl.VERBOSE, self.debug)
-        ch.setopt(pycurl.SSL_VERIFYPEER, False)
-        ch.setopt(pycurl.SSL_VERIFYHOST, False)
-        ch.setopt(pycurl.HTTPHEADER, headers)
-        ch.setopt(pycurl.COOKIEFILE, self.IGDataPath + self.username + "-cookies.dat")
-        ch.setopt(pycurl.COOKIEJAR, self.IGDataPath + self.username + "-cookies.dat")
-        ch.setopt(pycurl.POST, True)
-        ch.setopt(pycurl.POSTFIELDS, data)
-
-        ch.perform()
-        resp = buffer.getvalue()
-        header_len = ch.getinfo(pycurl.HEADER_SIZE)
-
-        header = resp[0: header_len]
-        body = json.loads(resp[header_len:])
-
-        uploadUrl = body['video_upload_urls'][3]['url']
-        job = body['video_upload_urls'][3]['job']
-
-        request_size = int(math.floor(len(videoData) / 4.0))
-
-        lastRequestExtra = (len(videoData) - (request_size * 4))
-
-        for a in range(4):
-            start = (a * request_size)
-            end = (a + 1) * request_size + (lastRequestExtra if a == 3 else 0)
-
-            headers = [
-                'Connection: keep-alive',
-                'Accept: */*',
-                'Host: upload.instagram.com',
-                'Cookie2: $Version=1',
-                'Accept-Encoding: gzip, deflate',
-                'Content-Type: application/octet-stream',
-                'Session-ID: ' + str(upload_id),
-                'Accept-Language: en-en',
-                'Content-Disposition: attachment; filename="video.mov"',
-                'Content-Length: ' + str(end - start),
-                'Content-Range: ' + 'bytes ' + str(start) + '-' + str(end - 1) + '/' + str(len(videoData)),
-                'job: ' + job,
-            ]
-
-            buffer = BytesIO()
-            ch = pycurl.Curl()
-            ch.setopt(pycurl.URL, uploadUrl)
-            ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
-            ch.setopt(pycurl.CUSTOMREQUEST, 'POST')
-            ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
-            ch.setopt(pycurl.FOLLOWLOCATION, True)
-            ch.setopt(pycurl.HEADER, True)
-            ch.setopt(pycurl.VERBOSE, False)
-            ch.setopt(pycurl.HTTPHEADER, headers)
-            ch.setopt(pycurl.COOKIEFILE, self.IGDataPath + self.username + "-cookies.dat")
-            ch.setopt(pycurl.COOKIEJAR, self.IGDataPath + self.username + "-cookies.dat")
-            ch.setopt(pycurl.POST, True)
-            ch.setopt(pycurl.POSTFIELDS, videoData[start:end])
-
-            ch.perform()
-            result = buffer.getvalue()
-            header_len = ch.getinfo(pycurl.HEADER_SIZE)
-            body = result[header_len:]
-            # array.append([body]) todo fix
-
-        ch.perform()
-        resp = buffer.getvalue()
-        header_len = ch.getinfo(pycurl.HEADER_SIZE)
-        ch.close()
-
-        header = resp[0: header_len]
-        upload = json.loads(resp[header_len:])
-
-        if upload['status'] == 'fail':
-            raise InstagramException(upload['message'])
-
-        if self.debug:
-            print 'RESPONSE: ' + resp[header_len:] + "\n"
-
-        configure = self.configureVideo(upload['upload_id'], video, caption)
-        self.expose()
-
-        return configure[1]
+        :type video: str
+        :param photo: Path to your video
+        :type caption: str
+        :param caption: Caption to be included in your video.
+        :rtype: object
+        :return: Upload data
+        """
+        return self.http.uploadVideo(video, caption)
 
     def direct_share(self, media_id, recipients, text=None):
         if not isinstance(recipients, list):
@@ -491,79 +292,79 @@ class Instagram:
         size = Image.open(video).size[0]
 
         post = json.dumps(
-            OrderedDict([
-                ('upload_id', upload_id),
-                ('source_type', 3),
-                ('poster_frame_index', 0),
-                ('length', 0.00),
-                ('audio_muted', False),
-                ('filter_type', '0'),
-                ('video_result', 'deprecated'),
-                ('clips', OrderedDict([
-                    ('length', getSeconds(video)),
-                    ('source_type', '3'),
-                    ('camera_position', 'back')
-                ])),
-                ('extra', OrderedDict([
-                    ('source_width', 960),
-                    ('source_height', 1280)
-                ])),
+                OrderedDict([
+                    ('upload_id', upload_id),
+                    ('source_type', 3),
+                    ('poster_frame_index', 0),
+                    ('length', 0.00),
+                    ('audio_muted', False),
+                    ('filter_type', '0'),
+                    ('video_result', 'deprecated'),
+                    ('clips', OrderedDict([
+                        ('length', Utils.getSeconds(video)),
+                        ('source_type', '3'),
+                        ('camera_position', 'back')
+                    ])),
+                    ('extra', OrderedDict([
+                        ('source_width', 960),
+                        ('source_height', 1280)
+                    ])),
 
-                ('device', OrderedDict([
-                    ('manufacturer', 'Xiaomi'),
-                    ('model', 'HM 1SW'),
-                    ('android_version', 18),
-                    ('android_release', '4.3')
-                ])),
-                ('_csrftoken', self.token),
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('caption', caption)
+                    ('device', OrderedDict([
+                        ('manufacturer', 'Xiaomi'),
+                        ('model', 'HM 1SW'),
+                        ('android_version', 18),
+                        ('android_release', '4.3')
+                    ])),
+                    ('_csrftoken', self.token),
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('caption', caption)
 
-            ])
+                ])
 
         )
 
         post = post.replace('"length":0', '"length":0.00')
 
-        return self.request('media/configure/?video=1', self.generateSignature(post))[1]
+        return self.http.request('media/configure/?video=1', self.generateSignature(post))[1]
 
     def configure(self, upload_id, photo, caption=''):
 
         size = Image.open(photo).size[0]
 
         post = json.dumps(
-            OrderedDict([
-                ('upload_id', upload_id),
-                ('camera_model', 'HM1S'),
-                ('source_type', 3),
-                ('date_time_original', time.strftime('%Y:%m:%d %H:%M:%S')),
-                ('camera_make', 'XIAOMI'),
-                ('edits', OrderedDict([
-                    ('crop_original_size', [size, size]),
-                    ('crop_zoom', 1.3333334),
-                    ('crop_center', [0.0, -0.0])
-                ])),
-                ('extra', OrderedDict([
-                    ('source_width', size),
-                    ('source_height', size)
-                ])),
+                OrderedDict([
+                    ('upload_id', upload_id),
+                    ('camera_model', 'HM1S'),
+                    ('source_type', 3),
+                    ('date_time_original', time.strftime('%Y:%m:%d %H:%M:%S')),
+                    ('camera_make', 'XIAOMI'),
+                    ('edits', OrderedDict([
+                        ('crop_original_size', [size, size]),
+                        ('crop_zoom', 1.3333334),
+                        ('crop_center', [0.0, -0.0])
+                    ])),
+                    ('extra', OrderedDict([
+                        ('source_width', size),
+                        ('source_height', size)
+                    ])),
 
-                ('device', OrderedDict([
-                    ('manufacturer', 'Xiaomi'),
-                    ('model', 'HM 1SW'),
-                    ('android_version', 18),
-                    ('android_release', '4.3')
-                ])),
-                ('_csrftoken', self.token),
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('caption', caption)
+                    ('device', OrderedDict([
+                        ('manufacturer', 'Xiaomi'),
+                        ('model', 'HM 1SW'),
+                        ('android_version', 18),
+                        ('android_release', '4.3')
+                    ])),
+                    ('_csrftoken', self.token),
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('caption', caption)
 
-            ])
+                ])
         )
         post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]')
-        return self.request('media/configure/', self.generateSignature(post))[1]
+        return self.http.request('media/configure/', self.generateSignature(post))[1]
 
     def editMedia(self, mediaId, captionText=''):
         """
@@ -576,14 +377,14 @@ class Instagram:
         :return: edit media data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('caption_text', captionText)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('caption_text', captionText)
+                ])
         )
-        return self.request("media/" + mediaId + "/edit_media/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/edit_media/", self.generateSignature(data))[1]
 
     def removeSelftag(self, mediaId):
         """
@@ -594,13 +395,13 @@ class Instagram:
         :return: edit media data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token)
+                ])
         )
-        return self.request("usertags/" + mediaId + "/remove/", self.generateSignature(data))[1]
+        return self.http.request("usertags/" + mediaId + "/remove/", self.generateSignature(data))[1]
 
     def mediaInfo(self, mediaId):
         """
@@ -611,14 +412,14 @@ class Instagram:
         :return: delete request data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('media_id', mediaId)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('media_id', mediaId)
+                ])
         )
-        return self.request("media/" + mediaId + "/info/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/info/", self.generateSignature(data))[1]
 
     def deleteMedia(self, mediaId):
         """
@@ -629,14 +430,14 @@ class Instagram:
         :return: delete request data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('media_id', mediaId)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('media_id', mediaId)
+                ])
         )
-        return self.request("media/" + mediaId + "/delete/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/delete/", self.generateSignature(data))[1]
 
     def comment(self, mediaId, commentText):
         """
@@ -649,14 +450,14 @@ class Instagram:
         :return: comment media data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('comment_text', commentText)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('comment_text', commentText)
+                ])
         )
-        return self.request("media/" + mediaId + "/comment/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/comment/", self.generateSignature(data))[1]
 
     def deleteComment(self, mediaId, captionText, commentId):
         """
@@ -669,14 +470,16 @@ class Instagram:
         :return: Delete comment data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('caption_text', captionText)  # BUG!!!
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('caption_text', captionText)  # BUG!!!
+                ])
         )
-        return self.request("media/" + mediaId + "/comment/" + commentId + "/delete/", self.generateSignature(data))[1]
+        return \
+            self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/", self.generateSignature(data))[
+                1]
 
     def changeProfilePicture(self, photo):
         """
@@ -684,74 +487,7 @@ class Instagram:
         :type photo: str
         :param photo: Path to photo
         """
-        if photo is None:
-            print ("Photo not valid")
-            return
-
-        uData = json.dumps(
-            OrderedDict([
-                ('_csrftoken', self.token),
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id)
-            ])
-        )
-        endpoint = Constants.API_URL + 'accounts/change_profile_picture/'
-        boundary = self.uuid
-        bodies = [
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', 'ig_sig_key_version'),
-                ('data', Constants.SIG_KEY_VERSION)
-            ]),
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', 'signed_body'),
-                ('data', hmac.new(Constants.IG_SIG_KEY, uData, hashlib.sha256).hexdigest() + uData)]),
-            OrderedDict([
-                ('type', 'form-data'),
-                ('name', 'profile_pic'),
-                ('data', file_get_contents(photo)),
-                ('filename', 'profile_pic'),
-                ('headers', [
-                    'Content-type: application/octet-stream',
-                    'Content-Transfer-Encoding: binary',
-                ])
-            ]),
-        ]
-
-        data = self.buildBody(bodies, boundary)
-        headers = [
-            'Proxy-Connection: keep-alive',
-            'Connection: keep-alive',
-            'Accept: */*',
-            'Content-type: multipart/form-data; boundary=' + boundary,
-            'Accept-Language: en-en',
-            'Accept-Encoding: gzip, deflate',
-        ]
-
-        buffer = BytesIO()
-        ch = pycurl.Curl()
-        ch.setopt(pycurl.URL, endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
-        ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
-        ch.setopt(pycurl.FOLLOWLOCATION, True)
-        ch.setopt(pycurl.HEADER, True)
-        ch.setopt(pycurl.VERBOSE, self.debug)
-        ch.setopt(pycurl.SSL_VERIFYPEER, False)
-        ch.setopt(pycurl.SSL_VERIFYHOST, False)
-        ch.setopt(pycurl.HTTPHEADER, headers)
-        ch.setopt(pycurl.COOKIEFILE, self.IGDataPath + "self.username-cookies.dat")
-        ch.setopt(pycurl.COOKIEJAR, self.IGDataPath + "self.username-cookies.dat")
-        ch.setopt(pycurl.POST, True)
-        ch.setopt(pycurl.POSTFIELDS, data)
-        ch.perform()
-
-        resp = buffer.getvalue()
-        header_len = ch.getinfo(pycurl.HEADER_SIZE)
-        header = resp[:header_len]
-        upload = json.loads(resp[header_len:])
-
-        ch.close()
+        self.http.changeProfilePicture(photo)
 
     def removeProfilePicture(self):
         """
@@ -760,9 +496,9 @@ class Instagram:
         :return: status request data
         """
         data = json.dumps(
-            OrderedDict([('_uuid', self.uuid), ('_uid', self.username_id), ('_csrftoken', self.token)])
+                OrderedDict([('_uuid', self.uuid), ('_uid', self.username_id), ('_csrftoken', self.token)])
         )
-        return self.request('accounts/remove_profile_picture/', self.generateSignature(data))[1]
+        return self.http.request('accounts/remove_profile_picture/', self.generateSignature(data))[1]
 
     def setPrivateAccount(self):
         """
@@ -772,13 +508,13 @@ class Instagram:
         :return: status request data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token)
+                ])
         )
-        return self.request('accounts/set_private/', self.generateSignature(data))[1]
+        return self.http.request('accounts/set_private/', self.generateSignature(data))[1]
 
     def setPublicAccount(self):
         """
@@ -787,13 +523,13 @@ class Instagram:
         :return: status request data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token)
+                ])
         )
-        return self.request('accounts/set_public/', self.generateSignature(data))[1]
+        return self.http.request('accounts/set_public/', self.generateSignature(data))[1]
 
     def getProfileData(self):
         """
@@ -802,13 +538,13 @@ class Instagram:
         :return:
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token)
+                ])
         )
-        return self.request('accounts/current_user/?edit=true', self.generateSignature(data))[1]
+        return self.http.request('accounts/current_user/?edit=true', self.generateSignature(data))[1]
 
     def editProfile(self, url, phone, first_name, biography, email, gender):
         """
@@ -827,21 +563,21 @@ class Instagram:
         :return: edit profile data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('external_url', url),
-                ('phone_number', phone),
-                ('username', self.username),
-                ('first_name', first_name),
-                ('biography', biography),
-                ('email', email),
-                ('gender', gender)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('external_url', url),
+                    ('phone_number', phone),
+                    ('username', self.username),
+                    ('first_name', first_name),
+                    ('biography', biography),
+                    ('email', email),
+                    ('gender', gender)
+                ])
         )
 
-        return self.request('accounts/edit_profile/', self.generateSignature(data))[1]
+        return self.http.request('accounts/edit_profile/', self.generateSignature(data))[1]
 
     def getUsernameInfo(self, usernameId):
         """
@@ -850,7 +586,7 @@ class Instagram:
         :rtype: object
         :return: Username data
         """
-        return self.request("users/" + str(usernameId) + "/info/")[1]
+        return self.http.request("users/" + str(usernameId) + "/info/")[1]
 
     def getSelfUsernameInfo(self):
         """
@@ -866,7 +602,7 @@ class Instagram:
         :rtype: object
         :return: Recent activity data
         """
-        activity = self.request('news/inbox/?')[1]
+        activity = self.http.request('news/inbox/?')[1]
 
         if activity['status'] != 'ok':
             raise InstagramException(activity['message'] + "\n")
@@ -880,7 +616,7 @@ class Instagram:
         :rtype: object
         :return: Recent activity data of follows
         """
-        activity = self.request('news/?')[1]
+        activity = self.http.request('news/?')[1]
         if activity['status'] != 'ok':
             raise InstagramException(activity['message'] + "\n")
 
@@ -892,7 +628,7 @@ class Instagram:
         :rtype: object
         :return: v2 inbox data
         """
-        inbox = self.request('direct_v2/inbox/?')[1]
+        inbox = self.http.request('direct_v2/inbox/?')[1]
 
         if inbox['status'] != 'ok':
             raise InstagramException(inbox['message'] + "\n")
@@ -907,8 +643,8 @@ class Instagram:
         :rtype: object
         :return: user tags data
         """
-        tags = self.request("usertags/" + str(usernameId) + "/feed/?rank_token=" + self.rank_token
-                            + "&ranked_content=true&")[1]
+        tags = self.http.request("usertags/" + str(usernameId) + "/feed/?rank_token=" + self.rank_token
+                                 + "&ranked_content=true&")[1]
         if tags['status'] != 'ok':
             raise InstagramException(tags['message'] + "\n")
 
@@ -930,7 +666,7 @@ class Instagram:
         :rtype: object
         :return:
         """
-        userFeed = self.request("feed/tag/" + tag + "/?rank_token=" + self.rank_token + "&ranked_content=true&")[1]
+        userFeed = self.http.request("feed/tag/" + tag + "/?rank_token=" + self.rank_token + "&ranked_content=true&")[1]
 
         if userFeed['status'] != 'ok':
             raise InstagramException(userFeed['message'] + "\n")
@@ -945,7 +681,7 @@ class Instagram:
         :rtype: object
         :return:
         """
-        likers = self.request("media/" + mediaId + "/likers/?")[1]
+        likers = self.http.request("media/" + mediaId + "/likers/?")[1]
         if likers['status'] != 'ok':
             raise InstagramException(likers['message'] + "\n")
 
@@ -959,7 +695,7 @@ class Instagram:
         :rtype: object
         :return: Geo Media data
         """
-        locations = self.request("maps/user/" + str(usernameId) + "/")[1]
+        locations = self.http.request("maps/user/" + str(usernameId) + "/")[1]
 
         if locations['status'] != 'ok':
             raise InstagramException(locations['message'] + "\n")
@@ -983,7 +719,9 @@ class Instagram:
         :return: query data
         """
         query = urllib.quote(query)
-        query = self.request("fbsearch/topsearch/?context=blended&query=" + query + "&rank_token=" + self.rank_token)[1]
+        query = \
+            self.http.request("fbsearch/topsearch/?context=blended&query=" + query + "&rank_token=" + self.rank_token)[
+                1]
 
         if query['status'] != 'ok':
             raise InstagramException(query['message'] + "\n")
@@ -998,9 +736,9 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = self.request(
-            'users/search/?ig_sig_key_version=' + Constants.SIG_KEY_VERSION \
-            + "&is_typeahead=true&query=" + query + "&rank_token=" + self.rank_token)[1]
+        query = self.http.request(
+                'users/search/?ig_sig_key_version=' + Constants.SIG_KEY_VERSION \
+                + "&is_typeahead=true&query=" + query + "&rank_token=" + self.rank_token)[1]
 
         if query['status'] != 'ok':
             raise InstagramException(query['message'] + "\n")
@@ -1017,7 +755,7 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = self.request("users/" + usernameName + "/usernameinfo/")[1]
+        query = self.http.request("users/" + usernameName + "/usernameinfo/")[1]
 
         if query['status'] != 'ok':
             raise InstagramException(query['message'] + "\n")
@@ -1033,9 +771,9 @@ class Instagram:
         :return:
         """
         data = OrderedDict([(
-            ('contacts', json.dumps(contacts))
+            ('contacts=', json.dumps(contacts))
         )])
-        return self.request('address_book/link/?include=extra_display_name,thumbnails', data)[1]
+        return self.http.request('address_book/link/?include=extra_display_name,thumbnails', data)[1]
 
     def searchTags(self, query):
         """
@@ -1045,7 +783,7 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = self.request("tags/search/?is_typeahead=true&q=" + query + "&rank_token=" + self.rank_token)[1]
+        query = self.http.request("tags/search/?is_typeahead=true&q=" + query + "&rank_token=" + self.rank_token)[1]
 
         if query['status'] != 'ok':
             raise InstagramException(query['message'] + "\n")
@@ -1058,10 +796,10 @@ class Instagram:
         :rtype: object
         :return: timeline data
         """
-        timeline = self.request(
-                "feed/timeline/?rank_token=" + self.rank_token + "&ranked_content=true"
-                + (("&max_id=" + str(maxid)) if maxid is not None else '')
-            )[1]
+        timeline = self.http.request(
+                "feed/timeline/?rank_token=" + self.rank_token + "&ranked_content=true" +
+                (("&max_id=" + str(maxid)) if maxid is not None else '')
+        )[1]
 
         if timeline['status'] != 'ok':
             raise InstagramException(timeline['message'] + "\n")
@@ -1081,11 +819,11 @@ class Instagram:
         :return: User feed data
         :raises: InstagramException
         """
-        userFeed = self.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
-                                + (("&max_id="+str(maxid)) if maxid is not None else '')\
-                                + (("&minTimestamp="+str(minTimestamp)) if minTimestamp is not None else '')\
-                                + "&ranked_content=true"
-                                )[1]
+        userFeed = self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
+                                     + (("&max_id=" + str(maxid)) if maxid is not None else '') \
+                                     + (("&minTimestamp=" + str(minTimestamp)) if minTimestamp is not None else '') \
+                                     + "&ranked_content=true"
+                                     )[1]
 
         if userFeed['status'] != 'ok':
             raise InstagramException(userFeed['message'] + "\n")
@@ -1105,7 +843,7 @@ class Instagram:
         else:
             endpoint = "feed/tag/" + hashtagString + "/?max_id=" \
                        + maxid + "&rank_token=" + self.rank_token + "&ranked_content=true&"
-        hashtagFeed = self.request(endpoint)[1]
+        hashtagFeed = self.http.request(endpoint)[1]
         if hashtagFeed['status'] != 'ok':
             raise InstagramException(hashtagFeed['message'] + "\n")
 
@@ -1122,7 +860,7 @@ class Instagram:
         query = urllib.quote(query)
         endpoint = "fbsearch/places/?rank_token=" + self.rank_token + "&query=" + query
 
-        locationFeed = self.request(endpoint)[1]
+        locationFeed = self.http.request(endpoint)[1]
 
         if locationFeed['status'] != 'ok':
             raise InstagramException(locationFeed['message'] + "\n")
@@ -1143,7 +881,7 @@ class Instagram:
             endpoint = "feed/location/" + locationId + "/?max_id=" \
                        + maxid + "&rank_token=" + self.rank_token + "&ranked_content=true&"
 
-        locationFeed = self.request(endpoint)[1]
+        locationFeed = self.http.request(endpoint)[1]
 
         if locationFeed['status'] != 'ok':
             raise InstagramException(locationFeed['message'] + "\n")
@@ -1164,8 +902,8 @@ class Instagram:
         :rtype: object
         :return: popular feed data
         """
-        popularFeed = self.request("feed/popular/?people_teaser_supported=1&rank_token=" \
-                                   + self.rank_token + "&ranked_content=true&")[1]
+        popularFeed = self.http.request("feed/popular/?people_teaser_supported=1&rank_token=" \
+                                        + self.rank_token + "&ranked_content=true&")[1]
 
         if popularFeed['status'] != 'ok':
             raise InstagramException(popularFeed['message'] + "\n")
@@ -1181,9 +919,9 @@ class Instagram:
         :rtype: object
         :return: followers data
         """
-        return self.request(
-            "friendships/" + usernameId + "/following/?max_id=" + maxid + "&ig_sig_key_version=" \
-            + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
+        return self.http.request(
+                "friendships/" + usernameId + "/following/?max_id=" + maxid + "&ig_sig_key_version=" \
+                + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
 
     def getUserFollowers(self, usernameId, maxid=''):
         """
@@ -1194,9 +932,9 @@ class Instagram:
         :rtype: object
         :return: followers data
         """
-        return self.request(
-            "friendships/" + usernameId + "/followers/?max_id=" + maxid \
-            + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
+        return self.http.request(
+                "friendships/" + usernameId + "/followers/?max_id=" + maxid \
+                + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
 
     def getSelfUserFollowers(self):
         """
@@ -1214,8 +952,8 @@ class Instagram:
         :rtype: object
         :return: users we are following data
         """
-        return self.request('friendships/following/?ig_sig_key_version=' \
-                            + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
+        return self.http.request('friendships/following/?ig_sig_key_version=' \
+                                 + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
 
     def like(self, mediaId):
         """
@@ -1227,14 +965,14 @@ class Instagram:
         :return: status request
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('media_id', mediaId)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('media_id', mediaId)
+                ])
         )
-        return self.request("media/" + mediaId + "/like/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/like/", self.generateSignature(data))[1]
 
     def unlike(self, mediaId):
         """
@@ -1246,14 +984,14 @@ class Instagram:
         :return: status request
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('media_id', mediaId)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('media_id', mediaId)
+                ])
         )
-        return self.request("media/" + mediaId + "/unlike/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/unlike/", self.generateSignature(data))[1]
 
     def getMediaComments(self, mediaId):
         """
@@ -1263,7 +1001,7 @@ class Instagram:
         :rtype: object
         :return: Media comments data
         """
-        return self.request("media/" + mediaId + "/comments/?")[1]
+        return self.http.request("media/" + mediaId + "/comments/?")[1]
 
     def setNameAndPhone(self, name='', phone=''):
         """
@@ -1276,16 +1014,16 @@ class Instagram:
         :return: Set status data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('first_name', name),
-                ('phone_number', phone),
-                ('_csrftoken', self.token)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('first_name', name),
+                    ('phone_number', phone),
+                    ('_csrftoken', self.token)
+                ])
         )
 
-        return self.request("accounts/set_phone_and_name/", self.generateSignature(data))[1]
+        return self.http.request("accounts/set_phone_and_name/", self.generateSignature(data))[1]
 
     def getDirectShare(self):
         """
@@ -1294,7 +1032,7 @@ class Instagram:
         :rtype: object
         :return: Direct share data
         """
-        return self.request('direct_share/inbox/?')[1]
+        return self.http.request('direct_share/inbox/?')[1]
 
     def backup(self):
         """
@@ -1306,8 +1044,8 @@ class Instagram:
             if os.path.isdir(dir_name):
                 os.mkdir(dir_name)
             file_put_contents(
-                os.path.join(dir_name, item['id'] + '.jpg'),
-                urllib.urlopen(item['image_versions2']['candidates'][0]['url']).read()
+                    os.path.join(dir_name, item['id'] + '.jpg'),
+                    urllib.urlopen(item['image_versions2']['candidates'][0]['url']).read()
             )  # todo test and remove below
 
             # urllib.urlretrieve(
@@ -1326,16 +1064,16 @@ class Instagram:
         """
 
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('user_id', userId),
-                ('_csrftoken', self.token)
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('user_id', userId),
+                    ('_csrftoken', self.token)
 
-            ])
+                ])
         )
 
-        return self.request("friendships/create/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/create/" + userId + "/", self.generateSignature(data))[1]
 
     def unfollow(self, userId):
         """
@@ -1347,15 +1085,15 @@ class Instagram:
         :return: Friendship status data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('user_id', userId),
-                ('_csrftoken', self.token)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('user_id', userId),
+                    ('_csrftoken', self.token)
+                ])
         )
 
-        return self.request("friendships/destroy/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/destroy/" + userId + "/", self.generateSignature(data))[1]
 
     def block(self, userId):
         """
@@ -1368,15 +1106,15 @@ class Instagram:
         """
 
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('user_id', userId),
-                ('_csrftoken', self.token)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('user_id', userId),
+                    ('_csrftoken', self.token)
+                ])
         )
 
-        return self.request("friendships/block/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/block/" + userId + "/", self.generateSignature(data))[1]
 
     def unblock(self, userId):
         """
@@ -1389,15 +1127,15 @@ class Instagram:
         """
 
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('user_id', userId),
-                ('_csrftoken', self.token)
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('user_id', userId),
+                    ('_csrftoken', self.token)
+                ])
         )
 
-        return self.request("friendships/unblock/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/unblock/" + userId + "/", self.generateSignature(data))[1]
 
     def userFriendship(self, userId):
         """
@@ -1418,7 +1156,7 @@ class Instagram:
                 ])
         )
 
-        return self.request("friendships/show/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/show/" + userId + "/", self.generateSignature(data))[1]
 
     def getLikedMedia(self, maxid=None):
         """
@@ -1427,8 +1165,8 @@ class Instagram:
         :rtype: object
         :return: Liked media data
         """
-        endpoint = 'feed/liked/?'+(('max_id='+str(maxid)+'&') if maxid is not None else '')
-        return self.request(endpoint)[1]
+        endpoint = 'feed/liked/?' + (('max_id=' + str(maxid) + '&') if maxid is not None else '')
+        return self.http.request(endpoint)[1]
 
     def generateSignature(self, data):
         hash = hmac.new(Constants.IG_SIG_KEY, data, hashlib.sha256).hexdigest()
@@ -1452,68 +1190,3 @@ class Instagram:
         )
 
         return uuid if type else uuid.replace('-', '')
-
-    def buildBody(self, bodies, boundary):
-        body = ''
-        for b in bodies:
-            body += ('--' + boundary + "\r\n")
-            body += ('Content-Disposition: ' + b['type'] + '; name="' + b['name'] + '"')
-            if 'filename' in b:
-                ext = os.path.splitext(b['filename'])[1][1:]
-                body += ('; filename="' + 'pending_media_' + locale.format("%.*f", (
-                    0, round(float('%.2f' % time.time()) * 1000)), grouping=False) + '.' + ext + '"')
-            if 'headers' in b and isinstance(b['headers'], list):
-                for header in b['headers']:
-                    body += ("\r\n" + header)
-            body += ("\r\n\r\n" + b['data'] + "\r\n")
-        body += ('--' + boundary + '--')
-
-        return body
-
-    def request(self, endpoint, post=None, login=False):
-        buffer = BytesIO()
-        if (not self.isLoggedIn) and not login:
-            raise InstagramException("Not logged in\n")
-
-        headers = [
-            'Connection: close',
-            'Accept: */*',
-            'Content-type: application/x-www-form-urlencoded; charset=UTF-8',
-            'Cookie2: $Version=1',
-            'Accept-Language: en-US'
-        ]
-
-        ch = pycurl.Curl()
-
-        ch.setopt(pycurl.URL, Constants.API_URL + endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
-        ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
-        ch.setopt(pycurl.FOLLOWLOCATION, True)
-        ch.setopt(pycurl.HEADER, True)
-        ch.setopt(pycurl.HTTPHEADER, headers)
-        ch.setopt(pycurl.VERBOSE, False)
-        ch.setopt(pycurl.SSL_VERIFYPEER, False)
-        ch.setopt(pycurl.SSL_VERIFYHOST, False)
-        ch.setopt(pycurl.COOKIEFILE, self.IGDataPath + self.username + '-cookies.dat')
-        ch.setopt(pycurl.COOKIEJAR, self.IGDataPath + self.username + '-cookies.dat')
-
-        if post:
-            ch.setopt(pycurl.POST, True)
-            ch.setopt(pycurl.POSTFIELDS, post)
-
-        ch.perform()
-        resp = buffer.getvalue()
-        header_len = ch.getinfo(pycurl.HEADER_SIZE)
-        header = resp[0: header_len]
-        body = resp[header_len:]
-        ch.close()
-
-        if self.debug:
-            import urllib
-            print "REQUEST: " + endpoint
-            if post is not None:
-                if not isinstance(post, list):
-                    print 'DATA: ' + urllib.unquote_plus(post)
-            print "RESPONSE: " + body + "\n"
-
-        return [header, json.loads(body)]
