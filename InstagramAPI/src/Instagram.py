@@ -1,4 +1,3 @@
-import hmac
 import json
 import locale
 import pycurl
@@ -17,11 +16,12 @@ try:
 except ImportError:
     from StringIO import StringIO as BytesIO
 
-from InstagramException import InstagramException
-from Constants import Constants
-
 from Utils import *
 from http import HttpInterface
+
+from InstagramException import InstagramException
+from Constants import Constants
+from SignatureUtils import SignatureUtils
 
 locale.setlocale(locale.LC_NUMERIC, '')
 
@@ -52,7 +52,7 @@ class Instagram:
         self.http = None
 
         self.debug = debug
-        self.device_id = self.generateDeviceId(hashlib.md5(username + password))
+        self.device_id = SignatureUtils.generateDeviceId(hashlib.md5(username + password))
         self.http = HttpInterface(self)
 
         if IGDataPath is not None:
@@ -78,7 +78,7 @@ class Instagram:
         self.username = username
         self.password = password
 
-        self.uuid = self.generateUUID(True)
+        self.uuid = SignatureUtils.generateUUID(True)
 
         if os.path.isfile(self.IGDataPath + self.username + '-cookies.dat') and \
                 os.path.isfile(self.IGDataPath + self.username + '-userId.dat') and \
@@ -102,7 +102,7 @@ class Instagram:
         :rtype List:
         """
         if (not self.isLoggedIn) or force:
-            fetch = self.http.request('si/fetch_headers/?challenge_type=signup&guid=' + self.generateUUID(False), None,
+            fetch = self.http.request('si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None,
                                       True)
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', fetch[0], re.MULTILINE)
             if match:
@@ -116,7 +116,7 @@ class Instagram:
                 ('login_attempt_count', 0)
             ])
 
-            login = self.http.request('accounts/login/', self.generateSignature(json.dumps(data)), True)
+            login = self.http.request('accounts/login/', SignatureUtils.generateSignature(json.dumps(data)), True)
             if login[1]['status'] == 'fail': raise InstagramException(login[1]['message'])
             self.isLoggedIn = True
             self.username_id = str(login[1]['logged_in_user']['pk'])
@@ -151,7 +151,7 @@ class Instagram:
                     ('experiments', Constants.EXPERIMENTS)
                 ])
         )
-        return self.http.request('qe/sync/', self.generateSignature(data))[1]
+        return self.http.request('qe/sync/', SignatureUtils.generateSignature(data))[1]
 
     def autoCompleteUserList(self):
         return self.http.request('friendships/autocomplete_user_list/')[1]
@@ -172,7 +172,7 @@ class Instagram:
                     ('experiment', 'ig_android_profile_contextual_feed')
                 ])
         )
-        return self.http.request('qe/expose/', self.generateSignature(data))[1]
+        return self.http.request('qe/expose/', SignatureUtils.generateSignature(data))[1]
 
     def logout(self):
         """
@@ -327,7 +327,7 @@ class Instagram:
 
         post = post.replace('"length":0', '"length":0.00')
 
-        return self.http.request('media/configure/?video=1', self.generateSignature(post))[1]
+        return self.http.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1]
 
     def configure(self, upload_id, photo, caption=''):
 
@@ -364,7 +364,7 @@ class Instagram:
                 ])
         )
         post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]')
-        return self.http.request('media/configure/', self.generateSignature(post))[1]
+        return self.http.request('media/configure/', SignatureUtils.generateSignature(post))[1]
 
     def editMedia(self, mediaId, captionText=''):
         """
@@ -384,7 +384,7 @@ class Instagram:
                     ('caption_text', captionText)
                 ])
         )
-        return self.http.request("media/" + mediaId + "/edit_media/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/edit_media/", SignatureUtils.generateSignature(data))[1]
 
     def removeSelftag(self, mediaId):
         """
@@ -401,7 +401,7 @@ class Instagram:
                     ('_csrftoken', self.token)
                 ])
         )
-        return self.http.request("usertags/" + mediaId + "/remove/", self.generateSignature(data))[1]
+        return self.http.request("usertags/" + mediaId + "/remove/", SignatureUtils.generateSignature(data))[1]
 
     def mediaInfo(self, mediaId):
         """
@@ -419,7 +419,7 @@ class Instagram:
                     ('media_id', mediaId)
                 ])
         )
-        return self.http.request("media/" + mediaId + "/info/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/info/", SignatureUtils.generateSignature(data))[1]
 
     def deleteMedia(self, mediaId):
         """
@@ -437,7 +437,7 @@ class Instagram:
                     ('media_id', mediaId)
                 ])
         )
-        return self.http.request("media/" + mediaId + "/delete/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/delete/", SignatureUtils.generateSignature(data))[1]
 
     def comment(self, mediaId, commentText):
         """
@@ -457,7 +457,7 @@ class Instagram:
                     ('comment_text', commentText)
                 ])
         )
-        return self.http.request("media/" + mediaId + "/comment/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/comment/", SignatureUtils.generateSignature(data))[1]
 
     def deleteComment(self, mediaId, captionText, commentId):
         """
@@ -478,7 +478,7 @@ class Instagram:
                 ])
         )
         return \
-            self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/", self.generateSignature(data))[
+            self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/", SignatureUtils.generateSignature(data))[
                 1]
 
     def changeProfilePicture(self, photo):
@@ -498,7 +498,7 @@ class Instagram:
         data = json.dumps(
                 OrderedDict([('_uuid', self.uuid), ('_uid', self.username_id), ('_csrftoken', self.token)])
         )
-        return self.http.request('accounts/remove_profile_picture/', self.generateSignature(data))[1]
+        return self.http.request('accounts/remove_profile_picture/', SignatureUtils.generateSignature(data))[1]
 
     def setPrivateAccount(self):
         """
@@ -514,7 +514,7 @@ class Instagram:
                     ('_csrftoken', self.token)
                 ])
         )
-        return self.http.request('accounts/set_private/', self.generateSignature(data))[1]
+        return self.http.request('accounts/set_private/', SignatureUtils.generateSignature(data))[1]
 
     def setPublicAccount(self):
         """
@@ -529,7 +529,7 @@ class Instagram:
                     ('_csrftoken', self.token)
                 ])
         )
-        return self.http.request('accounts/set_public/', self.generateSignature(data))[1]
+        return self.http.request('accounts/set_public/', SignatureUtils.generateSignature(data))[1]
 
     def getProfileData(self):
         """
@@ -544,7 +544,7 @@ class Instagram:
                     ('_csrftoken', self.token)
                 ])
         )
-        return self.http.request('accounts/current_user/?edit=true', self.generateSignature(data))[1]
+        return self.http.request('accounts/current_user/?edit=true', SignatureUtils.generateSignature(data))[1]
 
     def editProfile(self, url, phone, first_name, biography, email, gender):
         """
@@ -577,7 +577,7 @@ class Instagram:
                 ])
         )
 
-        return self.http.request('accounts/edit_profile/', self.generateSignature(data))[1]
+        return self.http.request('accounts/edit_profile/', SignatureUtils.generateSignature(data))[1]
 
     def getUsernameInfo(self, usernameId):
         """
@@ -972,7 +972,7 @@ class Instagram:
                     ('media_id', mediaId)
                 ])
         )
-        return self.http.request("media/" + mediaId + "/like/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/like/", SignatureUtils.generateSignature(data))[1]
 
     def unlike(self, mediaId):
         """
@@ -991,7 +991,7 @@ class Instagram:
                     ('media_id', mediaId)
                 ])
         )
-        return self.http.request("media/" + mediaId + "/unlike/", self.generateSignature(data))[1]
+        return self.http.request("media/" + mediaId + "/unlike/", SignatureUtils.generateSignature(data))[1]
 
     def getMediaComments(self, mediaId):
         """
@@ -1023,7 +1023,7 @@ class Instagram:
                 ])
         )
 
-        return self.http.request("accounts/set_phone_and_name/", self.generateSignature(data))[1]
+        return self.http.request("accounts/set_phone_and_name/", SignatureUtils.generateSignature(data))[1]
 
     def getDirectShare(self):
         """
@@ -1073,7 +1073,7 @@ class Instagram:
                 ])
         )
 
-        return self.http.request("friendships/create/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/create/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def unfollow(self, userId):
         """
@@ -1093,7 +1093,7 @@ class Instagram:
                 ])
         )
 
-        return self.http.request("friendships/destroy/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/destroy/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def block(self, userId):
         """
@@ -1114,7 +1114,7 @@ class Instagram:
                 ])
         )
 
-        return self.http.request("friendships/block/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/block/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def unblock(self, userId):
         """
@@ -1135,7 +1135,7 @@ class Instagram:
                 ])
         )
 
-        return self.http.request("friendships/unblock/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/unblock/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def userFriendship(self, userId):
         """
@@ -1156,7 +1156,7 @@ class Instagram:
                 ])
         )
 
-        return self.http.request("friendships/show/" + userId + "/", self.generateSignature(data))[1]
+        return self.http.request("friendships/show/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def getLikedMedia(self, maxid=None):
         """
@@ -1168,25 +1168,3 @@ class Instagram:
         endpoint = 'feed/liked/?' + (('max_id=' + str(maxid) + '&') if maxid is not None else '')
         return self.http.request(endpoint)[1]
 
-    def generateSignature(self, data):
-        hash = hmac.new(Constants.IG_SIG_KEY, data, hashlib.sha256).hexdigest()
-
-        return 'ig_sig_key_version=' + Constants.SIG_KEY_VERSION + \
-               '&signed_body=' + hash + '.' + urllib.quote_plus(data)
-
-    def generateDeviceId(self, seed):
-        # // Neutralize username/password -> device correlation
-        volatile_seed = '%d' % os.stat(os.path.dirname(os.path.realpath(__file__))).st_mtime
-
-        return 'android-' + str(hashlib.md5(str(seed) + str(volatile_seed)))[16:]
-
-    def generateUUID(self, type):
-        uuid = '%04x%04x-%04x-%04x-%04x-%04x%04x%04x' % (
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0x0fff) | 0x4000,
-            mt_rand(0, 0x3fff) | 0x8000,
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-        )
-
-        return uuid if type else uuid.replace('-', '')

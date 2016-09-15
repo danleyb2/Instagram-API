@@ -1,2 +1,2 @@
-from Utils import Utils
+from Utils.Utils import *
 from php import *
