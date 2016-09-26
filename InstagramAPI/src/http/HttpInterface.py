@@ -1,11 +1,9 @@
-import pycurl
+import hmac
 import json
 import locale
 import math
+import pycurl
 import time
-import hmac
-import os
-import hashlib
 from collections import OrderedDict
 
 try:
@@ -13,10 +11,8 @@ try:
 except ImportError:
     from StringIO import StringIO as BytesIO
 
-
 from InstagramAPI.src.InstagramException import InstagramException
 from InstagramAPI.src.Constants import Constants
-
 
 from InstagramAPI.src.Utils import *
 
@@ -24,6 +20,7 @@ from InstagramAPI.src.Utils import *
 class HttpInterface:
     def __init__(self, parent):
         self.parent = parent
+        self.userAgent = self.parent.settings.get('user_agent')
 
     def request(self, endpoint, post=None, login=False):
         buffer = BytesIO()
@@ -41,7 +38,7 @@ class HttpInterface:
         ch = pycurl.Curl()
 
         ch.setopt(pycurl.URL, Constants.API_URL + endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
+        ch.setopt(pycurl.USERAGENT, self.userAgent)
         ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)
@@ -144,7 +141,7 @@ class HttpInterface:
         ch = pycurl.Curl()
 
         ch.setopt(pycurl.URL, endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
+        ch.setopt(pycurl.USERAGENT, self.userAgent)
         ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)
@@ -218,7 +215,7 @@ class HttpInterface:
         buffer = BytesIO()
         ch = pycurl.Curl()
         ch.setopt(pycurl.URL, endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
+        ch.setopt(pycurl.USERAGENT, self.userAgent)
         ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)
@@ -267,7 +264,7 @@ class HttpInterface:
             buffer = BytesIO()
             ch = pycurl.Curl()
             ch.setopt(pycurl.URL, uploadUrl)
-            ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
+            ch.setopt(pycurl.USERAGENT, self.userAgent)
             ch.setopt(pycurl.CUSTOMREQUEST, 'POST')
             ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
             ch.setopt(pycurl.FOLLOWLOCATION, True)
@@ -358,7 +355,7 @@ class HttpInterface:
         buffer = BytesIO()
         ch = pycurl.Curl()
         ch.setopt(pycurl.URL, endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
+        ch.setopt(pycurl.USERAGENT, self.userAgent)
         ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)
@@ -435,7 +432,7 @@ class HttpInterface:
         buffer = BytesIO()
         ch = pycurl.Curl()
         ch.setopt(pycurl.URL, endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
+        ch.setopt(pycurl.USERAGENT, self.userAgent)
         ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)

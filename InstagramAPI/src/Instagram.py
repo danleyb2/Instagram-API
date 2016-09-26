@@ -3,13 +3,9 @@ import locale
 import pycurl
 import re
 import time
-import math
 import urllib
-import hashlib
 
 from collections import OrderedDict
-import os
-from PIL import Image
 
 try:
     from io import BytesIO
@@ -17,7 +13,7 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 from Utils import *
-from http import HttpInterface
+from http import HttpInterface, UserAgent
 
 from InstagramException import InstagramException
 from Constants import Constants
@@ -50,18 +46,30 @@ class Instagram:
         self.rank_token = None  # // Rank token
         self.IGDataPath = None  # // Data storage path
         self.http = None
+        self.settings = None
 
         self.debug = debug
         self.device_id = SignatureUtils.generateDeviceId(hashlib.md5(username + password))
-        self.http = HttpInterface(self)
 
         if IGDataPath is not None:
             self.IGDataPath = IGDataPath
         else:
             self.IGDataPath = os.path.join(
                     os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
+                    username,
                     ''
             )
+            if not os.path.isdir(IGDataPath):
+                os.mkdir(self.IGDataPath, 0777)
+
+        self.settings = Settings(
+                os.path.join(self.IGDataPath, 'settings-' + username + '.dat')
+        )
+        if self.settings.get('user_agent') is None:
+            userAgent = UserAgent()
+            ua = userAgent.buildUserAgent()
+            self.settings.set('user_agent', ua)
+        self.http = HttpInterface(self)
 
         self.setUser(username, password)
 
@@ -81,16 +89,12 @@ class Instagram:
         self.uuid = SignatureUtils.generateUUID(True)
 
         if os.path.isfile(self.IGDataPath + self.username + '-cookies.dat') and \
-                os.path.isfile(self.IGDataPath + self.username + '-userId.dat') and \
-                os.path.isfile(self.IGDataPath + self.username + '-token.dat'):
+                (self.settings.get('username_id') != None) and \
+                (self.settings.get('token') != None):
             self.isLoggedIn = True
-            with open(self.IGDataPath + self.username + '-userId.dat', 'r') as userIdFile:
-                self.username_id = userIdFile.read().strip()
-
+            self.username_id = self.settings.get('username_id')
             self.rank_token = self.username_id + '_' + self.uuid
-
-            with open(self.IGDataPath + self.username + '-token.dat') as tokenFile:
-                self.token = tokenFile.read().strip()
+            self.token = self.settings.get('token')
 
     def login(self, force=False):
         """
@@ -102,8 +106,9 @@ class Instagram:
         :rtype List:
         """
         if (not self.isLoggedIn) or force:
-            fetch = self.http.request('si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None,
-                                      True)
+            fetch = self.http.request(
+                    'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None,
+                    True)
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', fetch[0], re.MULTILINE)
             if match:
                 self.token = match.group(1)
@@ -120,11 +125,11 @@ class Instagram:
             if login[1]['status'] == 'fail': raise InstagramException(login[1]['message'])
             self.isLoggedIn = True
             self.username_id = str(login[1]['logged_in_user']['pk'])
-            file_put_contents(self.IGDataPath + self.username + '-userId.dat', self.username_id)
+            self.settings.set('username_id', self.username_id)
             self.rank_token = self.username_id + '_' + self.uuid
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', login[0], re.MULTILINE)
             if match: self.token = match.group(1)
-            file_put_contents(self.IGDataPath + self.username + '-token.dat', self.token)
+            self.settings.set('token', self.token)
 
             self.syncFeatures()
             self.autoCompleteUserList()
@@ -478,7 +483,8 @@ class Instagram:
                 ])
         )
         return \
-            self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/", SignatureUtils.generateSignature(data))[
+            self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/",
+                              SignatureUtils.generateSignature(data))[
                 1]
 
     def changeProfilePicture(self, photo):
@@ -1167,4 +1173,3 @@ class Instagram:
         """
         endpoint = 'feed/liked/?' + (('max_id=' + str(maxid) + '&') if maxid is not None else '')
         return self.http.request(endpoint)[1]
-
