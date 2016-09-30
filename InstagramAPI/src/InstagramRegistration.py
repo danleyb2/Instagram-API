@@ -23,6 +23,7 @@ class InstagramRegistration(object):
         self.IGDataPath = None
         self.username = None
         self.uuid = None
+        self.userAgent = None
 
         self.username = ''
         self.debug = debug
@@ -35,6 +36,8 @@ class InstagramRegistration(object):
                 os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
                 ''
             )
+
+        self.userAgent = 'Instagram '+Constants.VERSION+' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)'
 
     def checkUsername(self, username):
         """
@@ -118,7 +121,7 @@ class InstagramRegistration(object):
 
         ch = pycurl.Curl()
         ch.setopt(pycurl.URL, Constants.API_URL + endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
+        ch.setopt(pycurl.USERAGENT, self.userAgent)
         ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)

@@ -1,3 +1,4 @@
+from InstagramAPI import Constants
 from Utils import *
 
 
@@ -16,5 +17,5 @@ class UserAgent:
 
     def buildUserAgent(self):
         deviceData = self.getDeviceData()
-        return 'Instagram 8.5.1 Android (18/4.3; 320dpi; 720x1280; %s; %s; %s; qcom; en_US)' % (
-        deviceData[0], deviceData[1], deviceData[2])
+        return 'Instagram %s Android (18/4.3; 320dpi; 720x1280; %s; %s; %s; qcom; en_US)' % (
+            Constants.VERSION, deviceData[0], deviceData[1], deviceData[2])
