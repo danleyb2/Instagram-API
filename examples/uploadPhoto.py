@@ -6,8 +6,8 @@ username = ''
 password = ''
 debug = False
 
-photo = ''      # path to the photo
-caption = ''    # caption
+photo = ''  # path to the photo
+caption = ''  # caption
 # //////////////////////
 
 i = InstagramAPI.Instagram(username, password, debug)

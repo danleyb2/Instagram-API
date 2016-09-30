@@ -1,8 +1,7 @@
 import hmac
-from Constants import Constants
-import hashlib
 import urllib
-import os
+
+from Constants import Constants
 from Utils import *
 
 

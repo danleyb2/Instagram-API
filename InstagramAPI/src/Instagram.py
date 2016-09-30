@@ -66,7 +66,7 @@ class Instagram:
                 os.path.join(self.IGDataPath, 'settings-' + username + '.dat')
         )
         if self.settings.get('version') is None:
-            self.settings.set('version',Constants.VERSION)
+            self.settings.set('version', Constants.VERSION)
 
         if (self.settings.get('user_agent') is None) or (int(self.settings.get('version')) < int(Constants.VERSION)):
             userAgent = UserAgent()
