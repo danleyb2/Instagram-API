@@ -13,7 +13,8 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 from Utils import *
-from http import HttpInterface, UserAgent
+from http import HttpInterface, UserAgent, Response
+from http.Response import *
 
 from InstagramException import InstagramException
 from Constants import Constants
@@ -126,9 +127,12 @@ class Instagram:
             ])
 
             login = self.http.request('accounts/login/', SignatureUtils.generateSignature(json.dumps(data)), True)
-            if login[1]['status'] == 'fail': raise InstagramException(login[1]['message'])
+            response = LoginResponse(login[1])
+
+            if not response.isOk(): raise InstagramException(response.getMessage())
+
             self.isLoggedIn = True
-            self.username_id = str(login[1]['logged_in_user']['pk'])
+            self.username_id = response.getUsernameId()
             self.settings.set('username_id', self.username_id)
             self.rank_token = self.username_id + '_' + self.uuid
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', login[0], re.MULTILINE)
@@ -141,7 +145,7 @@ class Instagram:
             self.getv2Inbox()
             self.getRecentActivity()
 
-            return login[1]
+            return response
 
         check = self.timelineFeed()
 
