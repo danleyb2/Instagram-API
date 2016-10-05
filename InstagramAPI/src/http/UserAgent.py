@@ -1,18 +1,18 @@
-from InstagramAPI import Constants
-from Utils import *
+from InstagramAPI.src import Constants
+from InstagramAPI.src.Utils import *
 
 
 class UserAgent:
     def getDeviceData(self):
         csvfile = os.path.join(
-                os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data')
+                os.path.join(os.path.dirname(os.path.realpath(__file__)), 'devices.csv')
         )
         line_of_text = []
         with open(csvfile, 'rb') as file_handle:
-            for line in file_handle.readline().strip():
-                line_of_text.append(line)
-
-        deviceData = (line_of_text[mt_rand(0, 11867)][0]).split(';')
+            for line in file_handle.readlines():
+                line_of_text.append(line.strip())
+        #todo doesn't look like original
+        deviceData = (line_of_text[mt_rand(0, 11867)]).split(';')
         return deviceData
 
     def buildUserAgent(self):

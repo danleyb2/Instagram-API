@@ -1,4 +1,4 @@
-from . import Response
+from Response import Response
 
 
 class LoginResponse(Response):

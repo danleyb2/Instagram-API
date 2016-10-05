@@ -6,6 +6,7 @@ import time
 import urllib
 
 from collections import OrderedDict
+from distutils.version import LooseVersion
 
 try:
     from io import BytesIO
@@ -60,7 +61,7 @@ class Instagram:
                     username,
                     ''
             )
-            if not os.path.isdir(IGDataPath):
+            if not os.path.isdir(self.IGDataPath):
                 os.mkdir(self.IGDataPath, 0777)
 
         self.settings = Settings(
@@ -69,7 +70,7 @@ class Instagram:
         if self.settings.get('version') is None:
             self.settings.set('version', Constants.VERSION)
 
-        if (self.settings.get('user_agent') is None) or (int(self.settings.get('version')) < int(Constants.VERSION)):
+        if (self.settings.get('user_agent') is None) or (LooseVersion(self.settings.get('version')) < LooseVersion(Constants.VERSION)):
             userAgent = UserAgent()
             ua = userAgent.buildUserAgent()
             self.settings.set('user_agent', ua)
