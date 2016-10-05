@@ -1,4 +1,4 @@
-*Please go through the [contribution guidelines](https://github.com/danleyb2/Instagram-API/blob/master/.github/CONTRIBUTING.md)*
+*Please go through the [contribution guidelines](https://github.com/danleyb2/Instagram-API/blob/master/.github/CONTRIBUTING.md)*,  
 *just a translated Python implementation of this PHP [repository](https://github.com/mgp25/Instagram-API)*
 
 # ![logo](/examples/assets/instagram.png) Instagram Python [![License](https://poser.pugx.org/mgp25/instagram-php/license)](https://packagist.org/packages/mgp25/instagram-php)
