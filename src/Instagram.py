@@ -131,6 +131,19 @@ class Instagram:
             self.login(True)
         self.getv2Inbox()
         self.getRecentActivity()
+     
+   def changePassword(self, oldPassword, newPassword):
+    data = json.dumps(
+        OrderedDict([
+            ('_uuid', self.uuid),
+            ('_uid', self.username_id),
+            ('_csrftoken', self.token),
+            ('old_password', oldPassword),
+            ('new_password1', newPassword),
+            ('new_password2', newPassword)
+        ])
+    )
+    return self.request('accounts/change_password/', self.generateSignature(data))[1]
 
     def syncFeatures(self):
         data = json.dumps(
