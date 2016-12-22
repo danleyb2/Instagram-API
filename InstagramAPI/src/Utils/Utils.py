@@ -70,7 +70,7 @@ class Utils:
             # capture video preview
             command = [ffmpeg, '-i', file, '-f', 'mjpeg', '-ss', '00:00:01', '-vframes', '1', preview, '2>&1']
             exec_php(command)
-            return Utils.createIconGD(preview)
+            return file_get_contents(preview)
 
     @staticmethod
     def createIconGD(file, size=100, raw=True):
