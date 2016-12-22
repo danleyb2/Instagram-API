@@ -1,7 +1,7 @@
 from Response import Response
 
-class UploadPhotoResponse(Response):
 
+class UploadPhotoResponse(Response):
     def __init__(self, response):
 
         self.upload_id = None

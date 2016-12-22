@@ -1,7 +1,7 @@
 from Response import Response
 
-class ConfigureVideoResponse(Response):
 
+class ConfigureVideoResponse(Response):
     def __init__(self, response):
         self.upload_id = None
         self.media_id = None

@@ -2,7 +2,6 @@ from Response import Response
 
 
 class LoginResponse(Response):
-
     def __init__(self, response):
 
         self.username = None

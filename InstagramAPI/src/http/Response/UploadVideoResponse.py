@@ -2,7 +2,6 @@ from Response import Response
 
 
 class UploadVideoResponse(Response):
-
     def __init__(self, response):
         self.upload_id = None
 

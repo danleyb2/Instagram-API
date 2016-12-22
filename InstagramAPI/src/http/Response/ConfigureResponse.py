@@ -2,7 +2,6 @@ from Response import Response
 
 
 class ConfigureResponse(Response):
-
     def __init__(self, response):
         self.upload_id = None
         self.media_id = None

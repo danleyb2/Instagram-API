@@ -1,7 +1,7 @@
 from Response import Response
 
-class UploadJobVideoResponse(Response):
 
+class UploadJobVideoResponse(Response):
     def __init__(self, response):
         self.upload_id = None
         self.video_upload_urls = None

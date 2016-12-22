@@ -2,7 +2,6 @@ from User import User
 
 
 class Comment(object):
-
     def __init__(self, commentData):
         self.username_id = None
         self.comment = None
