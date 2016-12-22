@@ -1,12 +1,12 @@
 import json
-import locale
 import pycurl
-import re
 import time
 import urllib
-
 from collections import OrderedDict
 from distutils.version import LooseVersion
+
+import locale
+import re
 
 try:
     from io import BytesIO
@@ -14,7 +14,7 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 from Utils import *
-from http import HttpInterface, UserAgent, Response
+from http import HttpInterface, UserAgent
 from http.Response import *
 
 from InstagramException import InstagramException
@@ -57,22 +57,24 @@ class Instagram:
             self.IGDataPath = IGDataPath
         else:
             self.IGDataPath = os.path.join(
-                    os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
-                    username,
-                    ''
+                os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
+                username,
+                ''
             )
             if not os.path.isdir(self.IGDataPath):
                 os.mkdir(self.IGDataPath, 0777)
 
         self.settings = Settings(
-                os.path.join(self.IGDataPath, 'settings-' + username + '.dat')
+            os.path.join(self.IGDataPath, 'settings-' + username + '.dat')
         )
         if self.settings.get('version') is None:
             self.settings.set('version', Constants.VERSION)
 
-        if (self.settings.get('user_agent') is None) or (LooseVersion(self.settings.get('version')) < LooseVersion(Constants.VERSION)):
-            userAgent = UserAgent()
+        if (self.settings.get('user_agent') is None) or (
+            LooseVersion(self.settings.get('version')) < LooseVersion(Constants.VERSION)):
+            userAgent = UserAgent(self)
             ua = userAgent.buildUserAgent()
+            self.settings.set('version', Constants.VERSION)
             self.settings.set('user_agent', ua)
 
         self.http = HttpInterface(self)
@@ -113,8 +115,8 @@ class Instagram:
         """
         if (not self.isLoggedIn) or force:
             fetch = self.http.request(
-                    'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None,
-                    True)
+                'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None,
+                True)
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', fetch[0], re.MULTILINE)
             if match:
                 self.token = match.group(1)
@@ -157,13 +159,13 @@ class Instagram:
 
     def syncFeatures(self):
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('id', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('experiments', Constants.EXPERIMENTS)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('id', self.username_id),
+                ('_csrftoken', self.token),
+                ('experiments', Constants.EXPERIMENTS)
+            ])
         )
         return self.http.request('qe/sync/', SignatureUtils.generateSignature(data))[1]
 
@@ -178,13 +180,13 @@ class Instagram:
 
     def expose(self):
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('id', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('experiment', 'ig_android_profile_contextual_feed')
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('id', self.username_id),
+                ('_csrftoken', self.token),
+                ('experiment', 'ig_android_profile_contextual_feed')
+            ])
         )
         return self.http.request('qe/expose/', SignatureUtils.generateSignature(data))[1]
 
@@ -306,79 +308,81 @@ class Instagram:
         size = Image.open(video).size[0]
 
         post = json.dumps(
-                OrderedDict([
-                    ('upload_id', upload_id),
-                    ('source_type', 3),
-                    ('poster_frame_index', 0),
-                    ('length', 0.00),
-                    ('audio_muted', False),
-                    ('filter_type', '0'),
-                    ('video_result', 'deprecated'),
-                    ('clips', OrderedDict([
-                        ('length', Utils.getSeconds(video)),
-                        ('source_type', '3'),
-                        ('camera_position', 'back')
-                    ])),
-                    ('extra', OrderedDict([
-                        ('source_width', 960),
-                        ('source_height', 1280)
-                    ])),
+            OrderedDict([
+                ('upload_id', upload_id),
+                ('source_type', 3),
+                ('poster_frame_index', 0),
+                ('length', 0.00),
+                ('audio_muted', False),
+                ('filter_type', '0'),
+                ('video_result', 'deprecated'),
+                ('clips', OrderedDict([
+                    ('length', Utils.getSeconds(video)),
+                    ('source_type', '3'),
+                    ('camera_position', 'back')
+                ])),
+                ('extra', OrderedDict([
+                    ('source_width', 960),
+                    ('source_height', 1280)
+                ])),
 
-                    ('device', OrderedDict([
-                        ('manufacturer', 'Xiaomi'),
-                        ('model', 'HM 1SW'),
-                        ('android_version', 18),
-                        ('android_release', '4.3')
-                    ])),
-                    ('_csrftoken', self.token),
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('caption', caption)
+                ('device', OrderedDict([
+                    ('manufacturer', self.settings.get('manufacturer')),
+                    ('model', self.settings.get('model')),
+                    ('android_version', Constants.ANDROID_VERSION),
+                    ('android_release', Constants.ANDROID_RELEASE)
+                ])),
+                ('_csrftoken', self.token),
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('caption', caption)
 
-                ])
+            ])
 
         )
 
         post = post.replace('"length":0', '"length":0.00')
 
-        return self.http.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1]
+        return ConfigureVideoResponse(
+            self.http.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1])
 
     def configure(self, upload_id, photo, caption=''):
 
         size = Image.open(photo).size[0]
 
         post = json.dumps(
-                OrderedDict([
-                    ('upload_id', upload_id),
-                    ('camera_model', 'HM1S'),
-                    ('source_type', 3),
-                    ('date_time_original', time.strftime('%Y:%m:%d %H:%M:%S')),
-                    ('camera_make', 'XIAOMI'),
-                    ('edits', OrderedDict([
-                        ('crop_original_size', [size, size]),
-                        ('crop_zoom', 1.3333334),
-                        ('crop_center', [0.0, -0.0])
-                    ])),
-                    ('extra', OrderedDict([
-                        ('source_width', size),
-                        ('source_height', size)
-                    ])),
+            OrderedDict([
+                ('upload_id', upload_id),
+                ('camera_model', self.settings.get('model').replace(" ", "")),
+                ('source_type', 3),
+                ('date_time_original', time.strftime('%Y:%m:%d %H:%M:%S')),
+                ('camera_make', self.settings.get('manufacturer')),
+                ('edits', OrderedDict([
+                    ('crop_original_size', [size, size]),
+                    ('crop_zoom', 1.3333334),
+                    ('crop_center', [0.0, -0.0])
+                ])),
+                ('extra', OrderedDict([
+                    ('source_width', size),
+                    ('source_height', size)
+                ])),
 
-                    ('device', OrderedDict([
-                        ('manufacturer', 'Xiaomi'),
-                        ('model', 'HM 1SW'),
-                        ('android_version', 18),
-                        ('android_release', '4.3')
-                    ])),
-                    ('_csrftoken', self.token),
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('caption', caption)
+                ('device', OrderedDict([
+                    ('manufacturer', self.settings.get('manufacturer')),
+                    ('model', self.settings.get('model')),
+                    ('android_version', Constants.ANDROID_VERSION),
+                    ('android_release', Constants.ANDROID_RELEASE)
+                ])),
+                ('_csrftoken', self.token),
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('caption', caption)
 
-                ])
+            ])
         )
         post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]')
-        return self.http.request('media/configure/', SignatureUtils.generateSignature(post))[1]
+
+        return ConfigureResponse(self.http.request('media/configure/', SignatureUtils.generateSignature(post))[1])
 
     def editMedia(self, mediaId, captionText=''):
         """
@@ -391,12 +395,12 @@ class Instagram:
         :return: edit media data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('caption_text', captionText)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('caption_text', captionText)
+            ])
         )
         return self.http.request("media/" + mediaId + "/edit_media/", SignatureUtils.generateSignature(data))[1]
 
@@ -409,11 +413,11 @@ class Instagram:
         :return: edit media data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token)
+            ])
         )
         return self.http.request("usertags/" + mediaId + "/remove/", SignatureUtils.generateSignature(data))[1]
 
@@ -426,14 +430,15 @@ class Instagram:
         :return: delete request data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('media_id', mediaId)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('media_id', mediaId)
+            ])
         )
-        return self.http.request("media/" + mediaId + "/info/", SignatureUtils.generateSignature(data))[1]
+        return MediaInfoResponse(
+            self.http.request("media/" + mediaId + "/info/", SignatureUtils.generateSignature(data))[1])
 
     def deleteMedia(self, mediaId):
         """
@@ -444,12 +449,12 @@ class Instagram:
         :return: delete request data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('media_id', mediaId)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('media_id', mediaId)
+            ])
         )
         return self.http.request("media/" + mediaId + "/delete/", SignatureUtils.generateSignature(data))[1]
 
@@ -464,12 +469,12 @@ class Instagram:
         :return: comment media data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('comment_text', commentText)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('comment_text', commentText)
+            ])
         )
         return self.http.request("media/" + mediaId + "/comment/", SignatureUtils.generateSignature(data))[1]
 
@@ -484,12 +489,12 @@ class Instagram:
         :return: Delete comment data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('caption_text', captionText)  # BUG!!!
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('caption_text', captionText)  # BUG!!!
+            ])
         )
         return \
             self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/",
@@ -511,7 +516,7 @@ class Instagram:
         :return: status request data
         """
         data = json.dumps(
-                OrderedDict([('_uuid', self.uuid), ('_uid', self.username_id), ('_csrftoken', self.token)])
+            OrderedDict([('_uuid', self.uuid), ('_uid', self.username_id), ('_csrftoken', self.token)])
         )
         return self.http.request('accounts/remove_profile_picture/', SignatureUtils.generateSignature(data))[1]
 
@@ -523,11 +528,11 @@ class Instagram:
         :return: status request data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token)
+            ])
         )
         return self.http.request('accounts/set_private/', SignatureUtils.generateSignature(data))[1]
 
@@ -538,11 +543,11 @@ class Instagram:
         :return: status request data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token)
+            ])
         )
         return self.http.request('accounts/set_public/', SignatureUtils.generateSignature(data))[1]
 
@@ -553,11 +558,11 @@ class Instagram:
         :return:
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token)
+            ])
         )
         return self.http.request('accounts/current_user/?edit=true', SignatureUtils.generateSignature(data))[1]
 
@@ -578,18 +583,18 @@ class Instagram:
         :return: edit profile data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('external_url', url),
-                    ('phone_number', phone),
-                    ('username', self.username),
-                    ('first_name', first_name),
-                    ('biography', biography),
-                    ('email', email),
-                    ('gender', gender)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('external_url', url),
+                ('phone_number', phone),
+                ('username', self.username),
+                ('first_name', first_name),
+                ('biography', biography),
+                ('email', email),
+                ('gender', gender)
+            ])
         )
 
         return self.http.request('accounts/edit_profile/', SignatureUtils.generateSignature(data))[1]
@@ -752,8 +757,8 @@ class Instagram:
         :return: query data
         """
         query = self.http.request(
-                'users/search/?ig_sig_key_version=' + Constants.SIG_KEY_VERSION \
-                + "&is_typeahead=true&query=" + query + "&rank_token=" + self.rank_token)[1]
+            'users/search/?ig_sig_key_version=' + Constants.SIG_KEY_VERSION \
+            + "&is_typeahead=true&query=" + query + "&rank_token=" + self.rank_token)[1]
 
         if query['status'] != 'ok':
             raise InstagramException(query['message'] + "\n")
@@ -812,8 +817,8 @@ class Instagram:
         :return: timeline data
         """
         timeline = self.http.request(
-                "feed/timeline/?rank_token=" + self.rank_token + "&ranked_content=true" +
-                (("&max_id=" + str(maxid)) if maxid is not None else '')
+            "feed/timeline/?rank_token=" + self.rank_token + "&ranked_content=true" +
+            (("&max_id=" + str(maxid)) if maxid is not None else '')
         )[1]
 
         if timeline['status'] != 'ok':
@@ -935,8 +940,8 @@ class Instagram:
         :return: followers data
         """
         return self.http.request(
-                "friendships/" + usernameId + "/following/?max_id=" + maxid + "&ig_sig_key_version=" \
-                + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
+            "friendships/" + usernameId + "/following/?max_id=" + maxid + "&ig_sig_key_version=" \
+            + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
 
     def getUserFollowers(self, usernameId, maxid=''):
         """
@@ -948,8 +953,8 @@ class Instagram:
         :return: followers data
         """
         return self.http.request(
-                "friendships/" + usernameId + "/followers/?max_id=" + maxid \
-                + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
+            "friendships/" + usernameId + "/followers/?max_id=" + maxid \
+            + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
 
     def getSelfUserFollowers(self):
         """
@@ -980,12 +985,12 @@ class Instagram:
         :return: status request
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('media_id', mediaId)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('media_id', mediaId)
+            ])
         )
         return self.http.request("media/" + mediaId + "/like/", SignatureUtils.generateSignature(data))[1]
 
@@ -999,12 +1004,12 @@ class Instagram:
         :return: status request
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('media_id', mediaId)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('media_id', mediaId)
+            ])
         )
         return self.http.request("media/" + mediaId + "/unlike/", SignatureUtils.generateSignature(data))[1]
 
@@ -1029,13 +1034,13 @@ class Instagram:
         :return: Set status data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('first_name', name),
-                    ('phone_number', phone),
-                    ('_csrftoken', self.token)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('first_name', name),
+                ('phone_number', phone),
+                ('_csrftoken', self.token)
+            ])
         )
 
         return self.http.request("accounts/set_phone_and_name/", SignatureUtils.generateSignature(data))[1]
@@ -1059,8 +1064,8 @@ class Instagram:
             if os.path.isdir(dir_name):
                 os.mkdir(dir_name)
             file_put_contents(
-                    os.path.join(dir_name, item['id'] + '.jpg'),
-                    urllib.urlopen(item['image_versions2']['candidates'][0]['url']).read()
+                os.path.join(dir_name, item['id'] + '.jpg'),
+                urllib.urlopen(item['image_versions2']['candidates'][0]['url']).read()
             )  # todo test and remove below
 
             # urllib.urlretrieve(
@@ -1079,13 +1084,13 @@ class Instagram:
         """
 
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('user_id', userId),
-                    ('_csrftoken', self.token)
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('user_id', userId),
+                ('_csrftoken', self.token)
 
-                ])
+            ])
         )
 
         return self.http.request("friendships/create/" + userId + "/", SignatureUtils.generateSignature(data))[1]
@@ -1100,12 +1105,12 @@ class Instagram:
         :return: Friendship status data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('user_id', userId),
-                    ('_csrftoken', self.token)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('user_id', userId),
+                ('_csrftoken', self.token)
+            ])
         )
 
         return self.http.request("friendships/destroy/" + userId + "/", SignatureUtils.generateSignature(data))[1]
@@ -1121,12 +1126,12 @@ class Instagram:
         """
 
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('user_id', userId),
-                    ('_csrftoken', self.token)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('user_id', userId),
+                ('_csrftoken', self.token)
+            ])
         )
 
         return self.http.request("friendships/block/" + userId + "/", SignatureUtils.generateSignature(data))[1]
@@ -1142,12 +1147,12 @@ class Instagram:
         """
 
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('user_id', userId),
-                    ('_csrftoken', self.token)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('user_id', userId),
+                ('_csrftoken', self.token)
+            ])
         )
 
         return self.http.request("friendships/unblock/" + userId + "/", SignatureUtils.generateSignature(data))[1]
@@ -1163,12 +1168,12 @@ class Instagram:
         """
 
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('user_id', userId),
-                    ('_csrftoken', self.token)
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('user_id', userId),
+                ('_csrftoken', self.token)
+            ])
         )
 
         return self.http.request("friendships/show/" + userId + "/", SignatureUtils.generateSignature(data))[1]

@@ -2,9 +2,7 @@ from Response import Response
 
 
 class LoginResponse(Response):
-
     def __init__(self, response):
-        super(LoginResponse, self).__init__()
 
         self.username = None
         self.has_anonymous_profile_picture = None

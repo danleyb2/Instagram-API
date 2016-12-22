@@ -14,7 +14,7 @@ i = InstagramAPI.Instagram(username, password, debug)
 
 try:
     i.login()
-except InstagramException as e:
+except Exception as e:
     e.message
     exit()
 

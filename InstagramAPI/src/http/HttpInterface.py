@@ -1,10 +1,11 @@
 import hmac
 import json
-import locale
 import math
 import pycurl
 import time
 from collections import OrderedDict
+
+import locale
 
 try:
     from io import BytesIO
@@ -15,6 +16,7 @@ from InstagramAPI.src.InstagramException import InstagramException
 from InstagramAPI.src.Constants import Constants
 
 from InstagramAPI.src.Utils import *
+from InstagramAPI.src.http.Response import *
 
 
 class HttpInterface:
@@ -157,18 +159,19 @@ class HttpInterface:
         ch.perform()
         resp = buffer.getvalue()
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
-        ch.close()
 
         header = resp[0: header_len]
-        upload = json.loads(resp[header_len:])
+        upload = UploadPhotoResponse(json.loads(resp[header_len:]))
 
-        if upload['status'] == 'fail':
-            raise InstagramException(upload['message'])
+        ch.close()
+
+        if not upload.isOk():
+            raise InstagramException(upload.getMessage())
 
         if self.parent.debug:
             print 'RESPONSE: ' + resp[header_len:] + "\n"
 
-        configure = self.parent.configure(upload['upload_id'], photo, caption)
+        configure = self.parent.configure(upload.getUploadId(), photo, caption)
         self.parent.expose()
 
         return configure
@@ -233,10 +236,10 @@ class HttpInterface:
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
 
         header = resp[0: header_len]
-        body = json.loads(resp[header_len:])
+        body = UploadJobVideoResponse(json.loads(resp[header_len:]))
 
-        uploadUrl = body['video_upload_urls'][3]['url']
-        job = body['video_upload_urls'][3]['job']
+        uploadUrl = body.getVideoUploadUrl()
+        job = body.getVideoUploadJob()
 
         request_size = int(math.floor(len(videoData) / 4.0))
 
@@ -285,13 +288,11 @@ class HttpInterface:
         ch.perform()
         resp = buffer.getvalue()
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
-        ch.close()
 
         header = resp[0: header_len]
-        upload = json.loads(resp[header_len:])
+        upload = UploadVideoResponse(json.loads(resp[header_len:]))
 
-        if upload['status'] == 'fail':
-            raise InstagramException(upload['message'])
+        ch.close()
 
         if self.parent.debug:
             print 'RESPONSE: ' + resp[header_len:] + "\n"
@@ -312,11 +313,11 @@ class HttpInterface:
             return
 
         uData = json.dumps(
-                OrderedDict([
-                    ('_csrftoken', self.parent.token),
-                    ('_uuid', self.parent.uuid),
-                    ('_uid', self.parent.username_id)
-                ])
+            OrderedDict([
+                ('_csrftoken', self.parent.token),
+                ('_uuid', self.parent.uuid),
+                ('_uid', self.parent.username_id)
+            ])
         )
         endpoint = Constants.API_URL + 'accounts/change_profile_picture/'
         boundary = self.parent.uuid

@@ -2,9 +2,8 @@ class Response(object):
     STATUS_OK = "ok"
     STATUS_FAIL = "fail"
 
-    def __init__(self):
-        self.status = None
-        self.message = None
+    status = None
+    message = None
 
     def setStatus(self, status):
         self.status = status
