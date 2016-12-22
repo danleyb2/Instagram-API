@@ -71,7 +71,7 @@ class Instagram:
             self.settings.set('version', Constants.VERSION)
 
         if (self.settings.get('user_agent') is None) or (LooseVersion(self.settings.get('version')) < LooseVersion(Constants.VERSION)):
-            userAgent = UserAgent()
+            userAgent = UserAgent(self)
             ua = userAgent.buildUserAgent()
             self.settings.set('user_agent', ua)
 
@@ -325,10 +325,10 @@ class Instagram:
                     ])),
 
                     ('device', OrderedDict([
-                        ('manufacturer', 'Xiaomi'),
-                        ('model', 'HM 1SW'),
-                        ('android_version', 18),
-                        ('android_release', '4.3')
+                        ('manufacturer', self.settings.get('manufacturer')),
+                        ('model', self.settings.get('model')),
+                        ('android_version', Constants.ANDROID_VERSION),
+                        ('android_release', Constants.ANDROID_RELEASE)
                     ])),
                     ('_csrftoken', self.token),
                     ('_uuid', self.uuid),
@@ -350,10 +350,10 @@ class Instagram:
         post = json.dumps(
                 OrderedDict([
                     ('upload_id', upload_id),
-                    ('camera_model', 'HM1S'),
+                    ('camera_model', self.settings.get('model').replace(" ","")),
                     ('source_type', 3),
                     ('date_time_original', time.strftime('%Y:%m:%d %H:%M:%S')),
-                    ('camera_make', 'XIAOMI'),
+                    ('camera_make', self.settings.get('manufacturer')),
                     ('edits', OrderedDict([
                         ('crop_original_size', [size, size]),
                         ('crop_zoom', 1.3333334),
@@ -365,10 +365,10 @@ class Instagram:
                     ])),
 
                     ('device', OrderedDict([
-                        ('manufacturer', 'Xiaomi'),
-                        ('model', 'HM 1SW'),
-                        ('android_version', 18),
-                        ('android_release', '4.3')
+                        ('manufacturer', self.settings.get('manufacturer')),
+                        ('model', self.settings.get('model')),
+                        ('android_version', Constants.ANDROID_VERSION),
+                        ('android_release', Constants.ANDROID_RELEASE)
                     ])),
                     ('_csrftoken', self.token),
                     ('_uuid', self.uuid),
