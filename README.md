@@ -1,3 +1,4 @@
+*Please go through the [contribution guidelines](https://github.com/danleyb2/Instagram-API/blob/master/.github/CONTRIBUTING.md)*,  
 *just a translated Python implementation of this PHP [repository](https://github.com/mgp25/Instagram-API)*
 
 # ![logo](/examples/assets/instagram.png) Instagram Python [![License](https://poser.pugx.org/mgp25/instagram-php/license)](https://packagist.org/packages/mgp25/instagram-php)
@@ -10,6 +11,8 @@ Instagram's private API.
 
 **Read the [wiki](https://github.com/danleyb2/Instagram-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.  
 **Wiki for the PHP code should be 90% applicable too because the code is just translated, not transformed**
+
+**Frequently Asked Questions:** [F.A.Q.](https://github.com/danleyb2/Instagram-API/wiki/FAQ)
 
 **Do you like this project? Support it by donating**
  - To the [PHP](https://github.com/mgp25/Instagram-API) repo

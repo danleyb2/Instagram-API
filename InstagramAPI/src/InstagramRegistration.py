@@ -1,10 +1,8 @@
-import hashlib
 import hmac
 import json
-import os
 import pycurl
-import urllib
 import re
+import urllib
 from collections import OrderedDict
 
 try:
@@ -12,8 +10,8 @@ try:
 except ImportError:
     from io import BytesIO
 
-from src import Constants
-from php import *
+from Constants import Constants
+from Utils import *
 
 
 class InstagramRegistration(object):
@@ -23,6 +21,7 @@ class InstagramRegistration(object):
         self.IGDataPath = None
         self.username = None
         self.uuid = None
+        self.userAgent = None
 
         self.username = ''
         self.debug = debug
@@ -32,9 +31,11 @@ class InstagramRegistration(object):
             self.IGDataPath = IGDataPath
         else:
             self.IGDataPath = os.path.join(
-                os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
-                ''
+                    os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
+                    ''
             )
+
+        self.userAgent = 'Instagram ' + Constants.VERSION + ' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)'
 
     def checkUsername(self, username):
         """
@@ -45,11 +46,11 @@ class InstagramRegistration(object):
         :return: Username availability data
         """
         data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('username', username),
-                ('_csrftoken', 'missing'),
-            ])
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('username', username),
+                    ('_csrftoken', 'missing'),
+                ])
         )
         return self.request('users/check_username/', self.generateSignature(data))[1]
 
@@ -67,24 +68,25 @@ class InstagramRegistration(object):
         :return: Registration data
         """
         data = json.dumps(
-            OrderedDict([
-                ('phone_id', self.uuid),
-                ('_csrftoken', 'missing'),
-                ('username', username),
-                ('first_name', ''),
-                ('guid', self.uuid),
-                ('device_id', 'android-' + filter(
-                    None, re.split('(.{1,17})', hashlib.md5(str(mt_rand(1000, 9999))).hexdigest()))[mt_rand(0, 1)]),
-                ('email', email),
-                ('force_sign_up_code', ''),
-                ('qs_stamp', ''),
-                ('password', password),
-            ])
+                OrderedDict([
+                    ('phone_id', self.uuid),
+                    ('_csrftoken', 'missing'),
+                    ('username', username),
+                    ('first_name', ''),
+                    ('guid', self.uuid),
+                    ('device_id', 'android-' + filter(
+                            None, re.split('(.{1,17})', hashlib.md5(str(mt_rand(1000, 9999))).hexdigest()))[
+                        mt_rand(0, 1)]),
+                    ('email', email),
+                    ('force_sign_up_code', ''),
+                    ('qs_stamp', ''),
+                    ('password', password),
+                ])
         )
 
         result = self.request('accounts/create/', self.generateSignature(data))
 
-        if hasattr(result[1], 'account_created') and result[1]['account_created'] == True:
+        if 'account_created' in result[1] and result[1]['account_created'] == True:
             self.username_id = result[1]['created_user']['pk']
             file_put_contents(self.IGDataPath + username + "-userId.dat", self.username_id)
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', result[0], re.MULTILINE)
@@ -101,7 +103,7 @@ class InstagramRegistration(object):
                                     hashlib.sha256).hexdigest()  # todo renamed variable hash
 
         return 'ig_sig_key_version=' + Constants.SIG_KEY_VERSION + '&signed_body=' + hash_var_renamed + '.' + urllib.quote_plus(
-            data)
+                data)
 
     def generateUUID(self, type):  ##todo finish mt_rand
         uuid = '%04x%04x-%04x-%04x-%04x-%04x%04x%04x' % (
@@ -118,7 +120,7 @@ class InstagramRegistration(object):
 
         ch = pycurl.Curl()
         ch.setopt(pycurl.URL, Constants.API_URL + endpoint)
-        ch.setopt(pycurl.USERAGENT, Constants.USER_AGENT)
+        ch.setopt(pycurl.USERAGENT, self.userAgent)
         ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)

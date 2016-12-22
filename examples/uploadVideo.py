@@ -1,17 +1,18 @@
-from src.Instagram import Instagram,InstagramException
+import InstagramAPI
+from InstagramAPI import InstagramException
 
 # /////// CONFIG ///////
 username = ''
 password = ''
 debug = False
 
-video = ''         # path to the video
-caption = ''       # caption
+video = ''  # path to the video
+caption = ''  # caption
 # //////////////////////
 
-i = Instagram(username, password, debug)
+i = InstagramAPI.Instagram(username, password, debug)
 
-try :
+try:
     i.login()
 except InstagramException as e:
     e.message
