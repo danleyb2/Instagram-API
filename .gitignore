@@ -6,6 +6,7 @@ sigs/sigs
 sigs/sigKeys
 
 *.jpg
+*.pyc
 
 *.DS_Store
 
