@@ -73,6 +73,7 @@ class Instagram:
         if (self.settings.get('user_agent') is None) or (LooseVersion(self.settings.get('version')) < LooseVersion(Constants.VERSION)):
             userAgent = UserAgent(self)
             ua = userAgent.buildUserAgent()
+            self.settings.set('version', Constants.VERSION)
             self.settings.set('user_agent', ua)
 
         self.http = HttpInterface(self)
