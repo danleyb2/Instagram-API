@@ -31,5 +31,5 @@ password = raw_input("\nPassword: ").strip()
 email = raw_input("\nEmail: ").strip()
 
 result = r.createAccount(username, password, email)
-if hasattr(result, 'account_created') and result['account_created'] == True:
+if 'account_created' in result and result['account_created'] == True:
     print 'Your account was successfully created! :)'
