@@ -434,7 +434,7 @@ class Instagram:
                     ('media_id', mediaId)
                 ])
         )
-        return self.http.request("media/" + mediaId + "/info/", SignatureUtils.generateSignature(data))[1]
+        return MediaInfoResponse(self.http.request("media/" + mediaId + "/info/", SignatureUtils.generateSignature(data))[1])
 
     def deleteMedia(self, mediaId):
         """
