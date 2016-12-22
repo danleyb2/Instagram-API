@@ -18,11 +18,21 @@ Instagram's private API.
  - To the [PHP](https://github.com/mgp25/Instagram-API) repo
 
 ----------
-### Installation
+## Installation
+
+### PYPI
+
+```sh
+pip install instagram-python
+```
+
+##### or directly from Github
 
 ```sh
 pip install https://github.com/danleyb2/Instagram-API/archive/pip_package.zip
 ```
+
+See [examples](https://github.com/danleyb2/Instagram-API/tree/master/examples) for usage.
 
 ### Dependencies
 
@@ -30,7 +40,7 @@ pip install https://github.com/danleyb2/Instagram-API/archive/pip_package.zip
 
 For more info: https://github.com/danleyb2/Instagram-API/wiki/Dependencies
 
-### Why did i do the API?
+## Why did i do the API?
 For me,  
 *i love writing code*,  
 for him  
