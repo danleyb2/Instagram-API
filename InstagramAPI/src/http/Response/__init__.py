@@ -1,2 +1,7 @@
+from ConfigureResponse import ConfigureResponse
+from ConfigureVideoResponse import ConfigureVideoResponse
 from LoginResponse import LoginResponse
 from Response import Response
+from UploadJobVideoResponse import UploadJobVideoResponse
+from UploadPhotoResponse import UploadPhotoResponse
+from UploadVideoResponse import UploadVideoResponse

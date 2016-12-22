@@ -341,7 +341,7 @@ class Instagram:
 
         post = post.replace('"length":0', '"length":0.00')
 
-        return self.http.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1]
+        return ConfigureVideoResponse(self.http.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1])
 
     def configure(self, upload_id, photo, caption=''):
 
@@ -378,7 +378,8 @@ class Instagram:
                 ])
         )
         post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]')
-        return self.http.request('media/configure/', SignatureUtils.generateSignature(post))[1]
+
+        return ConfigureResponse(self.http.request('media/configure/', SignatureUtils.generateSignature(post))[1])
 
     def editMedia(self, mediaId, captionText=''):
         """
