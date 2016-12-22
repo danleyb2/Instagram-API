@@ -1,4 +1,4 @@
-__version__ = "1.2.1"
+__version__ = "1.3"
 __author__ = "Nyaundi Brian"
 
 from Constants import Constants
