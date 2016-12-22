@@ -150,7 +150,7 @@ class Instagram:
 
         check = self.timelineFeed()
 
-        if hasattr(check, 'message') and check['message'] == 'login_required':
+        if 'message' in check and check['message'] == 'login_required':
             self.login(True)
         self.getv2Inbox()
         self.getRecentActivity()

@@ -86,7 +86,7 @@ class InstagramRegistration(object):
 
         result = self.request('accounts/create/', self.generateSignature(data))
 
-        if hasattr(result[1], 'account_created') and result[1]['account_created'] == True:
+        if 'account_created' in result[1] and result[1]['account_created'] == True:
             self.username_id = result[1]['created_user']['pk']
             file_put_contents(self.IGDataPath + username + "-userId.dat", self.username_id)
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', result[0], re.MULTILINE)
