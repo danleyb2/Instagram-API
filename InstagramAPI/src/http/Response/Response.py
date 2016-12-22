@@ -1,4 +1,4 @@
-class Response:
+class Response(object):
     STATUS_OK = "ok"
     STATUS_FAIL = "fail"
 
