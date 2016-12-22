@@ -1,4 +1,4 @@
-import src
+from InstagramAPI import src
 import os
 import setuptools
 
