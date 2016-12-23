@@ -5,7 +5,9 @@
 
 PHP [![Latest Stable Version](https://poser.pugx.org/mgp25/instagram-php/v/stable)](https://packagist.org/packages/mgp25/instagram-php) [![Total Downloads](https://poser.pugx.org/mgp25/instagram-php/downloads)](https://packagist.org/packages/mgp25/instagram-php)
 
-PYTHON (yet to come)
+PYTHON [![Latest Stable Version](http://img.shields.io/pypi/v/instagram-python.svg)](https://pypi.python.org/pypi/instagram-python) [![Total Downloads](http://img.shields.io/pypi/dm/instagram-python.svg)](https://pypi.python.org/pypi/instagram-python)
+
+
 
 Instagram's private API.
 
