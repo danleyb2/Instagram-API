@@ -120,8 +120,12 @@ class Instagram:
         """
         if (not self.isLoggedIn) or force:
             fetch = self.http.request(
-                'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None,
-                True)
+                'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None,True)
+
+            if fetch[0] == '':
+                raise InstagramException("Couldn't get challenge, check your connection")
+                #return response #FIXME unreachable code
+
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', fetch[0], re.MULTILINE)
             if match:
                 self.token = match.group(1)
@@ -1192,3 +1196,15 @@ class Instagram:
         """
         endpoint = 'feed/liked/?' + (('max_id=' + str(maxid) + '&') if maxid is not None else '')
         return self.http.request(endpoint)[1]
+
+    def setProxy(self, proxy):
+        self.http.setProxy(proxy)
+
+    def setProxyPort(self, port):
+        self.http.setProxyPort(port)
+
+    def setProxyCredentials(self, username, password):
+        self.http.setProxyCredentials(username, password)
+
+    def clearProxy(self):
+        self.http.clearProxy()
