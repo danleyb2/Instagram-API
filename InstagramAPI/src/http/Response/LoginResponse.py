@@ -12,7 +12,7 @@ class LoginResponse(Response):
         self.pk = None
         self.is_private = None
 
-        if 'username' in response['logged_in_user']:
+        if 'logged_in_user' in response and 'username' in response['logged_in_user']:
             self.username = response['logged_in_user']['username']
             self.has_anonymous_profile_picture = response['logged_in_user']['has_anonymous_profile_picture']
             self.profile_pic_url = response['logged_in_user']['profile_pic_url']
