@@ -1,6 +1,3 @@
-__version__ = "1.3"
-__author__ = "Nyaundi Brian"
-
 from Constants import Constants
 from Instagram import Instagram
 from InstagramException import InstagramException
