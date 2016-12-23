@@ -64,18 +64,7 @@ class Instagram:
             if not os.path.isdir(self.IGDataPath):
                 os.mkdir(self.IGDataPath, 0777)
 
-        self.settings = Settings(
-            os.path.join(self.IGDataPath, 'settings-' + username + '.dat')
-        )
-        if self.settings.get('version') is None:
-            self.settings.set('version', Constants.VERSION)
-
-        if (self.settings.get('user_agent') is None) or (
-            LooseVersion(self.settings.get('version')) < LooseVersion(Constants.VERSION)):
-            userAgent = UserAgent(self)
-            ua = userAgent.buildUserAgent()
-            self.settings.set('version', Constants.VERSION)
-            self.settings.set('user_agent', ua)
+        self.checkSettings(username)
 
         self.http = HttpInterface(self)
 
@@ -94,6 +83,8 @@ class Instagram:
         self.username = username
         self.password = password
 
+        self.checkSettings(username)
+
         self.uuid = SignatureUtils.generateUUID(True)
 
         if os.path.isfile(self.IGDataPath + self.username + '-cookies.dat') and \
@@ -103,6 +94,20 @@ class Instagram:
             self.username_id = self.settings.get('username_id')
             self.rank_token = self.username_id + '_' + self.uuid
             self.token = self.settings.get('token')
+
+    def checkSettings(self,username):
+        self.settings = Settings(
+            os.path.join(self.IGDataPath, 'settings-' + username + '.dat')
+        )
+        if self.settings.get('version') is None:
+            self.settings.set('version', Constants.VERSION)
+
+        if (self.settings.get('user_agent') is None) or (
+            LooseVersion(self.settings.get('version')) < LooseVersion(Constants.VERSION)):
+            userAgent = UserAgent(self)
+            ua = userAgent.buildUserAgent()
+            self.settings.set('version', Constants.VERSION)
+            self.settings.set('user_agent', ua)
 
     def login(self, force=False):
         """

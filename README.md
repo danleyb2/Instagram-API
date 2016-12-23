@@ -37,7 +37,7 @@ instagram = Instagram();
 If you want to test code that is in the master branch, which hasn't been pushed as a release, you can use Github.
 
 ```sh
-pip install https://github.com/danleyb2/Instagram-API/archive/pip_package.zip
+pip install https://github.com/danleyb2/Instagram-API/archive/master.zip
 ```
 
 ## Examples
