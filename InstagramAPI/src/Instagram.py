@@ -96,6 +96,8 @@ class Instagram:
             self.username_id = self.settings.get('username_id')
             self.rank_token = self.username_id + '_' + self.uuid
             self.token = self.settings.get('token')
+        else:
+            self.isLoggedIn = False
 
     def checkSettings(self, username):
         self.IGDataPath = os.path.join(
