@@ -234,6 +234,30 @@ class Instagram:
     def megaphoneLog(self):
         return self.http.request('megaphone/log/')[1]
 
+    def getPendingInbox(self):
+        """
+        Pending Inbox
+
+        :rtype: object
+        :return: Pending Inbox Data
+        """
+        pendingInbox = self.request('direct_v2/pending_inbox/?')[1]
+
+        if pendingInbox['status'] != 'ok':
+            raise InstagramException(pendingInbox['message'] + "\n")
+            # return FIXME unreachable code
+
+        return pendingInbox
+
+    def explore(self):
+        """
+        Explore Tab
+
+        :rtype: object
+        :return: Explore data
+        """
+        return self.request('discover/explore/?')[1]
+
     def expose(self):
         data = json.dumps(
             OrderedDict([
@@ -484,6 +508,37 @@ class Instagram:
                               SignatureUtils.generateSignature(data))[
                 1]
 
+    def deleteCommentsBulk(self, mediaId, commentIds):
+        """
+        Delete Comment Bulk
+
+        :type mediaId: str
+        :param mediaId: Media ID
+        :type commentIds: list
+        :param commentIds: List of comments to delete
+        :rtype: object
+        :return: Delete Comment Bulk Data
+        """
+        if not isinstance(commentIds, list):
+            commentIds = [commentIds]
+
+        string = []
+        for commentId in commentIds:
+            string.append(str(commentId))
+
+        comment_ids_to_delete = ','.join(string)
+
+        data = json.dumps(
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('comment_ids_to_delete', comment_ids_to_delete)
+            ])
+        )
+        return self.http.request("media/" + mediaId + "/comment/bulk_delete/",
+                                 SignatureUtils.generateSignature(data))[1]
+
     def changeProfilePicture(self, photo):
         """
         Sets account to public.
@@ -581,6 +636,30 @@ class Instagram:
         )
 
         return self.http.request('accounts/edit_profile/', SignatureUtils.generateSignature(data))[1]
+
+    def changePassword(self, oldPassword, newPassword):
+        """
+        Change Password
+
+        :type oldPassword: str
+        :param oldPassword: Old Password
+        :type newPassword: str
+        :param newPassword: New Password
+        :rtype: object
+        :return: Change Password Data
+        """
+
+        data = json.dumps(
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token),
+                ('old_password', oldPassword),
+                ('new_password1', newPassword),
+                ('new_password2', newPassword)
+            ])
+        )
+        return self.http.request("accounts/change_password/", SignatureUtils.generateSignature(data))[1]
 
     def getUsernameInfo(self, usernameId):
         """
