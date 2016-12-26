@@ -115,9 +115,7 @@ class InstagramRegistration(object):
                     ('username', username),
                     ('first_name', ''),
                     ('guid', self.uuid),
-                    ('device_id', 'android-' + filter(
-                            None, re.split('(.{1,17})', hashlib.md5(str(mt_rand(1000, 9999))).hexdigest()))[
-                        mt_rand(0, 1)]),
+                    ('device_id', self.generateDeviceId(hashlib.md5(username + password).hexdigest())),
                     ('email', email),
                     ('force_sign_up_code', ''),
                     ('qs_stamp', ''),
@@ -137,6 +135,9 @@ class InstagramRegistration(object):
             os.rename(self.IGDataPath + 'cookies.dat', self.IGDataPath + username + "-cookies.dat")
 
         return result
+
+    def generateDeviceId(self, seed):
+        return 'android-'+hashlib.md5(seed).hexdigest()[16:]
 
     def generateSignature(self, data):
 
