@@ -24,9 +24,8 @@ class InstagramRegistration(object):
         self.username = None
         self.uuid = None
         self.userAgent = None
-
-        self.proxy = None       # Fix for AttributeError
-        self.proxy_auth = None  # Fix for AttributeError
+        self.proxy = None       # Proxy
+        self.proxy_auth = None  # Proxy Auth
 
         self.username = ''
         self.debug = debug

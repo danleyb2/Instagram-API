@@ -48,9 +48,8 @@ class Instagram:
         self.IGDataPath = None  # // Data storage path
         self.http = None
         self.settings = None
-
-        self.proxy = None       # Fix for AttributeError
-        self.proxy_auth = None  # Fix for AttributeError
+        self.proxy = None       # Proxy
+        self.proxy_auth = None  # Proxy Auth
 
         self.debug = debug
         self.device_id = SignatureUtils.generateDeviceId(hashlib.md5(username + password))
