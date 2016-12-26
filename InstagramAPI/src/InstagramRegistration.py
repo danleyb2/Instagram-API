@@ -5,6 +5,8 @@ import re
 import urllib
 from collections import OrderedDict
 
+from InstagramAPI import InstagramException
+
 try:
     from StringIO import StringIO as BytesIO
 except ImportError:
@@ -23,6 +25,9 @@ class InstagramRegistration(object):
         self.uuid = None
         self.userAgent = None
 
+        self.proxy = None       # Fix for AttributeError
+        self.proxy_auth = None  # Fix for AttributeError
+
         self.username = ''
         self.debug = debug
         self.uuid = self.generateUUID(True)
@@ -36,6 +41,43 @@ class InstagramRegistration(object):
             )
 
         self.userAgent = 'Instagram ' + Constants.VERSION + ' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)'
+
+    def setProxy(self, proxy, port=None, username=None, password=None):
+        """
+        Set the proxy.
+
+        :type proxy: str
+        :param proxy: Full proxy string. Ex: user:pass@192.168.0.0:8080
+                        Use $proxy = "" to clear proxy
+        :type port: int
+        :param port: Port of proxy
+        :type username: str
+        :param username: Username for proxy
+        :type password: str
+        :param password: Password for proxy
+
+        :raises: InstagramException
+        """
+        if proxy == "":
+            self.proxy = ""
+            return
+
+        proxy = parse_url(proxy)
+
+        if port and isinstance(port, int):
+            proxy['port'] = int(port)
+
+        if username and password:
+            proxy['user'] = username
+            proxy['pass'] = password
+
+        if proxy['host'] and proxy['port'] and isinstance(proxy['port'], int):
+            self.proxy = proxy['host'] + ':' + proxy['port']
+        else:
+            raise InstagramException('Proxy host error. Please check ip address and port of proxy.')
+
+        if proxy['user'] and proxy['pass']:
+            self.proxy_auth = proxy['user'] + ':' + proxy['pass']
 
     def checkUsername(self, username):
         """
@@ -135,6 +177,11 @@ class InstagramRegistration(object):
         if post is not None:
             ch.setopt(pycurl.POST, True)
             ch.setopt(pycurl.POSTFIELDS, post)
+
+        if self.proxy:
+            ch.setopt(pycurl.PROXY, self.proxy)
+            if self.proxy_auth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.proxy_auth)
 
         ch.perform()
         resp = buffer.getvalue()
