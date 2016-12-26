@@ -49,6 +49,9 @@ class Instagram:
         self.http = None
         self.settings = None
 
+        self.proxy = None       # Fix for AttributeError
+        self.proxy_auth = None  # Fix for AttributeError
+
         self.debug = debug
         self.device_id = SignatureUtils.generateDeviceId(hashlib.md5(username + password))
 
@@ -114,6 +117,43 @@ class Instagram:
             ua = userAgent.buildUserAgent()
             self.settings.set('version', Constants.VERSION)
             self.settings.set('user_agent', ua)
+
+    def setProxy(self, proxy, port=None, username=None, password=None):
+        """
+        Set the proxy.
+
+        :type proxy: str
+        :param proxy: Full proxy string. Ex: user:pass@192.168.0.0:8080
+                        Use $proxy = "" to clear proxy
+        :type port: int
+        :param port: Port of proxy
+        :type username: str
+        :param username: Username for proxy
+        :type password: str
+        :param password: Password for proxy
+
+        :raises: InstagramException
+        """
+        if proxy == "":
+            self.proxy = ""
+            return
+
+        proxy = parse_url(proxy)
+
+        if port and isinstance(port, int):
+            proxy['port'] = int(port)
+
+        if username and password:
+            proxy['user'] = username
+            proxy['pass'] = password
+
+        if proxy['host'] and proxy['port'] and isinstance(proxy['port'], int):
+            self.proxy = proxy['host'] + ':' + proxy['port']
+        else:
+            raise InstagramException('Proxy host error. Please check ip address and port of proxy.')
+
+        if proxy['user'] and proxy['pass']:
+            self.proxy_auth = proxy['user'] + ':' + proxy['pass']
 
     def login(self, force=False):
         """
@@ -1130,14 +1170,3 @@ class Instagram:
         endpoint = 'feed/liked/?' + (('max_id=' + str(maxid) + '&') if maxid is not None else '')
         return self.http.request(endpoint)[1]
 
-    def setProxy(self, proxy):
-        self.http.setProxy(proxy)
-
-    def setProxyPort(self, port):
-        self.http.setProxyPort(port)
-
-    def setProxyCredentials(self, username, password):
-        self.http.setProxyCredentials(username, password)
-
-    def clearProxy(self):
-        self.http.clearProxy()

@@ -54,17 +54,14 @@ class HttpInterface:
         ch.setopt(pycurl.COOKIEFILE, self.parent.IGDataPath + self.parent.username + '-cookies.dat')
         ch.setopt(pycurl.COOKIEJAR, self.parent.IGDataPath + self.parent.username + '-cookies.dat')
 
-        if not self.proxy is None:
-            ch.setopt(pycurl.PROXYPORT, self.proxyPort)
-            ch.setopt(pycurl.PROXYTYPE, 'HTTP')
-            ch.setopt(pycurl.PROXY, self.proxy)
-
-        if not self.proxyUser is None:
-            ch.setopt(pycurl.PROXYUSERPWD, self.proxyUser + ':' + self.proxyPass)
-
         if post:
             ch.setopt(pycurl.POST, True)
             ch.setopt(pycurl.POSTFIELDS, post)
+
+        if self.parent.proxy:
+            ch.setopt(pycurl.PROXY, self.parent.proxy)
+            if self.parent.proxy_auth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
 
         ch.perform()
         resp = buffer.getvalue()
@@ -167,13 +164,11 @@ class HttpInterface:
         ch.setopt(pycurl.POST, True)
         ch.setopt(pycurl.POSTFIELDS, data)
 
-        if not self.proxy is None:
-            ch.setopt(pycurl.PROXYPORT, self.proxyPort)
-            ch.setopt(pycurl.PROXYTYPE, 'HTTP')
-            ch.setopt(pycurl.PROXY, self.proxy)
+        if self.parent.proxy:
+            ch.setopt(pycurl.PROXY, self.parent.proxy)
+            if self.parent.proxy_auth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
 
-        if not self.proxyUser is None:
-            ch.setopt(pycurl.PROXYUSERPWD, self.proxyUser + ':' + self.proxyPass)
 
         ch.perform()
         resp = buffer.getvalue()
@@ -250,13 +245,10 @@ class HttpInterface:
         ch.setopt(pycurl.POST, True)
         ch.setopt(pycurl.POSTFIELDS, data)
 
-        if not self.proxy is None:
-            ch.setopt(pycurl.PROXYPORT, self.proxyPort)
-            ch.setopt(pycurl.PROXYTYPE, 'HTTP')
-            ch.setopt(pycurl.PROXY, self.proxy)
-
-        if not self.proxyUser is None:
-            ch.setopt(pycurl.PROXYUSERPWD, self.proxyUser + ':' + self.proxyPass)
+        if self.parent.proxy:
+            ch.setopt(pycurl.PROXY, self.parent.proxy)
+            if self.parent.proxy_auth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
 
         ch.perform()
         resp = buffer.getvalue()
@@ -305,6 +297,11 @@ class HttpInterface:
             ch.setopt(pycurl.COOKIEJAR, self.parent.IGDataPath + self.parent.username + "-cookies.dat")
             ch.setopt(pycurl.POST, True)
             ch.setopt(pycurl.POSTFIELDS, videoData[start:end])
+
+            if self.parent.proxy:
+                ch.setopt(pycurl.PROXY, self.parent.proxy)
+                if self.parent.proxy_auth:
+                    ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
 
             ch.perform()
             result = buffer.getvalue()
@@ -396,13 +393,10 @@ class HttpInterface:
         ch.setopt(pycurl.POST, True)
         ch.setopt(pycurl.POSTFIELDS, data)
 
-        if not self.proxy is None:
-            ch.setopt(pycurl.PROXYPORT, self.proxyPort)
-            ch.setopt(pycurl.PROXYTYPE, 'HTTP')
-            ch.setopt(pycurl.PROXY, self.proxy)
-
-        if not self.proxyUser is None:
-            ch.setopt(pycurl.PROXYUSERPWD, self.proxyUser + ':' + self.proxyPass)
+        if self.parent.proxy:
+            ch.setopt(pycurl.PROXY, self.parent.proxy)
+            if self.parent.proxy_auth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
 
         ch.perform()
 
@@ -482,13 +476,10 @@ class HttpInterface:
         ch.setopt(pycurl.POST, True)
         ch.setopt(pycurl.POSTFIELDS, data)
 
-        if not self.proxy is None:
-            ch.setopt(pycurl.PROXYPORT, self.proxyPort)
-            ch.setopt(pycurl.PROXYTYPE, 'HTTP')
-            ch.setopt(pycurl.PROXY, self.proxy)
-
-        if not self.proxyUser is None:
-            ch.setopt(pycurl.PROXYUSERPWD, self.proxyUser + ':' + self.proxyPass)
+        if self.parent.proxy:
+            ch.setopt(pycurl.PROXY, self.parent.proxy)
+            if self.parent.proxy_auth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
 
         ch.perform()
         resp = buffer.getvalue()
@@ -514,16 +505,3 @@ class HttpInterface:
 
         return body
 
-    def setProxy(self, proxy):
-        self.proxy = proxy
-
-    def setProxyPort(self, port):
-        self.proxyPort = port
-
-    def setProxyCredentials(self, username, password):
-        self.proxyUser = username
-        self.proxyPass = password
-
-    def clearProxy(self):
-        self.proxy = None
-        self.proxyUser = None

@@ -18,3 +18,10 @@ def exec_php(cmd):
     from subprocess import Popen, PIPE, STDOUT
     p = Popen(cmd, shell=False, stdout=PIPE, stderr=STDOUT)
     return [p.wait(), p.stdout.readlines()]
+
+
+def parse_url(url):
+    import urlparse
+    r = urlparse.urlparse(url)._asdict() #Fixme Access to a protected member _asdict() of a class
+    r['host'] = r['netloc']
+    return r
