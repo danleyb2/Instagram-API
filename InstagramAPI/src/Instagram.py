@@ -1,5 +1,4 @@
 import json
-import pycurl
 import time
 import urllib
 from collections import OrderedDict
@@ -95,7 +94,14 @@ class Instagram:
             self.rank_token = self.username_id + '_' + self.uuid
             self.token = self.settings.get('token')
 
-    def checkSettings(self,username):
+    def checkSettings(self, username):
+        self.IGDataPath = os.path.join(
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
+            username,
+            ''
+        )
+        if not os.path.isdir(self.IGDataPath): os.mkdir(self.IGDataPath, 0777)
+
         self.settings = Settings(
             os.path.join(self.IGDataPath, 'settings-' + username + '.dat')
         )
@@ -103,7 +109,7 @@ class Instagram:
             self.settings.set('version', Constants.VERSION)
 
         if (self.settings.get('user_agent') is None) or (
-            LooseVersion(self.settings.get('version')) < LooseVersion(Constants.VERSION)):
+                    LooseVersion(self.settings.get('version')) < LooseVersion(Constants.VERSION)):
             userAgent = UserAgent(self)
             ua = userAgent.buildUserAgent()
             self.settings.set('version', Constants.VERSION)
@@ -120,11 +126,11 @@ class Instagram:
         """
         if (not self.isLoggedIn) or force:
             fetch = self.http.request(
-                'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None,True)
+                'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None, True)
 
-            if fetch[0] == '':
+            if not fetch[0] or fetch[1]['status'] == 'fail':
                 raise InstagramException("Couldn't get challenge, check your connection")
-                #return response #FIXME unreachable code
+                # return response #FIXME unreachable code
 
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', fetch[0], re.MULTILINE)
             if match:
