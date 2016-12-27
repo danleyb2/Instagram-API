@@ -309,6 +309,45 @@ class Instagram:
     def direct_share(self, media_id, recipients, text=None):
         self.http.direct_share(media_id, recipients, text)
 
+    def directThread(self, threadId):
+        """
+        Direct Thread Data
+
+        :type threadId: str
+        :param threadId: Thread Id
+        :rtype: object
+        :return: Direct Thread Data
+        """
+
+        directThread = self.request("direct_v2/threads/" + str(threadId) + "/?")[1]
+
+        if directThread['status'] != 'ok':
+            raise InstagramException(directThread['message'] + "\n")
+            # return Fixme unreachable code
+
+        return directThread
+
+    def directThreadAction(self, threadId, threadAction):
+        """
+        Direct Thread Action
+
+        :type threadId: str
+        :param threadId: Thread Id
+        :type threadAction: str
+        :param threadAction: Thread Action 'approve' OR 'decline' OR 'block'
+        :rtype: object
+        :return: Direct Thread Action Data
+        """
+        data = json.dumps(
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id),
+                ('_csrftoken', self.token)
+            ])
+        )
+        return self.request("direct_v2/threads/" + str(threadId) + "/" + str(threadAction) + "/",
+                            self.generateSignature(data))[1]
+
     def configureVideo(self, upload_id, video, caption=''):
 
         self.uploadPhoto(video, caption, upload_id)
