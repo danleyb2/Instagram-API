@@ -57,8 +57,8 @@ class InstagramRegistration(object):
 
         :raises: InstagramException
         """
-        if proxy == "":
-            self.proxy = ""
+        if proxy == '':
+            self.proxy = ''
             return
 
         proxy = parse_url(proxy)

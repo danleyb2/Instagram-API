@@ -66,15 +66,15 @@ class Checkpoint(object):
             'Proxy-Connection: keep-alive',
             'Accept-Language: es-es',
 
-            "Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/" +
-            str(self.settings.get('username_id')) + "/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss",
+            'Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/' +
+            str(self.settings.get('username_id')) + '/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss',
 
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
         ]
 
         self.request(
-            "https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/" +
-            str(self.settings.get('username_id')) + "/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss",
+            'https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/' +
+            str(self.settings.get('username_id')) + '/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss',
             headers,
             post
         )
@@ -93,16 +93,16 @@ class Checkpoint(object):
             'Proxy-Connection: keep-alive',
             'Accept-Language: es-es',
 
-            "Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/" +
-            str(self.settings.get('username_id')) + "/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss",
+            'Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/' +
+            str(self.settings.get('username_id')) + '/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss',
 
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
         ]
 
         self.request(
-            "https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/" +
+            'https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/' +
             str(self.settings.get('username_id')) +
-            "/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss",
+            '/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss',
             headers,
             post
         )

@@ -135,8 +135,8 @@ class Instagram:
 
         :raises: InstagramException
         """
-        if proxy == "":
-            self.proxy = ""
+        if proxy == '':
+            self.proxy = ''
             return
 
         proxy = parse_url(proxy)
@@ -318,7 +318,6 @@ class Instagram:
         :rtype: object
         :return: Direct Thread Data
         """
-
         directThread = self.request("direct_v2/threads/" + str(threadId) + "/?")[1]
 
         if directThread['status'] != 'ok':
@@ -549,7 +548,7 @@ class Instagram:
 
     def deleteCommentsBulk(self, mediaId, commentIds):
         """
-        Delete Comment Bulk
+        Delete Comment Bulk.
 
         :type mediaId: str
         :param mediaId: Media ID
@@ -678,7 +677,7 @@ class Instagram:
 
     def changePassword(self, oldPassword, newPassword):
         """
-        Change Password
+        Change Password.
 
         :type oldPassword: str
         :param oldPassword: Old Password
@@ -698,7 +697,7 @@ class Instagram:
                 ('new_password2', newPassword)
             ])
         )
-        return self.http.request("accounts/change_password/", SignatureUtils.generateSignature(data))[1]
+        return self.http.request('accounts/change_password/', SignatureUtils.generateSignature(data))[1]
 
     def getUsernameInfo(self, usernameId):
         """
