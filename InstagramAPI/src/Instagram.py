@@ -174,8 +174,10 @@ class Instagram:
         if (not self.isLoggedIn) or force:
             fetch = self.http.request(
                 'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None, True)
+            header = fetch[0]
+            response = ChallengeResponse(fetch[1])
 
-            if not fetch[0] or fetch[1]['status'] == 'fail':
+            if not header or not response.isOk():
                 raise InstagramException("Couldn't get challenge, check your connection")
                 # return response #FIXME unreachable code
 
