@@ -22,10 +22,7 @@ class HttpInterface:
     def __init__(self, parent):
         self.parent = parent
         self.userAgent = self.parent.settings.get('user_agent')
-        self.proxy = None
-        self.proxyPort = None
-        self.proxyUser = None
-        self.proxyPass = None
+
 
     def request(self, endpoint, post=None, login=False):
         buffer = BytesIO()
@@ -186,6 +183,10 @@ class HttpInterface:
             print 'RESPONSE: ' + resp[header_len:] + "\n"
 
         configure = self.parent.configure(upload.getUploadId(), photo, caption)
+
+        if not configure.isOk():
+            raise InstagramException(configure.getMessage())
+
         self.parent.expose()
 
         return configure
