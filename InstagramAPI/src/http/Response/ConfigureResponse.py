@@ -6,11 +6,13 @@ class ConfigureResponse(Response):
         self.upload_id = None
         self.media_id = None
         self.image_url = None
+        self.media_code = None
 
         if self.STATUS_OK == response['status']:
             self.upload_id = response['upload_id']
             self.media_id = response['media']['id']
             self.image_url = response['media']['image_versions2']['candidates']['0']['url']
+            self.media_code = response['media']['code']
         else:
             self.setMessage(response['message'])
 
@@ -24,3 +26,9 @@ class ConfigureResponse(Response):
 
     def getImageUrl(self):
         return self.image_url
+
+    def getMediaCode(self):
+        return self.media_code
+
+    def getMediaUrl(self):
+        return 'https://www.instagram.com/p/' + self.getMediaCode() + '/'
