@@ -523,7 +523,7 @@ class Instagram:
         )
         return self.http.request("media/" + mediaId + "/comment/", SignatureUtils.generateSignature(data))[1]
 
-    def deleteComment(self, mediaId, captionText, commentId):
+    def deleteComment(self, mediaId, commentId):
         """
         Delete Comment.
         :type mediaId: str
@@ -537,14 +537,12 @@ class Instagram:
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('caption_text', captionText)  # BUG!!!
+                ('_csrftoken', self.token)
             ])
         )
         return \
             self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/",
-                              SignatureUtils.generateSignature(data))[
-                1]
+                              SignatureUtils.generateSignature(data))[1]
 
     def deleteCommentsBulk(self, mediaId, commentIds):
         """
