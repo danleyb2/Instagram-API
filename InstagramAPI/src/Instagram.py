@@ -49,8 +49,9 @@ class Instagram:
         self.customPath = False
         self.http = None
         self.settings = None
-        self.proxy = None       # Proxy
-        self.proxy_auth = None  # Proxy Auth
+        self.proxy = None  # Full Proxy
+        self.proxyHost = None  # Proxy Host and Port
+        self.proxyAuth = None  # Proxy User and Pass
 
         self.debug = debug
         self.device_id = SignatureUtils.generateDeviceId(hashlib.md5(username + password))
@@ -139,8 +140,9 @@ class Instagram:
 
         :raises: InstagramException
         """
+        self.proxy = proxy
+
         if proxy == '':
-            self.proxy = ''
             return
 
         proxy = parse_url(proxy)
@@ -153,12 +155,12 @@ class Instagram:
             proxy['pass'] = password
 
         if proxy['host'] and proxy['port'] and isinstance(proxy['port'], int):
-            self.proxy = proxy['host'] + ':' + proxy['port']
+            self.proxyHost = proxy['host'] + ':' + proxy['port']
         else:
             raise InstagramException('Proxy host error. Please check ip address and port of proxy.')
 
         if proxy['user'] and proxy['pass']:
-            self.proxy_auth = proxy['user'] + ':' + proxy['pass']
+            self.proxyAuth = proxy['user'] + ':' + proxy['pass']
 
     def login(self, force=False):
         """

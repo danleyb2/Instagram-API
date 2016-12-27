@@ -24,8 +24,9 @@ class InstagramRegistration(object):
         self.username = None
         self.uuid = None
         self.userAgent = None
-        self.proxy = None       # Proxy
-        self.proxy_auth = None  # Proxy Auth
+        self.proxy = None  # Full Proxy
+        self.proxyHost = None  # Proxy Host and Port
+        self.proxyAuth = None  # Proxy User and Pass
 
         self.username = ''
         self.debug = debug
@@ -57,8 +58,9 @@ class InstagramRegistration(object):
 
         :raises: InstagramException
         """
+        self.proxy = proxy
+
         if proxy == '':
-            self.proxy = ''
             return
 
         proxy = parse_url(proxy)
@@ -71,12 +73,12 @@ class InstagramRegistration(object):
             proxy['pass'] = password
 
         if proxy['host'] and proxy['port'] and isinstance(proxy['port'], int):
-            self.proxy = proxy['host'] + ':' + proxy['port']
+            self.proxyHost = proxy['host'] + ':' + proxy['port']
         else:
             raise InstagramException('Proxy host error. Please check ip address and port of proxy.')
 
         if proxy['user'] and proxy['pass']:
-            self.proxy_auth = proxy['user'] + ':' + proxy['pass']
+            self.proxyAuth = proxy['user'] + ':' + proxy['pass']
 
     def checkUsername(self, username):
         """
@@ -179,9 +181,9 @@ class InstagramRegistration(object):
             ch.setopt(pycurl.POSTFIELDS, post)
 
         if self.proxy:
-            ch.setopt(pycurl.PROXY, self.proxy)
-            if self.proxy_auth:
-                ch.setopt(pycurl.PROXYUSERPWD, self.proxy_auth)
+            ch.setopt(pycurl.PROXY, self.proxyHost)
+            if self.proxyAuth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.proxyAuth)
 
         ch.perform()
         resp = buffer.getvalue()

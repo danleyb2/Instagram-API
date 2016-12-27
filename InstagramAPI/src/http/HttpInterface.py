@@ -23,7 +23,6 @@ class HttpInterface:
         self.parent = parent
         self.userAgent = self.parent.settings.get('user_agent')
 
-
     def request(self, endpoint, post=None, login=False):
         buffer = BytesIO()
         if (not self.parent.isLoggedIn) and not login:
@@ -56,9 +55,9 @@ class HttpInterface:
             ch.setopt(pycurl.POSTFIELDS, post)
 
         if self.parent.proxy:
-            ch.setopt(pycurl.PROXY, self.parent.proxy)
-            if self.parent.proxy_auth:
-                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
+            ch.setopt(pycurl.PROXY, self.parent.proxyHost)
+            if self.parent.proxyAuth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxyAuth)
 
         ch.perform()
         resp = buffer.getvalue()
@@ -162,9 +161,9 @@ class HttpInterface:
         ch.setopt(pycurl.POSTFIELDS, data)
 
         if self.parent.proxy:
-            ch.setopt(pycurl.PROXY, self.parent.proxy)
-            if self.parent.proxy_auth:
-                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
+            ch.setopt(pycurl.PROXY, self.parent.proxyHost)
+            if self.parent.proxyAuth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxyAuth)
 
 
         ch.perform()
@@ -247,9 +246,9 @@ class HttpInterface:
         ch.setopt(pycurl.POSTFIELDS, data)
 
         if self.parent.proxy:
-            ch.setopt(pycurl.PROXY, self.parent.proxy)
-            if self.parent.proxy_auth:
-                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
+            ch.setopt(pycurl.PROXY, self.parent.proxyHost)
+            if self.parent.proxyAuth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxyAuth)
 
         ch.perform()
         resp = buffer.getvalue()
@@ -300,9 +299,9 @@ class HttpInterface:
             ch.setopt(pycurl.POSTFIELDS, videoData[start:end])
 
             if self.parent.proxy:
-                ch.setopt(pycurl.PROXY, self.parent.proxy)
-                if self.parent.proxy_auth:
-                    ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
+                ch.setopt(pycurl.PROXY, self.parent.proxyHost)
+                if self.parent.proxyAuth:
+                    ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxyAuth)
 
             ch.perform()
             result = buffer.getvalue()
@@ -395,9 +394,9 @@ class HttpInterface:
         ch.setopt(pycurl.POSTFIELDS, data)
 
         if self.parent.proxy:
-            ch.setopt(pycurl.PROXY, self.parent.proxy)
-            if self.parent.proxy_auth:
-                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
+            ch.setopt(pycurl.PROXY, self.parent.proxyHost)
+            if self.parent.proxyAuth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxyAuth)
 
         ch.perform()
 
@@ -478,9 +477,9 @@ class HttpInterface:
         ch.setopt(pycurl.POSTFIELDS, data)
 
         if self.parent.proxy:
-            ch.setopt(pycurl.PROXY, self.parent.proxy)
-            if self.parent.proxy_auth:
-                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxy_auth)
+            ch.setopt(pycurl.PROXY, self.parent.proxyHost)
+            if self.parent.proxyAuth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxyAuth)
 
         ch.perform()
         resp = buffer.getvalue()
