@@ -25,3 +25,11 @@ def parse_url(url):
     r = urlparse.urlparse(url)._asdict() #Fixme Access to a protected member _asdict() of a class
     r['host'] = r['netloc']
     return r
+
+
+def json_decode(json_string):
+    import json
+    try:
+        return json.loads(json_string)
+    except ValueError:
+        return None
