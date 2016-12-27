@@ -182,6 +182,8 @@ class Instagram:
             match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', fetch[0], re.MULTILINE)
             if match:
                 self.token = match.group(1)
+            else:
+                raise InstagramException('Missing csfrtoken')
 
             data = OrderedDict([
                 ('username', self.username),
