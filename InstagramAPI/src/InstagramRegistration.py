@@ -5,7 +5,7 @@ import re
 import urllib
 from collections import OrderedDict
 
-from InstagramAPI import InstagramException
+from InstagramAPI.src import InstagramException
 
 try:
     from StringIO import StringIO as BytesIO
