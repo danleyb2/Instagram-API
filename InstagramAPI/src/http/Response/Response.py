@@ -4,6 +4,7 @@ class Response(object):
 
     status = None
     message = None
+    fullResponse = None
 
     def setStatus(self, status):
         self.status = status
@@ -16,6 +17,12 @@ class Response(object):
 
     def getMessage(self):
         return self.message
+
+    def setFullResponse(self, response):
+        self.fullResponse = response
+
+    def getFullResponse(self):
+        return self.fullResponse
 
     def isOk(self):
         return self.getStatus() == Response.STATUS_OK

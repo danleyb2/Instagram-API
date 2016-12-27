@@ -35,3 +35,4 @@ class MediaInfoResponse(Response):
             self.setMessage(response['message'])
 
         self.setStatus(response['status'])
+        self.setFullResponse(response)
