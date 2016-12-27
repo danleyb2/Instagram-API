@@ -46,6 +46,7 @@ class Instagram:
         self.isLoggedIn = False  # // Session status
         self.rank_token = None  # // Rank token
         self.IGDataPath = None  # // Data storage path
+        self.customPath = False
         self.http = None
         self.settings = None
         self.proxy = None       # Proxy
@@ -56,6 +57,7 @@ class Instagram:
 
         if IGDataPath is not None:
             self.IGDataPath = IGDataPath
+            self.customPath = True
         else:
             self.IGDataPath = os.path.join(
                 os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
@@ -99,11 +101,13 @@ class Instagram:
             self.isLoggedIn = False
 
     def checkSettings(self, username):
-        self.IGDataPath = os.path.join(
-            os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
-            username,
-            ''
-        )
+        if self.customPath:
+            self.IGDataPath = os.path.join(
+                os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
+                username,
+                ''
+            )
+
         if not os.path.isdir(self.IGDataPath): os.mkdir(self.IGDataPath, 0777)
 
         self.settings = Settings(
