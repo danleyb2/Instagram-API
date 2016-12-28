@@ -1073,15 +1073,14 @@ class Instagram:
         """
         return self.getUserFollowers(self.username_id)
 
-    def getUsersFollowing(self):
+    def getSelfUsersFollowing(self):
         """
         Get self users we are following.
 
         :rtype: object
         :return: users we are following data
         """
-        return self.http.request('friendships/following/?ig_sig_key_version=' \
-                                 + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
+        return self.getUserFollowings(self.username_id)
 
     def like(self, mediaId):
         """
