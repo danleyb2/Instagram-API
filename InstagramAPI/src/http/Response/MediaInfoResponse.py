@@ -36,3 +36,18 @@ class MediaInfoResponse(Response):
 
         self.setStatus(response['status'])
         self.setFullResponse(response)
+
+    def getTakenTime(self):
+        return self.taken_at
+
+    def getImageUrl(self):
+        return self.image_url
+
+    def getLikeCount(self):
+        return self.like_count
+
+    def getLikers(self):
+        return self.likers
+
+    def getComments(self):
+        return self.comments
