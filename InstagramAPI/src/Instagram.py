@@ -1296,3 +1296,8 @@ class Instagram:
         endpoint = 'feed/liked/?' + (('max_id=' + str(maxid) + '&') if maxid is not None else '')
         return self.http.request(endpoint)[1]
 
+    def verifyPeer(self, enable):
+        self.http.verifyPeer(enable)
+
+    def verifyHost(self, enable):
+        self.http.verifyHost(enable)

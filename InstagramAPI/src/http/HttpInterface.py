@@ -18,8 +18,13 @@ from InstagramAPI.src.Utils import *
 from InstagramAPI.src.http.Response import *
 
 
-class HttpInterface:
+class HttpInterface(object):
     def __init__(self, parent):
+        self.parent = None
+        self.userAgent = None
+        self.verifyPeer = False
+        self.verifyHost = False
+
         self.parent = parent
         self.userAgent = self.parent.settings.get('user_agent')
 
@@ -45,8 +50,8 @@ class HttpInterface:
         ch.setopt(pycurl.HEADER, True)
         ch.setopt(pycurl.HTTPHEADER, headers)
         ch.setopt(pycurl.VERBOSE, False)
-        ch.setopt(pycurl.SSL_VERIFYPEER, False)
-        ch.setopt(pycurl.SSL_VERIFYHOST, False)
+        ch.setopt(pycurl.SSL_VERIFYPEER, self.verifyPeer)
+        ch.setopt(pycurl.SSL_VERIFYHOST, self.verifyHost)
         ch.setopt(pycurl.COOKIEFILE, self.parent.IGDataPath + self.parent.username + '-cookies.dat')
         ch.setopt(pycurl.COOKIEJAR, self.parent.IGDataPath + self.parent.username + '-cookies.dat')
 
@@ -152,8 +157,8 @@ class HttpInterface:
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)
         ch.setopt(pycurl.VERBOSE, self.parent.debug)
-        ch.setopt(pycurl.SSL_VERIFYPEER, False)
-        ch.setopt(pycurl.SSL_VERIFYHOST, False)
+        ch.setopt(pycurl.SSL_VERIFYPEER, self.verifyPeer)
+        ch.setopt(pycurl.SSL_VERIFYHOST, self.verifyHost)
         ch.setopt(pycurl.HTTPHEADER, headers)
         ch.setopt(pycurl.COOKIEFILE, self.parent.IGDataPath + self.parent.username + "-cookies.dat")
         ch.setopt(pycurl.COOKIEJAR, self.parent.IGDataPath + self.parent.username + "-cookies.dat")
@@ -385,8 +390,8 @@ class HttpInterface:
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)
         ch.setopt(pycurl.VERBOSE, self.parent.debug)
-        ch.setopt(pycurl.SSL_VERIFYPEER, False)
-        ch.setopt(pycurl.SSL_VERIFYHOST, False)
+        ch.setopt(pycurl.SSL_VERIFYPEER, self.verifyPeer)
+        ch.setopt(pycurl.SSL_VERIFYHOST, self.verifyHost)
         ch.setopt(pycurl.HTTPHEADER, headers)
         ch.setopt(pycurl.COOKIEFILE, self.parent.IGDataPath + self.parent.username + "-cookies.dat")
         ch.setopt(pycurl.COOKIEJAR, self.parent.IGDataPath + self.parent.username + "-cookies.dat")
@@ -468,8 +473,8 @@ class HttpInterface:
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)
         ch.setopt(pycurl.VERBOSE, self.parent.debug)
-        ch.setopt(pycurl.SSL_VERIFYPEER, False)
-        ch.setopt(pycurl.SSL_VERIFYHOST, False)
+        ch.setopt(pycurl.SSL_VERIFYPEER, self.verifyPeer)
+        ch.setopt(pycurl.SSL_VERIFYHOST, self.verifyHost)
         ch.setopt(pycurl.HTTPHEADER, headers)
         ch.setopt(pycurl.COOKIEFILE, self.parent.IGDataPath + self.parent.username + "-cookies.dat")
         ch.setopt(pycurl.COOKIEJAR, self.parent.IGDataPath + self.parent.username + "-cookies.dat")
@@ -505,3 +510,8 @@ class HttpInterface:
 
         return body
 
+    def verifyPeer(self, enable):
+        self.verifyPeer = enable
+
+    def verifyHost(self, enable):
+        self.verifyHost = enable
