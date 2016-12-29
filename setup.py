@@ -1,7 +1,7 @@
 import os
 import setuptools
 
-__version__ = "1.3"
+__version__ = "1.4"
 __author__ = "Nyaundi Brian"
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
