@@ -809,9 +809,10 @@ class Instagram:
         :rtype: object
         :return:
         """
-        likers = self.http.request("media/" + mediaId + "/likers/?")[1]
-        if likers['status'] != 'ok':
-            raise InstagramException(likers['message'] + "\n")
+        likers = MediaLikersResponse(self.http.request("media/" + mediaId + "/likers/")[1])
+        if not likers.isOk():
+            raise InstagramException(likers['message'] + "\n")  # bug is no longer json
+            # return #fixme unreachable code
 
         return likers
 

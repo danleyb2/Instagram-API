@@ -7,6 +7,7 @@ from ConfigureVideoResponse import ConfigureVideoResponse
 from FollowingResponse import FollowingResponse
 from LoginResponse import LoginResponse
 from MediaInfoResponse import MediaInfoResponse
+from MediaLikersResponse import MediaLikersResponse
 from Response import Response
 from UploadJobVideoResponse import UploadJobVideoResponse
 from UploadPhotoResponse import UploadPhotoResponse
