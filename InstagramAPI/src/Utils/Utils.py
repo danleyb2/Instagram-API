@@ -1,7 +1,7 @@
 import hashlib
-import os
 from tempfile import mkdtemp
 
+import os
 from PIL import Image
 
 from php import *

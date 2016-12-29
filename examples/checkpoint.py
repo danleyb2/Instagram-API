@@ -2,7 +2,6 @@ from InstagramAPI import Checkpoint
 
 debug = True
 
-
 print("####################")
 print("#                  #")
 print("#    CHECKPOINT    #")

@@ -22,7 +22,7 @@ def exec_php(cmd):
 
 def parse_url(url):
     import urlparse
-    r = urlparse.urlparse(url)._asdict() #Fixme Access to a protected member _asdict() of a class
+    r = urlparse.urlparse(url)._asdict()  # Fixme Access to a protected member _asdict() of a class
     r['host'] = r['netloc']
     return r
 

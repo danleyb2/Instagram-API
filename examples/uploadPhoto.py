@@ -1,5 +1,4 @@
 import InstagramAPI
-from InstagramAPI import InstagramException
 
 # /////// CONFIG ///////
 username = ''

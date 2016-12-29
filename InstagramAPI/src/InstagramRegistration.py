@@ -213,7 +213,6 @@ class InstagramRegistration(object):
         ch.setopt(pycurl.COOKIEFILE, os.path.join(self.IGDataPath, self.username, self.username + "-cookies.dat"))
         ch.setopt(pycurl.COOKIEJAR, os.path.join(self.IGDataPath, self.username, self.username + "-cookies.dat"))
 
-
         if post is not None:
             ch.setopt(pycurl.POST, True)
             ch.setopt(pycurl.POSTFIELDS, post)

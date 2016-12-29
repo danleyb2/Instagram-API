@@ -1,5 +1,6 @@
-import os
 from collections import OrderedDict
+
+import os
 
 
 class Settings:

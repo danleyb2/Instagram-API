@@ -1,10 +1,11 @@
 import hmac
 import json
-import locale
 import math
 import pycurl
 import time
 from collections import OrderedDict
+
+import locale
 
 try:
     from io import BytesIO
@@ -169,7 +170,6 @@ class HttpInterface(object):
             ch.setopt(pycurl.PROXY, self.parent.proxyHost)
             if self.parent.proxyAuth:
                 ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxyAuth)
-
 
         ch.perform()
         resp = buffer.getvalue()
