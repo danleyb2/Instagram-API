@@ -1,11 +1,16 @@
-import hmac
 import json
 import pycurl
-import re
-import urllib
 from collections import OrderedDict
 
+import re
+
 from InstagramAPI.src import InstagramException
+from InstagramAPI.src import SignatureUtils
+from InstagramAPI.src.http.Response import ChallengeResponse
+from InstagramAPI.src.http.Response.AccountCreationResponse import AccountCreationResponse
+from InstagramAPI.src.http.Response.CheckEmailResponse import CheckEmailResponse
+from InstagramAPI.src.http.Response.CheckUsernameResponse import CheckUsernameResponse
+from InstagramAPI.src.http.Response.UsernameSuggestionsResponse import UsernameSuggestionsResponse
 
 try:
     from StringIO import StringIO as BytesIO
@@ -23,21 +28,25 @@ class InstagramRegistration(object):
         self.IGDataPath = None
         self.username = None
         self.uuid = None
+        self.waterfall_id = None
+        self.token = None
         self.userAgent = None
+        self.settings = None
         self.proxy = None  # Full Proxy
         self.proxyHost = None  # Proxy Host and Port
         self.proxyAuth = None  # Proxy User and Pass
 
         self.username = ''
         self.debug = debug
-        self.uuid = self.generateUUID(True)
+        self.uuid = SignatureUtils.generateUUID(True)
+        self.waterfall_id = SignatureUtils.generateUUID(True)
 
         if IGDataPath is not None:
             self.IGDataPath = IGDataPath
         else:
             self.IGDataPath = os.path.join(
-                    os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
-                    ''
+                os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
+                ''
             )
 
         self.userAgent = 'Instagram ' + Constants.VERSION + ' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)'
@@ -89,15 +98,44 @@ class InstagramRegistration(object):
         :return: Username availability data
         """
         data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('username', username),
-                    ('_csrftoken', 'missing'),
-                ])
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('username', username),
+                ('_csrftoken', 'missing'),
+            ])
         )
-        return self.request('users/check_username/', self.generateSignature(data))[1]
 
-    def createAccount(self, username, password, email):
+        self.username = username
+        self.settings = Settings(os.path.join(self.IGDataPath, self.username, 'settings-' + username + '.dat'))
+        return CheckUsernameResponse(self.request('users/check_username/', SignatureUtils.generateSignature(data))[1])
+
+    def checkEmail(self, email):
+
+        data = json.dumps(
+            OrderedDict([
+                ('qe_id', SignatureUtils.generateUUID(True)),
+                ('waterfall_id', SignatureUtils.generateUUID(True)),
+                ('email', email),
+                ('_csrftoken', 'missing'),
+            ])
+        )
+
+        return CheckEmailResponse(self.request('users/check_email/', SignatureUtils.generateSignature(data))[1])
+
+    def usernameSuggestions(self, email, name):
+        data = json.dumps(
+            OrderedDict([
+                ('name', SignatureUtils.generateUUID(True)),
+                ('waterfall_id', SignatureUtils.generateUUID(True)),
+                ('email', email),
+                ('_csrftoken', 'missing'),
+            ])
+        )
+
+        return UsernameSuggestionsResponse(
+            self.request('accounts/username_suggestions/', SignatureUtils.generateSignature(data))[1])
+
+    def createAccount(self, username, password, email, name=''):
         """
         Register account.
         :type username: str
@@ -110,54 +148,57 @@ class InstagramRegistration(object):
         :rtype: object
         :return: Registration data
         """
+
+        token = self.getCsfrtoken()
         data = json.dumps(
-                OrderedDict([
-                    ('phone_id', self.uuid),
-                    ('_csrftoken', 'missing'),
-                    ('username', username),
-                    ('first_name', ''),
-                    ('guid', self.uuid),
-                    ('device_id', self.generateDeviceId(hashlib.md5(username + password).hexdigest())),
-                    ('email', email),
-                    ('force_sign_up_code', ''),
-                    ('qs_stamp', ''),
-                    ('password', password),
-                ])
+            OrderedDict([
+                ('allow_contacts_sync', 'true'),
+                ('phone_id', self.uuid),
+                ('_csrftoken', token),
+                ('username', username),
+                ('first_name', name),
+                ('guid', self.uuid),
+                ('device_id', SignatureUtils.generateDeviceId(hashlib.md5(username + password).hexdigest())),
+                ('email', email),
+                ('force_sign_up_code', ''),
+                ('waterfall_id', self.waterfall_id),
+                ('qs_stamp', ''),
+                ('password', password),
+            ])
         )
 
-        result = self.request('accounts/create/', self.generateSignature(data))
+        result = self.request('accounts/create/', SignatureUtils.generateSignature(data))
+        header = result[0]
+        response = AccountCreationResponse(result[1])
 
-        if 'account_created' in result[1] and result[1]['account_created'] == True:
-            self.username_id = result[1]['created_user']['pk']
-            file_put_contents(self.IGDataPath + username + "-userId.dat", self.username_id)
-            match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', result[0], re.MULTILINE)
+        if response.isAccountCreated():
+            self.username_id = response.getUsernameId()
+            self.settings.set('username_id', self.username_id)
+            match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', header, re.MULTILINE)
             token = match.group(1) if match else ''
-            self.username = username
-            file_put_contents(self.IGDataPath + username + "-token.dat", token)
-            os.rename(self.IGDataPath + 'cookies.dat', self.IGDataPath + username + "-cookies.dat")
+            self.settings.set('token', token)
 
-        return result
+        return response
 
-    def generateDeviceId(self, seed):
-        return 'android-'+hashlib.md5(seed).hexdigest()[16:]
+    def getCsfrtoken(self):
 
-    def generateSignature(self, data):
+        fetch = self.request('si/fetch_headers/', None, True)
 
-        hash_var_renamed = hmac.new(Constants.IG_SIG_KEY, data,
-                                    hashlib.sha256).hexdigest()  # todo renamed variable hash
+        header = fetch[0]
+        response = ChallengeResponse(fetch[1])
 
-        return 'ig_sig_key_version=' + Constants.SIG_KEY_VERSION + '&signed_body=' + hash_var_renamed + '.' + urllib.quote_plus(
-                data)
+        if not header or not response.isOk():
+            raise InstagramException("Couldn't get challenge, check your connection")
+            # return response #fixme unreachable code
 
-    def generateUUID(self, type):  ##todo finish mt_rand
-        uuid = '%04x%04x-%04x-%04x-%04x-%04x%04x%04x' % (
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0x0fff) | 0x4000,
-            mt_rand(0, 0x3fff) | 0x8000,
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-        )
-        return uuid if type else uuid.replace('-', '')
+        match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', fetch[0], re.MULTILINE)
+
+        if not match:
+            raise InstagramException("Missing csfrtoken")
+            # return $response #fixme unreachable code
+
+        token = match.group(1)
+        return token[22:]
 
     def request(self, endpoint, post=None):
         buffer = BytesIO()
@@ -169,12 +210,9 @@ class InstagramRegistration(object):
         ch.setopt(pycurl.FOLLOWLOCATION, True)
         ch.setopt(pycurl.HEADER, True)
         ch.setopt(pycurl.VERBOSE, False)
-        if os.path.isfile(self.IGDataPath + self.username + "-cookies.dat"):
-            ch.setopt(pycurl.COOKIEFILE, self.IGDataPath + self.username + "-cookies.dat")
-            ch.setopt(pycurl.COOKIEJAR, self.IGDataPath + self.username + "-cookies.dat")
-        else:
-            ch.setopt(pycurl.COOKIEFILE, self.IGDataPath + 'cookies.dat')
-            ch.setopt(pycurl.COOKIEJAR, self.IGDataPath + 'cookies.dat')
+        ch.setopt(pycurl.COOKIEFILE, os.path.join(self.IGDataPath, self.username, self.username + "-cookies.dat"))
+        ch.setopt(pycurl.COOKIEJAR, os.path.join(self.IGDataPath, self.username, self.username + "-cookies.dat"))
+
 
         if post is not None:
             ch.setopt(pycurl.POST, True)
@@ -200,4 +238,4 @@ class InstagramRegistration(object):
                     print "DATA: " + str(post)
             print "RESPONSE: " + body
 
-        return [header, json.loads(body)]
+        return [header, json_decode(body)]

@@ -1060,7 +1060,8 @@ class Instagram:
         :rtype: object
         :return: followers data
         """
-        from InstagramAPI.src.FollowerResponse import FollowerResponse  # FixMe watch for move to http/Response folder
+        from InstagramAPI.src.http.FollowerResponse import \
+            FollowerResponse  # FixMe watch for move to http/Response folder
         return FollowerResponse(self.http.request(
             "friendships/" + usernameId + "/followers/?max_id=" + maxid \
             + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1])

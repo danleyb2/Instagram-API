@@ -1,5 +1,5 @@
-from http import Response
-from http.Response.User import User
+from InstagramAPI.src.http import Response
+from InstagramAPI.src.http.Response.User import User
 
 
 class FollowerResponse(Response):
