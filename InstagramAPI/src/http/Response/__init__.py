@@ -1,5 +1,6 @@
 from ConfigureResponse import ConfigureResponse
 from ChallengeResponse import ChallengeResponse
+from FollowingResponse import FollowingResponse
 from ConfigureVideoResponse import ConfigureVideoResponse
 from LoginResponse import LoginResponse
 from MediaInfoResponse import MediaInfoResponse

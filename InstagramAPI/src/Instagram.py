@@ -1047,9 +1047,9 @@ class Instagram:
         :rtype: object
         :return: followers data
         """
-        return self.http.request(
+        return FollowingResponse(self.http.request(
             "friendships/" + usernameId + "/following/?max_id=" + maxid + "&ig_sig_key_version=" \
-            + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1]
+            + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1])
 
     def getUserFollowers(self, usernameId, maxid=''):
         """
