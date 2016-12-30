@@ -4,7 +4,9 @@ from CheckEmailResponse import CheckEmailResponse
 from CheckUsernameResponse import CheckUsernameResponse
 from ConfigureResponse import ConfigureResponse
 from ConfigureVideoResponse import ConfigureVideoResponse
+from FollowerResponse import FollowerResponse
 from FollowingResponse import FollowingResponse
+from LocationResponse import LocationResponse
 from LoginResponse import LoginResponse
 from MediaInfoResponse import MediaInfoResponse
 from MediaLikersResponse import MediaLikersResponse
