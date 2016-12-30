@@ -12,4 +12,5 @@ from Response import Response
 from UploadJobVideoResponse import UploadJobVideoResponse
 from UploadPhotoResponse import UploadPhotoResponse
 from UploadVideoResponse import UploadVideoResponse
+from UsernameInfoResponse import UsernameInfoResponse
 from UsernameSuggestionsResponse import UsernameSuggestionsResponse

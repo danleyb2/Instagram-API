@@ -884,12 +884,15 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = self.http.request("users/" + usernameName + "/usernameinfo/")[1]
+        query = UsernameInfoResponse(self.http.request("users/" + usernameName + "/usernameinfo/")[1])
 
-        if query['status'] != 'ok':
-            raise InstagramException(query['message'] + "\n")
+        if not query.isOk():
+            raise InstagramException(query.getMessage() + "\n")
 
         return query
+
+    def getUsernameId(self, username):
+        return self.searchUsername(username).getUsernameId()
 
     def syncFromAdressBook(self, contacts):
         """
