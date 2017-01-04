@@ -11,3 +11,5 @@ sigs/sigKeys
 *.DS_Store
 
 .idea
+
+instagram_api.egg-info
