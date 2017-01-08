@@ -493,6 +493,82 @@ class HttpInterface(object):
         upload = json.loads(resp[header_len:])
         ch.close()
 
+    def direct_message(self, media_id, recipients, text):
+        if not isinstance(recipients, list):
+            recipients = [recipients]
+
+        string = []
+        for recipient in recipients:
+            string.append('"' + recipient + '"')
+
+        recipient_users = ','.join(string)
+
+        endpoint = Constants.API_URL + 'direct_v2/threads/broadcast/text/'
+        boundary = self.parent.uuid
+        bodies = [
+            OrderedDict([
+                ('type', 'form-data'),
+                ('name', 'recipient_users'),
+                ('data', "[[" + recipient_users + "]]")
+            ]),
+
+            OrderedDict([
+                ('type', 'form-data'),
+                ('name', 'client_context'),
+                ('data', self.parent.uuid)
+            ]),
+
+            OrderedDict([
+                ('type', 'form-data'),
+                ('name', 'thread_ids'),
+                ('data', '["0"]')
+            ]),
+
+            OrderedDict([
+                ('type', 'form-data'),
+                ('name', 'text'),
+                ('data', '' if text is None else text)
+            ]),
+
+        ]
+
+        data = self.buildBody(bodies, boundary)
+        headers = [
+            'Proxy-Connection: keep-alive',
+            'Connection: keep-alive',
+            'Accept: */*',
+            'Content-type: multipart/form-data boundary=' + boundary,
+            'Accept-Language: en-en',
+        ]
+
+        buffer = BytesIO()
+        ch = pycurl.Curl()
+        ch.setopt(pycurl.URL, endpoint)
+        ch.setopt(pycurl.USERAGENT, self.userAgent)
+        ch.setopt(pycurl.WRITEFUNCTION, buffer.write)
+        ch.setopt(pycurl.FOLLOWLOCATION, True)
+        ch.setopt(pycurl.HEADER, True)
+        ch.setopt(pycurl.VERBOSE, self.parent.debug)
+        ch.setopt(pycurl.SSL_VERIFYPEER, self.verifyPeer)
+        ch.setopt(pycurl.SSL_VERIFYHOST, self.verifyHost)
+        ch.setopt(pycurl.HTTPHEADER, headers)
+        ch.setopt(pycurl.COOKIEFILE, self.parent.IGDataPath + self.parent.username + "-cookies.dat")
+        ch.setopt(pycurl.COOKIEJAR, self.parent.IGDataPath + self.parent.username + "-cookies.dat")
+        ch.setopt(pycurl.POST, True)
+        ch.setopt(pycurl.POSTFIELDS, data)
+
+        if self.parent.proxy:
+            ch.setopt(pycurl.PROXY, self.parent.proxyHost)
+            if self.parent.proxyAuth:
+                ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxyAuth)
+
+        ch.perform()
+        resp = buffer.getvalue()
+        header_len = ch.getinfo(pycurl.HEADER_SIZE)
+        header = resp[0:header_len]
+        upload = json.loads(resp[header_len:])
+        ch.close()
+
     def buildBody(self, bodies, boundary):
         body = ''
         for b in bodies:

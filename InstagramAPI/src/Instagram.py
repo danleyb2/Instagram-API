@@ -330,6 +330,19 @@ class Instagram:
     def direct_share(self, media_id, recipients, text=None):
         self.http.direct_share(media_id, recipients, text)
 
+    def direct_message(self, recipients, text):
+        """
+        Send direct message to user by inbox
+
+        :type recipients: list|int
+        :param recipients: Users id
+        :type text: str
+        :param text: Text message
+
+        :return: void
+        """
+        return self.http.direct_message(recipients, text)
+
     def directThread(self, threadId):
         """
         Direct Thread Data
