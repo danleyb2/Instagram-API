@@ -345,7 +345,7 @@ class Instagram:
 
         :return: void
         """
-        return self.http.direct_message(recipients, text)
+        self.http.direct_message(recipients, text)
 
     def directThread(self, threadId):
         """

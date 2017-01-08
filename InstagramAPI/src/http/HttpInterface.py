@@ -493,7 +493,7 @@ class HttpInterface(object):
         upload = json.loads(resp[header_len:])
         ch.close()
 
-    def direct_message(self, media_id, recipients, text):
+    def direct_message(self, recipients, text):
         if not isinstance(recipients, list):
             recipients = [recipients]
 
