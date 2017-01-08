@@ -271,7 +271,13 @@ class Instagram:
         :rtype: object
         :return: Explore data
         """
-        return self.http.request('discover/explore/?')[1]
+        explore = ExploreResponse(self.http.request('discover/explore/?')[1])
+
+        if not explore.isOk():
+            raise InstagramException(explore.getMessage() + "\n")
+
+            # return todo unreachable code
+        return explore
 
     def expose(self):
         data = json.dumps(

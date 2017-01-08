@@ -1,7 +1,8 @@
 from InstagramAPI.src.http.Response.Objects.Comment import Comment
+from InstagramAPI.src.http.Response.Objects.Explore import Explore
 from InstagramAPI.src.http.Response.Objects.HdProfilePicUrlInfo import HdProfilePicUrlInfo
 from InstagramAPI.src.http.Response.Objects.User import User
-from InstagramAPI.src.http.Response.VideoVersions import VideoVersions
+from InstagramAPI.src.http.Response.Objects.VideoVersions import VideoVersions
 
 
 class Item(object):
@@ -38,6 +39,10 @@ class Item(object):
         self.like_count = 0
         self.preview = ''
         self.has_liked = False
+        self.explore_context = ''
+        self.explore_source_token = ''
+        self.explore = ''
+        self.impression_token = ''
 
         self.taken_at = item['taken_at']
         self.pk = item['pk']
@@ -88,6 +93,14 @@ class Item(object):
             self.preview = item['preview']
         if 'has_liked' in item:
             self.has_liked = item['has_liked']
+        if 'explore_context' in item:
+            self.explore_context = item['explore_context']
+        if 'explore_source_token' in item:
+            self.explore_source_token = item['explore_source_token']
+        if 'explore' in item:
+            self.explore = Explore(item['explore'])
+        if 'impression_token' in item:
+            self.impression_token = item['impression_token']
 
     def getTakenAt(self):
         return self.taken_at
@@ -175,3 +188,15 @@ class Item(object):
 
     def hasLiked(self):
         return self.has_liked
+
+    def getExploreContext(self):
+        return self.explore_context
+
+    def getExploreSourceToken(self):
+        return self.explore_source_token
+
+    def getExplore(self):
+        return self.explore
+
+    def getImpressionToken(self):
+        return self.impression_token
