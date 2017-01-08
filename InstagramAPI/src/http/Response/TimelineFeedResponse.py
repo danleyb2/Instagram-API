@@ -16,22 +16,26 @@ class TimelineFeedResponse(Response):
         self.feed_items = None
         self.megaphone = None
 
-        self.num_results = response['num_results']
-        self.is_direct_v2_enabled = response['is_direct_v2_enabled']
-        self.auto_load_more_enabled = response['auto_load_more_enabled']
-        self.more_available = response['more_available']
-        self.next_max_id = response['next_max_id']
-        messages = []
-        for message in response['_messages']:
-            messages.append(_Message(message))
+        if self.STATUS_OK == response['status']:
+            self.num_results = response['num_results']
+            self.is_direct_v2_enabled = response['is_direct_v2_enabled']
+            self.auto_load_more_enabled = response['auto_load_more_enabled']
+            self.more_available = response['more_available']
+            self.next_max_id = response['next_max_id']
+            messages = []
+            for message in response['_messages']:
+                messages.append(_Message(message))
 
-        self._messages = messages
-        items = []
-        for item in response['feed_items']:
-            items.append(Item(item['media_or_ad']))
+            self._messages = messages
+            items = []
+            for item in response['feed_items']:
+                items.append(Item(item['media_or_ad']))
 
-        self.feed_items = items
-        self.megaphone = FeedAysf(response['megaphone']['feed_aysf'])
+            self.feed_items = items
+            self.megaphone = FeedAysf(response['megaphone']['feed_aysf'])
+        else:
+            self.setMessage(response['message'])
+        self.setStatus(response['status'])
 
     def getNumResults(self):
         return self.num_results

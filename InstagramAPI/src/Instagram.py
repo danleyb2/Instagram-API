@@ -298,8 +298,12 @@ class Instagram:
         :rtype: bool
         :return: Returns true if logged out correctly
         """
-        logout = self.http.request('accounts/logout/')
-        return True if logout == 'ok' else False
+        logout = LogoutResponse(self.http.request('accounts/logout/')[1])
+
+        if logout.isOk():
+            return True
+        else:
+            return False
 
     def uploadPhoto(self, photo, caption=None, upload_id=None):
         """

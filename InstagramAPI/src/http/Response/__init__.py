@@ -9,6 +9,7 @@ from FollowerResponse import FollowerResponse
 from FollowingResponse import FollowingResponse
 from LocationResponse import LocationResponse
 from LoginResponse import LoginResponse
+from LogoutResponse import LogoutResponse
 from MediaInfoResponse import MediaInfoResponse
 from MediaLikersResponse import MediaLikersResponse
 from ReelsTrayFeedResponse import ReelsTrayFeedResponse

@@ -5,8 +5,10 @@ class Explore(object):
         self.source_token = None
 
         self.explanation = data['explanation']
-        self.actor_id = data['actor_id']
-        self.source_token = data['source_token']
+        if 'actor_id' in data:
+            self.actor_id = data['actor_id']
+        if 'source_token' in data:
+            self.source_token = data['source_token']
 
     def getExplanation(self):
         return self.explanation

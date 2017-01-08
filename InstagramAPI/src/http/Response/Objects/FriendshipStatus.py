@@ -6,9 +6,12 @@ class FriendshipStatus(object):
         self.is_private = None
 
         self.following = data['following']
-        self.incoming_request = data['incoming_request']
-        self.outgoing_request = data['outgoing_request']
-        self.is_private = data['is_private']
+        if 'source_token' in data:
+            self.incoming_request = data['incoming_request']
+        if 'source_token' in data:
+            self.outgoing_request = data['outgoing_request']
+        if 'is_private' in data:
+            self.is_private = data['is_private']
 
     def getFollowing(self):
         return self.following
