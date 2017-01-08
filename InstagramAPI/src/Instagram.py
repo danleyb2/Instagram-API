@@ -241,7 +241,7 @@ class Instagram:
         return self.http.request('qe/sync/', SignatureUtils.generateSignature(data))[1]
 
     def autoCompleteUserList(self):
-        return self.http.request('friendships/autocomplete_user_list/')[1]
+        return autoCompleteUserListResponse(self.http.request('friendships/autocomplete_user_list/')[1])
 
     def timelineFeed(self):
         return TimelineFeedResponse(self.http.request('feed/timeline/')[1])

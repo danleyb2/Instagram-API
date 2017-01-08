@@ -1,3 +1,6 @@
+from InstagramAPI.src.http.Response.Objects.FriendshipStatus import FriendshipStatus
+
+
 class User(object):
     def __init__(self, userData):
         self.username = None
@@ -6,8 +9,10 @@ class User(object):
         self.profile_pic_url = None
         self.full_name = None
         self.pk = None
-        self.is_verified = None
-        self.is_private = None
+        self.is_verified = False
+        self.is_private = False
+        self.coeff_weight = 0
+        self.friendship_status = None
 
         self.username = userData['username']
         self.profile_pic_url = userData['profile_pic_url']
@@ -20,6 +25,11 @@ class User(object):
             self.has_anonymous_profile_picture = userData['has_anonymous_profile_picture']
         if 'is_favorite' in userData:
             self.is_favorite = userData['is_favorite']
+        if 'coeff_weight' in userData:
+            self.coeff_weight = userData['coeff_weight']
+        if 'friendship_status' in userData:
+            self.friendship_status = FriendshipStatus(userData['friendship_status'])
+
 
     def getUsername(self):
         return self.username
@@ -44,3 +54,9 @@ class User(object):
 
     def isFavorite(self):
         return self.is_favorite
+
+    def getCoeffWeight(self):
+        return self.coeff_weight
+
+    def getFriendshipStatus(self):
+        return self.friendship_status
