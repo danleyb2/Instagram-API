@@ -10,6 +10,7 @@ from LocationResponse import LocationResponse
 from LoginResponse import LoginResponse
 from MediaInfoResponse import MediaInfoResponse
 from MediaLikersResponse import MediaLikersResponse
+from ReelsTrayFeedResponse import ReelsTrayFeedResponse
 from Response import Response
 from UploadJobVideoResponse import UploadJobVideoResponse
 from UploadPhotoResponse import UploadPhotoResponse

@@ -1,0 +1,26 @@
+from InstagramAPI.src.http.Response.Items import Items
+from InstagramAPI.src.http.Response.Tray import Tray
+from Response import Response
+
+
+class ReelsTrayFeedResponse(Response):
+    def __init__(self, response):
+
+        self.trays = None
+
+        if self.STATUS_OK == response['status']:
+            trays = []
+            for tray in response['tray']:
+                items = []
+                for item in tray['items']:
+                    items.append(Items(item))
+
+                trays.append(Tray(items, tray['user'], tray['can_reply'], tray['expiring_at']))
+
+            self.trays = trays
+        else:
+            self.setMessage(response['message'])
+        self.setStatus(response['status'])
+
+    def getTrays(self):
+        return self.trays

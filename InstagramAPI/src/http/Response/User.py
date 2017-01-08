@@ -13,7 +13,8 @@ class User(object):
         self.profile_pic_url = userData['profile_pic_url']
         self.full_name = userData['full_name']
         self.pk = userData['pk']
-        self.is_verified = userData['is_verified']
+        if 'is_verified' in userData:
+            self.is_verified = userData['is_verified']
         self.is_private = userData['is_private']
         if 'has_anonymous_profile_picture' in userData:
             self.has_anonymous_profile_picture = userData['has_anonymous_profile_picture']

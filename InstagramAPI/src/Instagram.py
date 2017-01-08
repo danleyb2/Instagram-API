@@ -1,11 +1,10 @@
 import json
+import locale
+import re
 import time
 import urllib
 from collections import OrderedDict
 from distutils.version import LooseVersion
-
-import locale
-import re
 
 try:
     from io import BytesIO
@@ -209,10 +208,12 @@ class Instagram:
             self.settings.set('token', self.token)
 
             self.syncFeatures()
-            self.autoCompleteUserList()
             self.timelineFeed()
+            self.getReelsTrayFeed()
+            self.autoCompleteUserList()
             self.getv2Inbox()
             self.getRecentActivity()
+            self.explore()
 
             return response
 
@@ -220,8 +221,12 @@ class Instagram:
 
         if 'message' in check and check['message'] == 'login_required':
             self.login(True)
+
+        # self.getReelsTrayFeed()
+        # self.autoCompleteUserList()
         self.getv2Inbox()
         self.getRecentActivity()
+        # self.explore()
 
     def syncFeatures(self):
         data = json.dumps(
@@ -266,7 +271,7 @@ class Instagram:
         :rtype: object
         :return: Explore data
         """
-        return self.request('discover/explore/?')[1]
+        return self.http.request('discover/explore/?')[1]
 
     def expose(self):
         data = json.dumps(
@@ -730,7 +735,7 @@ class Instagram:
         :rtype: object
         :return: Recent activity data
         """
-        activity = self.http.request('news/inbox/?')[1]
+        activity = self.http.request('news/inbox/')[1]
 
         if activity['status'] != 'ok':
             raise InstagramException(activity['message'] + "\n")
@@ -947,6 +952,14 @@ class Instagram:
             raise InstagramException(timeline['message'] + "\n")
 
         return timeline
+
+    def getReelsTrayFeed(self):
+        feed = ReelsTrayFeedResponse(self.http.request('feed/reels_tray/')[1])
+        if not feed.isOk():
+            raise InstagramException(feed.getMessage() + "\n")
+            # return todo Unreachable code
+
+        return feed
 
     def getUserFeed(self, usernameId, maxid=None, minTimestamp=None):
         """
