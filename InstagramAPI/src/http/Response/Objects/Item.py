@@ -1,10 +1,10 @@
-from InstagramAPI.src.http.Response.Comment import Comment
-from InstagramAPI.src.http.Response.HdProfilePicUrlInfo import HdProfilePicUrlInfo
-from InstagramAPI.src.http.Response.User import User
+from InstagramAPI.src.http.Response.Objects.Comment import Comment
+from InstagramAPI.src.http.Response.Objects.HdProfilePicUrlInfo import HdProfilePicUrlInfo
+from InstagramAPI.src.http.Response.Objects.User import User
 from InstagramAPI.src.http.Response.VideoVersions import VideoVersions
 
 
-class Items(object):
+class Item(object):
     PHOTO = 1
     VIDEO = 2
 
@@ -21,19 +21,23 @@ class Items(object):
         self.image_versions2 = None
         self.original_width = None
         self.original_height = None
-        self.view_count = ''
+        self.view_count = 0
         self.organic_tracking_token = None
         self.has_more_comments = None
         self.max_num_visible_preview_comments = None
         self.comments = None
-        self.comment_count = None
+        self.comment_count = 0
         self.caption = None
         self.caption_is_edited = None
         self.photo_of_you = None
         self.video_versions = ''
-        self.has_audio = ''
+        self.has_audio = False
         self.video_duration = ''
         self.user = None
+        self.likers = ''
+        self.like_count = 0
+        self.preview = ''
+        self.has_liked = False
 
         self.taken_at = item['taken_at']
         self.pk = item['pk']
@@ -75,8 +79,15 @@ class Items(object):
 
         if 'video_duration' in item:
             self.video_duration = item['video_duration']
-
         self.user = User(item['user'])
+        if 'likers' in item:
+            self.likers = item['likers']
+        if 'like_count' in item:
+            self.like_count = item['like_count']
+        if 'preview' in item:
+            self.preview = item['preview']
+        if 'has_liked' in item:
+            self.has_liked = item['has_liked']
 
     def getTakenAt(self):
         return self.taken_at
@@ -152,3 +163,15 @@ class Items(object):
 
     def getUser(self):
         return self.user
+
+    def getMediaLikers(self):
+        return self.likers
+
+    def getLikeCount(self):
+        return self.like_count
+
+    def getPreview(self):
+        return self.preview
+
+    def hasLiked(self):
+        return self.has_liked

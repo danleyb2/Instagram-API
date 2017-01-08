@@ -1,4 +1,4 @@
-from HdProfilePicUrlInfo import HdProfilePicUrlInfo
+from InstagramAPI.src.http.Response.Objects.HdProfilePicUrlInfo import HdProfilePicUrlInfo
 from Response import Response
 
 

@@ -1,6 +1,6 @@
-from Comment import Comment
+from InstagramAPI.src.http.Response.Objects.Comment import Comment
+from Objects.User import User
 from Response import Response
-from User import User
 
 
 class MediaInfoResponse(Response):

@@ -1,5 +1,5 @@
-from InstagramAPI.src.http.Response.Items import Items
-from InstagramAPI.src.http.Response.Tray import Tray
+from InstagramAPI.src.http.Response.Objects.Item import Item
+from InstagramAPI.src.http.Response.Objects.Tray import Tray
 from Response import Response
 
 
@@ -13,7 +13,7 @@ class ReelsTrayFeedResponse(Response):
             for tray in response['tray']:
                 items = []
                 for item in tray['items']:
-                    items.append(Items(item))
+                    items.append(Item(item))
 
                 trays.append(Tray(items, tray['user'], tray['can_reply'], tray['expiring_at']))
 

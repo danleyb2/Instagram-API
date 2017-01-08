@@ -1,5 +1,5 @@
+from InstagramAPI.src.http.Response.Objects.User import User
 from Response import Response
-from User import User
 
 
 class FollowingResponse(Response):

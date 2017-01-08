@@ -1,4 +1,4 @@
-from InstagramAPI.src.http.Response.User import User
+from InstagramAPI.src.http.Response.Objects.User import User
 from Response import Response
 
 

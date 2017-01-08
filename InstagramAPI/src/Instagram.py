@@ -219,7 +219,7 @@ class Instagram:
 
         check = self.timelineFeed()
 
-        if 'message' in check and check['message'] == 'login_required':
+        if check.getMessage() == 'login_required':
             self.login(True)
 
         # self.getReelsTrayFeed()
@@ -244,7 +244,7 @@ class Instagram:
         return self.http.request('friendships/autocomplete_user_list/')[1]
 
     def timelineFeed(self):
-        return self.http.request('feed/timeline/')[1]
+        return TimelineFeedResponse(self.http.request('feed/timeline/')[1])
 
     def megaphoneLog(self):
         return self.http.request('megaphone/log/')[1]
