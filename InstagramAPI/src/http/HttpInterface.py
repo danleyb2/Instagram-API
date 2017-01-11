@@ -581,7 +581,7 @@ class HttpInterface(object):
             if 'headers' in b and isinstance(b['headers'], list):
                 for header in b['headers']:
                     body += ("\r\n" + header)
-            body += ("\r\n\r\n" + b['data'] + "\r\n")
+            body += ("\r\n\r\n" + str(b['data']) + "\r\n")
         body += ('--' + boundary + '--')
 
         return body
