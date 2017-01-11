@@ -32,7 +32,7 @@ class TimelineFeedResponse(Response):
                 items.append(Item(item['media_or_ad']))
 
             self.feed_items = items
-            self.megaphone = FeedAysf(response['megaphone']['feed_aysf'])
+            self.megaphone = FeedAysf(response['megaphone']['feed_aysf'])  # todo KeyError: 'megaphone'
         else:
             self.setMessage(response['message'])
         self.setStatus(response['status'])
