@@ -20,4 +20,5 @@ from UploadPhotoResponse import UploadPhotoResponse
 from UploadVideoResponse import UploadVideoResponse
 from UsernameInfoResponse import UsernameInfoResponse
 from UsernameSuggestionsResponse import UsernameSuggestionsResponse
+from V2InboxResponse import V2InboxResponse
 from autoCompleteUserListResponse import autoCompleteUserListResponse

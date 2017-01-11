@@ -780,14 +780,14 @@ class Instagram:
 
     def getv2Inbox(self):
         """
-        He didn't know this yet.
+        I dont know this yet.
         :rtype: object
         :return: v2 inbox data
         """
-        inbox = self.http.request('direct_v2/inbox/?')[1]
+        inbox = V2InboxResponse(self.http.request('direct_v2/inbox/?')[1])
 
-        if inbox['status'] != 'ok':
-            raise InstagramException(inbox['message'] + "\n")
+        if not inbox.isOk():
+            raise InstagramException(inbox.getMessage() + "\n")
 
         return inbox
 
