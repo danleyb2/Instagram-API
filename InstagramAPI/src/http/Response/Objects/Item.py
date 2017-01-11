@@ -88,8 +88,10 @@ class Item(object):
         if 'video_duration' in item:
             self.video_duration = item['video_duration']
         self.user = User(item['user'])
-        if 'likers' in item:
-            self.likers = item['likers']
+        likers = []
+        for liker in item['likers']:
+            likers.append(User(liker))
+        self.likers = likers
         if 'like_count' in item:
             self.like_count = item['like_count']
         if 'preview' in item:
@@ -111,7 +113,7 @@ class Item(object):
         return self.taken_at
 
     def getUsernameId(self):
-        return self.pk
+        return self.user.getUsernameId()
 
     def getMediaId(self):
         return self.id
@@ -208,3 +210,6 @@ class Item(object):
 
     def getUsertags(self):
         return self.usertags
+
+    def getlikers(self):
+        return self.likers
