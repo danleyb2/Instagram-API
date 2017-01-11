@@ -12,7 +12,7 @@ class FollowingResponse(Response):
             for user in response['users']:
                 users.append(User(user))
             self.followings = users
-            self.next_max_id  # todo statement has no effect
+            self.next_max_id = response['next_max_id']
         else:
             self.setMessage(response['message'])
         self.setStatus(response['status'])
