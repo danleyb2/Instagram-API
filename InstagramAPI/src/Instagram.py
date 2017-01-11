@@ -799,10 +799,10 @@ class Instagram:
         :rtype: object
         :return: user tags data
         """
-        tags = self.http.request("usertags/" + str(usernameId) + "/feed/?rank_token=" + self.rank_token
-                                 + "&ranked_content=true&")[1]
-        if tags['status'] != 'ok':
-            raise InstagramException(tags['message'] + "\n")
+        tags = UsertagsResponse(self.http.request("usertags/" + str(usernameId) + "/feed/?rank_token=" + self.rank_token
+                                                  + "&ranked_content=true&")[1])
+        if not tags.isOk():
+            raise InstagramException(tags.getMessage() + "\n")
 
         return tags
 

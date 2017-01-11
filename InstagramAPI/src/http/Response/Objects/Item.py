@@ -43,6 +43,7 @@ class Item(object):
         self.explore_source_token = ''
         self.explore = ''
         self.impression_token = ''
+        self.usertags = None
 
         self.taken_at = item['taken_at']
         self.pk = item['pk']
@@ -101,6 +102,8 @@ class Item(object):
             self.explore = Explore(item['explore'])
         if 'impression_token' in item:
             self.impression_token = item['impression_token']
+        if 'usertags' in item:
+            self.usertags = item['usertags']
 
     def getTakenAt(self):
         return self.taken_at
@@ -200,3 +203,6 @@ class Item(object):
 
     def getImpressionToken(self):
         return self.impression_token
+
+    def getUsertags(self):
+        return self.usertags

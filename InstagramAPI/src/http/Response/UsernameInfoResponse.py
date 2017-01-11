@@ -55,7 +55,8 @@ class UsernameInfoResponse(Response):
             self.follower_count = response['user']['follower_count']
             self.pk = response['user']['pk']
             self.username = response['user']['username']
-            self.geo_media_count = response['user']['geo_media_count']
+            if 'geo_media_count' in response['user']:
+                self.geo_media_count = response['user']['geo_media_count']
             self.profile_pic_url = response['user']['profile_pic_url']
             if 'can_see_organic_insights' in response['user']:
                 self.can_see_organic_insights = response['user']['can_see_organic_insights']
