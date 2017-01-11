@@ -201,7 +201,7 @@ class HttpInterface(object):
 
         endpoint = Constants.API_URL + 'upload/video/'
         boundary = self.parent.uuid
-        upload_id = round(float('%.2f' % time.time()) * 1000)
+        upload_id = str(int(round(float('%.2f' % time.time()) * 1000)))
         bodies = [
             OrderedDict([
                 ('type', 'form-data'),
