@@ -14,6 +14,7 @@ from MediaInfoResponse import MediaInfoResponse
 from MediaLikersResponse import MediaLikersResponse
 from ReelsTrayFeedResponse import ReelsTrayFeedResponse
 from Response import Response
+from TagFeedResponse import TagFeedResponse
 from TimelineFeedResponse import TimelineFeedResponse
 from UploadJobVideoResponse import UploadJobVideoResponse
 from UploadPhotoResponse import UploadPhotoResponse

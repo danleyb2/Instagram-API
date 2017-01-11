@@ -822,10 +822,11 @@ class Instagram:
         :rtype: object
         :return:
         """
-        userFeed = self.http.request("feed/tag/" + tag + "/?rank_token=" + self.rank_token + "&ranked_content=true&")[1]
+        userFeed = TagFeedResponse(
+            self.http.request("feed/tag/" + tag + "/?rank_token=" + self.rank_token + "&ranked_content=true&")[1])
 
-        if userFeed['status'] != 'ok':
-            raise InstagramException(userFeed['message'] + "\n")
+        if not userFeed.isOk():
+            raise InstagramException(userFeed.getMessage() + "\n")
 
         return userFeed
 
@@ -839,7 +840,7 @@ class Instagram:
         """
         likers = MediaLikersResponse(self.http.request("media/" + mediaId + "/likers/")[1])
         if not likers.isOk():
-            raise InstagramException(likers['message'] + "\n")  # bug is no longer json
+            raise InstagramException(likers.getMessage() + "\n")
             # return #fixme unreachable code
 
         return likers

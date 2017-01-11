@@ -1,3 +1,4 @@
+from InstagramAPI.src.http.Response.Objects.Caption import Caption
 from InstagramAPI.src.http.Response.Objects.Comment import Comment
 from InstagramAPI.src.http.Response.Objects.Explore import Explore
 from InstagramAPI.src.http.Response.Objects.HdProfilePicUrlInfo import HdProfilePicUrlInfo
@@ -71,7 +72,8 @@ class Item(object):
 
         self.comments = comments
         self.comment_count = item['comment_count']
-        self.caption = item['caption']
+        if item['caption']:
+            self.caption = Caption(item['caption'])
         self.caption_is_edited = item['caption_is_edited']
         self.photo_of_you = item['photo_of_you']
         if 'video_versions' in item:
