@@ -23,8 +23,9 @@ class TimelineFeedResponse(Response):
             self.more_available = response['more_available']
             self.next_max_id = response['next_max_id']
             messages = []
-            for message in response['_messages']:
-                messages.append(_Message(message))
+            if '_messages' in response and '_messages' in response:  # todo duplicated code
+                for message in response['_messages']:
+                    messages.append(_Message(message))
 
             self._messages = messages
             items = []

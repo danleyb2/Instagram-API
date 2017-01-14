@@ -89,8 +89,9 @@ class Item(object):
             self.video_duration = item['video_duration']
         self.user = User(item['user'])
         likers = []
-        for liker in item['likers']:
-            likers.append(User(liker))
+        if 'likers' in item and len(item['likers']):
+            for liker in item['likers']:
+                likers.append(User(liker))
         self.likers = likers
         if 'like_count' in item:
             self.like_count = item['like_count']

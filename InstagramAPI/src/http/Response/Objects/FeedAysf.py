@@ -22,8 +22,9 @@ class FeedAysf(object):
         self.landing_site_title = data['landing_site_title']
         self.is_dismissable = data['is_dismissable']
         suggestions = []
-        for suggestion in data['suggestions']:
-            suggestions.append(Suggestion(suggestion))
+        if 'suggestions' in data and len(data['suggestions']):
+            for suggestion in data['suggestions']:
+                suggestions.append(Suggestion(suggestion))
 
         self.suggestions = suggestions
         self.should_refill = data['should_refill']
