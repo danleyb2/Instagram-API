@@ -60,7 +60,7 @@ class Item(object):
 
         self.image_versions2 = images
         self.original_width = item['original_width']
-        if 'view_count' in item:
+        if 'view_count' in item and item['view_count']:
             self.view_count = item['view_count']
 
         self.organic_tracking_token = item['organic_tracking_token']
@@ -76,16 +76,16 @@ class Item(object):
             self.caption = Caption(item['caption'])
         self.caption_is_edited = item['caption_is_edited']
         self.photo_of_you = item['photo_of_you']
-        if 'video_versions' in item:
+        if 'video_versions' in item and item['video_versions']:
             videos = []
             for video in item['video_versions']:
                 videos.append(VideoVersions(video))
             self.video_versions = videos
 
-        if 'has_audio' in item:
+        if 'has_audio' in item and item['has_audio']:
             self.has_audio = item['has_audio']
 
-        if 'video_duration' in item:
+        if 'video_duration' in item and item['video_duration']:
             self.video_duration = item['video_duration']
         self.user = User(item['user'])
         likers = []
@@ -93,21 +93,21 @@ class Item(object):
             for liker in item['likers']:
                 likers.append(User(liker))
         self.likers = likers
-        if 'like_count' in item:
+        if 'like_count' in item and item['like_count']:
             self.like_count = item['like_count']
-        if 'preview' in item:
+        if 'preview' in item and item['preview']:
             self.preview = item['preview']
-        if 'has_liked' in item:
+        if 'has_liked' in item and item['has_liked']:
             self.has_liked = item['has_liked']
-        if 'explore_context' in item:
+        if 'explore_context' in item and item['explore_context']:
             self.explore_context = item['explore_context']
-        if 'explore_source_token' in item:
+        if 'explore_source_token' in item and item['explore_source_token']:
             self.explore_source_token = item['explore_source_token']
-        if 'explore' in item:
+        if 'explore' in item and item['explore']:
             self.explore = Explore(item['explore'])
-        if 'impression_token' in item:
+        if 'impression_token' in item and item['impression_token']:
             self.impression_token = item['impression_token']
-        if 'usertags' in item:
+        if 'usertags' in item and item['usertags']:
             self.usertags = item['usertags']
 
     def getTakenAt(self):
