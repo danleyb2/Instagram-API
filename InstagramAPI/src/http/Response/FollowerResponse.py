@@ -13,7 +13,8 @@ class FollowerResponse(Response):
                 users.append(User(user))
 
             self.followers = users
-            self.next_max_id = response['next_max_id']
+            self.next_max_id = response['next_max_id'] if (
+            'next_max_id' in response and response['next_max_id']) else None
         else:
             self.setMessage(response['message'])
         self.setStatus(response['status'])
