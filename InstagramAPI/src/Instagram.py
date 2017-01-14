@@ -676,7 +676,8 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
-        return self.http.request('accounts/current_user/?edit=true', SignatureUtils.generateSignature(data))[1]
+        return ProfileResponse(
+            self.http.request('accounts/current_user/?edit=true', SignatureUtils.generateSignature(data))[1])
 
     def editProfile(self, url, phone, first_name, biography, email, gender):
         """
@@ -709,7 +710,7 @@ class Instagram:
             ])
         )
 
-        return self.http.request('accounts/edit_profile/', SignatureUtils.generateSignature(data))[1]
+        return ProfileResponse(self.http.request('accounts/edit_profile/', SignatureUtils.generateSignature(data))[1])
 
     def changePassword(self, oldPassword, newPassword):
         """

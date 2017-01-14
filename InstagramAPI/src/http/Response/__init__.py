@@ -12,6 +12,7 @@ from LoginResponse import LoginResponse
 from LogoutResponse import LogoutResponse
 from MediaInfoResponse import MediaInfoResponse
 from MediaLikersResponse import MediaLikersResponse
+from ProfileResponse import ProfileResponse
 from ReelsTrayFeedResponse import ReelsTrayFeedResponse
 from Response import Response
 from TagFeedResponse import TagFeedResponse
