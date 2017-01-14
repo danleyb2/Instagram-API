@@ -23,14 +23,16 @@ class TimelineFeedResponse(Response):
             self.more_available = response['more_available']
             self.next_max_id = response['next_max_id']
             messages = []
-            if '_messages' in response and '_messages' in response:  # todo duplicated code
+            if '_messages' in response and len(response['_messages']):
                 for message in response['_messages']:
                     messages.append(_Message(message))
 
             self._messages = messages
             items = []
-            for item in response['feed_items']:
-                items.append(Item(item['media_or_ad']))
+            if 'feed_items' in response and len(response['feed_items']):
+                for item in response['feed_items']:
+                    if 'media_or_ad' in item and item['media_or_ad']:
+                        items.append(Item(item['media_or_ad']))
 
             self.feed_items = items
             self.megaphone = FeedAysf(response['megaphone']['feed_aysf'])  # todo KeyError: 'megaphone'

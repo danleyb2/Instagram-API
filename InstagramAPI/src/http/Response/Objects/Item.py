@@ -55,8 +55,12 @@ class Item(object):
         self.client_cache_key = item['client_cache_key']
         self.filter_type = item['filter_type']
         images = []
-        for image in item['image_versions2']['candidates']:
-            images.append(HdProfilePicUrlInfo(image))
+        if 'image_versions2' in item \
+                and 'candidates' in item['image_versions2'] \
+                and len(item['image_versions2']['candidates']):
+
+            for image in item['image_versions2']['candidates']:
+                images.append(HdProfilePicUrlInfo(image))
 
         self.image_versions2 = images
         self.original_width = item['original_width']
@@ -67,8 +71,9 @@ class Item(object):
         self.has_more_comments = item['has_more_comments']
         self.max_num_visible_preview_comments = item['max_num_visible_preview_comments']
         comments = []
-        for comment in item['comments']:
-            comments.append(Comment(comment))
+        if 'comments' in item and len(item['comments']):
+            for comment in item['comments']:
+                comments.append(Comment(comment))
 
         self.comments = comments
         self.comment_count = item['comment_count']
