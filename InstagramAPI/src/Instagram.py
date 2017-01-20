@@ -256,7 +256,7 @@ class Instagram:
         :rtype: object
         :return: Pending Inbox Data
         """
-        pendingInbox = self.request('direct_v2/pending_inbox/?')[1]
+        pendingInbox = self.http.request('direct_v2/pending_inbox/?')[1]
 
         if pendingInbox['status'] != 'ok':
             raise InstagramException(pendingInbox['message'] + "\n")
@@ -356,7 +356,7 @@ class Instagram:
         :rtype: object
         :return: Direct Thread Data
         """
-        directThread = self.request("direct_v2/threads/" + str(threadId) + "/?")[1]
+        directThread = self.http.request("direct_v2/threads/" + str(threadId) + "/?")[1]
 
         if directThread['status'] != 'ok':
             raise InstagramException(directThread['message'] + "\n")
@@ -382,7 +382,7 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
-        return self.request("direct_v2/threads/" + str(threadId) + "/" + str(threadAction) + "/",
+        return self.http.request("direct_v2/threads/" + str(threadId) + "/" + str(threadAction) + "/",
                             self.generateSignature(data))[1]
 
     def configureVideo(self, upload_id, video, caption=''):
