@@ -82,7 +82,7 @@ class HttpInterface(object):
 
         return [header, json.loads(body)]
 
-    def uploadPhoto(self, photo, caption=None, upload_id=None):
+    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None):
         """
         Upload photo to Instagram.
 
@@ -96,8 +96,10 @@ class HttpInterface(object):
         endpoint = Constants.API_URL + 'upload/photo/'
         boundary = self.parent.uuid
 
-        if upload_id is not None:
+        if upload_id is not None and customPreview is None:
             fileToUpload = Utils.createVideoIcon(photo)
+        elif customPreview is not None:
+            fileToUpload = customPreview
         else:
             upload_id = locale.format("%.*f", (0, round(float('%.2f' % time.time()) * 1000)), grouping=False)
             fileToUpload = file_get_contents(photo)
@@ -195,7 +197,7 @@ class HttpInterface(object):
 
         return configure
 
-    def uploadVideo(self, video, caption=None):
+    def uploadVideo(self, video, caption=None, customPreview=None):
 
         videoData = file_get_contents(video)
 
@@ -326,7 +328,7 @@ class HttpInterface(object):
         if self.parent.debug:
             print 'RESPONSE: ' + resp[header_len:] + "\n"
 
-        configure = self.parent.configureVideo(upload['upload_id'], video, caption)
+        configure = self.parent.configureVideo(upload['upload_id'], video, caption, customPreview)
         self.parent.expose()
 
         return configure[1]

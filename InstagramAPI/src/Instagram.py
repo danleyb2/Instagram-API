@@ -305,7 +305,7 @@ class Instagram:
         else:
             return False
 
-    def uploadPhoto(self, photo, caption=None, upload_id=None):
+    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None):
         """
         Upload photo to Instagram.
 
@@ -316,9 +316,9 @@ class Instagram:
         :rtype: object
         :return: Upload data
         """
-        return self.http.uploadPhoto(photo, caption, upload_id)
+        return self.http.uploadPhoto(photo, caption, upload_id, customPreview)
 
-    def uploadVideo(self, video, caption=None):
+    def uploadVideo(self, video, caption=None, customPreview=None):
         """
         Upload video to Instagram.
 
@@ -329,7 +329,7 @@ class Instagram:
         :rtype: object
         :return: Upload data
         """
-        return self.http.uploadVideo(video, caption)
+        return self.http.uploadVideo(video, caption), customPreview
 
     def direct_share(self, media_id, recipients, text=None):
         self.http.direct_share(media_id, recipients, text)
@@ -385,9 +385,9 @@ class Instagram:
         return self.request("direct_v2/threads/" + str(threadId) + "/" + str(threadAction) + "/",
                             self.generateSignature(data))[1]
 
-    def configureVideo(self, upload_id, video, caption=''):
+    def configureVideo(self, upload_id, video, caption='', customPreview=None):
 
-        self.uploadPhoto(video, caption, upload_id)
+        self.uploadPhoto(video, caption, upload_id, customPreview)
         size = Image.open(video).size[0]
 
         post = json.dumps(
