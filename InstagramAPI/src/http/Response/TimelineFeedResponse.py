@@ -35,8 +35,9 @@ class TimelineFeedResponse(Response):
                         items.append(Item(item['media_or_ad']))
 
             self.feed_items = items
-            self.megaphone = FeedAysf(response['megaphone']['feed_aysf']) if (
-            'megaphone' in response and 'feed_aysf' in response['megaphone']) else None
+            if 'megaphone' in response and 'feed_aysf' in response['megaphone']:
+                self.megaphone = FeedAysf(response['megaphone']['feed_aysf']) if 'megaphone' in response else None
+
         else:
             self.setMessage(response['message'])
         self.setStatus(response['status'])
