@@ -256,10 +256,10 @@ class Instagram:
         :rtype: object
         :return: Pending Inbox Data
         """
-        pendingInbox = self.request('direct_v2/pending_inbox/?')[1]
+        pendingInbox = PendingInboxResponse(self.http.request('direct_v2/pending_inbox/?')[1])
 
-        if pendingInbox['status'] != 'ok':
-            raise InstagramException(pendingInbox['message'] + "\n")
+        if not pendingInbox.isOk():
+            raise InstagramException(pendingInbox.getMessage() + "\n")
             # return FIXME unreachable code
 
         return pendingInbox
@@ -289,7 +289,7 @@ class Instagram:
                 ('experiment', 'ig_android_profile_contextual_feed')
             ])
         )
-        return self.http.request('qe/expose/', SignatureUtils.generateSignature(data))[1]
+        return ExposeResponse(self.http.request('qe/expose/', SignatureUtils.generateSignature(data))[1])
 
     def logout(self):
         """

@@ -5,6 +5,7 @@ from CheckUsernameResponse import CheckUsernameResponse
 from ConfigureResponse import ConfigureResponse
 from ConfigureVideoResponse import ConfigureVideoResponse
 from ExploreResponse import ExploreResponse
+from ExposeResponse import ExposeResponse
 from FollowerResponse import FollowerResponse
 from FollowingResponse import FollowingResponse
 from LocationResponse import LocationResponse
@@ -12,6 +13,7 @@ from LoginResponse import LoginResponse
 from LogoutResponse import LogoutResponse
 from MediaInfoResponse import MediaInfoResponse
 from MediaLikersResponse import MediaLikersResponse
+from PendingInboxResponse import PendingInboxResponse
 from ProfileResponse import ProfileResponse
 from ReelsTrayFeedResponse import ReelsTrayFeedResponse
 from Response import Response
