@@ -1038,14 +1038,14 @@ class Instagram:
         :return: User feed data
         :raises: InstagramException
         """
-        userFeed = self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
-                                     + (("&max_id=" + str(maxid)) if maxid is not None else '') \
-                                     + (("&minTimestamp=" + str(minTimestamp)) if minTimestamp is not None else '') \
-                                     + "&ranked_content=true"
-                                     )[1]
+        userFeed = UserFeedResponse(self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
+                                                      + (("&max_id=" + str(maxid)) if maxid is not None else '') \
+                                                      + (("&minTimestamp=" + str(minTimestamp)) if minTimestamp is not None else '') \
+                                                      + "&ranked_content=true"
+                                                      )[1])
 
-        if userFeed['status'] != 'ok':
-            raise InstagramException(userFeed['message'] + "\n")
+        if not userFeed.isOk():
+            raise InstagramException(userFeed.getMessage() + "\n")
 
         return userFeed
 
@@ -1107,13 +1107,13 @@ class Instagram:
 
         return locationFeed
 
-    def getSelfUserFeed(self):
+    def getSelfUserFeed(self, max_id=None):
         """
         Get self user feed.
         :rtype: object
         :return: User feed data
         """
-        return self.getUserFeed(self.username_id)
+        return self.getUserFeed(self.username_id, max_id)
 
     def getPopularFeed(self):
         """
@@ -1256,20 +1256,39 @@ class Instagram:
         """
         Backups all your uploaded photos :).
         """
-        myUploads = self.getSelfUserFeed()
-        for item in myUploads['items']:
-            dir_name = self.IGDataPath + 'backup/' + self.username + "-" + time.strftime('%Y-%m-%d')
-            if os.path.isdir(dir_name):
-                os.mkdir(dir_name)
-            file_put_contents(
-                os.path.join(dir_name, item['id'] + '.jpg'),
-                urllib.urlopen(item['image_versions2']['candidates'][0]['url']).read()
-            )  # todo test and remove below
+        go = False
+        while True:
+            if not go:
+                myUploads = self.getSelfUserFeed()
+            else:
+                myUploads = self.getSelfUserFeed(myUploads.getNextMaxId() if myUploads.getNextMaxId() else None)
 
-            # urllib.urlretrieve(
-            #    item['image_versions2']['candidates'][0]['url'],
-            #    self.IGDataPath + 'backup/' + self.username + "-" + time.strftime('%Y-%m-%d') + '/' + item['id'] + '.jpg'
-            # )
+            if not os.path.isdir(self.IGDataPath + 'backup/'):
+                os.mkdir(self.IGDataPath + 'backup/')
+
+            for item in myUploads.getItems():
+                dir_name = self.IGDataPath + 'backup/' + self.username + "-" + time.strftime('%Y-%m-%d')
+                if not os.path.isdir(dir_name):
+                    os.mkdir(dir_name)
+
+                if item.getVideoVersions():
+                    file_put_contents(
+                        os.path.join(dir_name, item.getMediaId() + '.mp4'),
+                        urllib.urlopen(item.getVideoVersions()[0].getUrl()).read()
+                    )  # todo test and remove below
+                else:
+                    file_put_contents(
+                        os.path.join(dir_name, item.getMediaId() + '.jpg'),
+                        urllib.urlopen(item.getImageVersions()[0].getUrl()).read()
+                    )  # todo test and remove below
+
+                    # urllib.urlretrieve(
+                    #    item['image_versions2']['candidates'][0]['url'],
+                    #    self.IGDataPath + 'backup/' + self.username + "-" + time.strftime('%Y-%m-%d') + '/' + item['id'] + '.jpg'
+                    # )
+            go = True
+
+            if not myUploads.getNextMaxId(): break
 
     def follow(self, userId):
         """

@@ -32,7 +32,7 @@ class Item(object):
         self.caption = None
         self.caption_is_edited = None
         self.photo_of_you = None
-        self.video_versions = ''
+        self.video_versions = None
         self.has_audio = False
         self.video_duration = ''
         self.user = None

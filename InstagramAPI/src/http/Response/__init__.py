@@ -22,6 +22,7 @@ from TimelineFeedResponse import TimelineFeedResponse
 from UploadJobVideoResponse import UploadJobVideoResponse
 from UploadPhotoResponse import UploadPhotoResponse
 from UploadVideoResponse import UploadVideoResponse
+from UserFeedResponse import UserFeedResponse
 from UsernameInfoResponse import UsernameInfoResponse
 from UsernameSuggestionsResponse import UsernameSuggestionsResponse
 from UsertagsResponse import UsertagsResponse
