@@ -38,5 +38,56 @@ class ProfileResponse(Response):
 
         self.setStatus(response['status'])
 
-    def getProperty(self, property):  # todo shadows built-in property
-        return getattr(self, property)
+    def getUsername(self):
+        return self.username
+
+    def getPhoneNumber(self):
+        return self.phone_number
+
+    def hasAnonymousProfilePicture(self):
+        return self.has_anonymous_profile_picture
+
+    def getHdProfilePicVersions(self):
+        return self.hd_profile_pic_versions
+
+    def getGender(self):
+        return self.gender
+
+    def getBirthday(self):
+        return self.birthday
+
+    def needsEmailConfirm(self):
+        return self.needs_email_confirm
+
+    def getNationalNumber(self):
+        return self.national_number
+
+    def getProfilePicUrl(self):
+        return self.profile_pic_url
+
+    def getProfilePicId(self):
+        return self.profile_pic_id
+
+    def getBiography(self):
+        return self.biography
+
+    def getFullName(self):
+        return self.full_name
+
+    def getUsernameId(self):
+        return self.pk
+
+    def getCountryCode(self):
+        return self.country_code
+
+    def getHdProfilePicUrlInfo(self):
+        return self.hd_profile_pic_url_info
+
+    def getEmail(self):
+        return self.email
+
+    def isPrivate(self):
+        return self.is_private
+
+    def getExternalUrl(self):
+        return self.external_url
