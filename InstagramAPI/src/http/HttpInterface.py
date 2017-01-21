@@ -187,7 +187,7 @@ class HttpInterface(object):
             print 'RESPONSE: ' + resp[header_len:] + "\n"
 
         if reel_flag:
-            configure = self.parent.configure_to_reel(upload.getUploadId(), photo)
+            configure = self.parent.configureToReel(upload.getUploadId(), photo)
         else:
             configure = self.parent.configure(upload.getUploadId(), photo, caption)
 
