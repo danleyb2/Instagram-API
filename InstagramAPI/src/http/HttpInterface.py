@@ -99,7 +99,7 @@ class HttpInterface(object):
         if upload_id is not None and customPreview is None:
             fileToUpload = Utils.createVideoIcon(photo)
         elif customPreview is not None:
-            fileToUpload = customPreview
+            fileToUpload = file_get_contents(customPreview)
         else:
             upload_id = locale.format("%.*f", (0, round(float('%.2f' % time.time()) * 1000)), grouping=False)
             fileToUpload = file_get_contents(photo)
