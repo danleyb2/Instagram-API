@@ -18,18 +18,17 @@ class User(object):
         self.profile_pic_url = userData['profile_pic_url']
         self.full_name = userData['full_name']
         self.pk = userData['pk']
-        if 'is_verified' in userData:
+        if 'is_verified' in userData and userData['is_verified']:
             self.is_verified = userData['is_verified']
         self.is_private = userData['is_private']
-        if 'has_anonymous_profile_picture' in userData:
+        if 'has_anonymous_profile_picture' in userData and userData['has_anonymous_profile_picture']:
             self.has_anonymous_profile_picture = userData['has_anonymous_profile_picture']
-        if 'is_favorite' in userData:
+        if 'is_favorite' in userData and userData['is_favorite']:
             self.is_favorite = userData['is_favorite']
-        if 'coeff_weight' in userData:
+        if 'coeff_weight' in userData and userData['coeff_weight']:
             self.coeff_weight = userData['coeff_weight']
-        if 'friendship_status' in userData:
+        if 'friendship_status' in userData and userData['friendship_status']:
             self.friendship_status = FriendshipStatus(userData['friendship_status'])
-
 
     def getUsername(self):
         return self.username

@@ -19,7 +19,8 @@ class ExploreResponse(Response):
             self.max_id = response['max_id']
             items = []
             for item in response['items']:
-                items.append(Item(item['media']))
+                if 'media' in item and item['media']:
+                    items.append(Item(item['media']))
 
             self.items = items
         else:

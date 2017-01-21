@@ -10,12 +10,14 @@ class ReelsTrayFeedResponse(Response):
 
         if self.STATUS_OK == response['status']:
             trays = []
-            for tray in response['tray']:
-                items = []
-                for item in tray['items']:
-                    items.append(Item(item))
+            if 'tray' in response and len(response['tray']):
+                for tray in response['tray']:
+                    items = []
+                    if 'items' in tray and len(tray['items']):
+                        for item in tray['items']:
+                            items.append(Item(item))
 
-                trays.append(Tray(items, tray['user'], tray['can_reply'], tray['expiring_at']))
+                    trays.append(Tray(items, tray['user'], tray['can_reply'], tray['expiring_at']))
 
             self.trays = trays
         else:
