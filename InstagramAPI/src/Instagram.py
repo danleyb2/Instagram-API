@@ -318,6 +318,10 @@ class Instagram:
         """
         return self.http.uploadPhoto(photo, caption, upload_id, customPreview)
 
+    def uploadPhotoReel(self, photo, caption=None, upload_id=None, customPreview=None):
+
+        return self.http.uploadPhoto(photo, caption, upload_id, customPreview, True)
+
     def uploadVideo(self, video, caption=None, customPreview=None):
         """
         Upload video to Instagram.
@@ -466,6 +470,41 @@ class Instagram:
         post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]')
 
         return ConfigureResponse(self.http.request('media/configure/', SignatureUtils.generateSignature(post))[1])
+
+    def configureToReel(self, upload_id, photo):
+
+        size = Image.open(photo).size[0]
+
+        post = json.dumps(
+            OrderedDict([
+                ('upload_id', upload_id),
+                ('source_type', 3),
+                ('edits', OrderedDict([
+                    ('crop_original_size', [size, size]),
+                    ('crop_zoom', 1.3333334),
+                    ('crop_center', [0.0, 0.0])
+                ])),
+                ('extra', OrderedDict([
+                    ('source_width', size),
+                    ('source_height', size)
+                ])),
+
+                ('device', OrderedDict([
+                    ('manufacturer', self.settings.get('manufacturer')),
+                    ('model', self.settings.get('model')),
+                    ('android_version', Constants.ANDROID_VERSION),
+                    ('android_release', Constants.ANDROID_RELEASE)
+                ])),
+                ('_csrftoken', self.token),
+                ('_uuid', self.uuid),
+                ('_uid', self.username_id)
+
+            ])
+        )
+        post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]')
+
+        return ConfigureResponse(
+            self.http.request('media/configure_to_reel/', SignatureUtils.generateSignature(post))[1])
 
     def editMedia(self, mediaId, captionText=''):
         """

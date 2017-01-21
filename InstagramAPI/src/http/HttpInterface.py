@@ -82,7 +82,7 @@ class HttpInterface(object):
 
         return [header, json.loads(body)]
 
-    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None):
+    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, reel_flag=False):
         """
         Upload photo to Instagram.
 
@@ -98,8 +98,6 @@ class HttpInterface(object):
 
         if upload_id is not None and customPreview is None:
             fileToUpload = Utils.createVideoIcon(photo)
-        elif customPreview is not None:
-            fileToUpload = file_get_contents(customPreview)
         else:
             upload_id = locale.format("%.*f", (0, round(float('%.2f' % time.time()) * 1000)), grouping=False)
             fileToUpload = file_get_contents(photo)
@@ -188,7 +186,10 @@ class HttpInterface(object):
         if self.parent.debug:
             print 'RESPONSE: ' + resp[header_len:] + "\n"
 
-        configure = self.parent.configure(upload.getUploadId(), photo, caption)
+        if reel_flag:
+            configure = self.parent.configure_to_reel(upload.getUploadId(), photo)
+        else:
+            configure = self.parent.configure(upload.getUploadId(), photo, caption)
 
         if not configure.isOk():
             raise InstagramException(configure.getMessage())
