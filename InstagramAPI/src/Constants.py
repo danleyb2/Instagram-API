@@ -1,8 +1,7 @@
-# /**
-# * Constant declarations.
-# */
-
-class Constants:
+class Constants(object):
+    """
+    Constant declarations.
+    """
     API_URL = 'https://i.instagram.com/api/v1/'
     VERSION = '9.1.5'
     IG_SIG_KEY = 'af0431ace409e957498c6050e2299baa829014a781905eef3fc94139151e5d38'
