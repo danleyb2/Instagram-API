@@ -29,6 +29,8 @@ class UsernameInfoResponse(Response):
         self.hd_profile_pic_url_info = None
         self.usertag_review_enabled = False
         self.external_url = None
+        self.is_favorite = None
+        self.is_verified = None
 
         if self.STATUS_OK == response['status']:
             self.usertags_count = response['user']['usertags_count']
@@ -62,6 +64,8 @@ class UsernameInfoResponse(Response):
                 self.can_see_organic_insights = response['user']['can_see_organic_insights']
 
             self.is_private = response['user']['is_private']
+            self.is_favorite = response['user']['is_favorite']
+            self.is_favorite = response['user']['is_verified']  # todo possible typo bug
             if 'can_convert_to_business' in response['user']:
                 self.can_convert_to_business = response['user']['can_convert_to_business']
 
@@ -135,6 +139,12 @@ class UsernameInfoResponse(Response):
 
     def canConvertToBusiness(self):
         return self.can_convert_to_business
+
+    def isFavorite(self):
+        return self.is_favorite
+
+    def isVerified(self):
+        return self.is_verified
 
     def isBusiness(self):
         return self.is_business
