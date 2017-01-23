@@ -2,6 +2,7 @@ from AccountCreationResponse import AccountCreationResponse
 from ChallengeResponse import ChallengeResponse
 from CheckEmailResponse import CheckEmailResponse
 from CheckUsernameResponse import CheckUsernameResponse
+from CommentResponse import CommentResponse
 from ConfigureResponse import ConfigureResponse
 from ConfigureVideoResponse import ConfigureVideoResponse
 from ExploreResponse import ExploreResponse
