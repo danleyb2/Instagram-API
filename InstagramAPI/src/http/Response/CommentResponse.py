@@ -9,7 +9,9 @@ class CommentResponse(Response):
         self.next_max_id = None
 
         if self.STATUS_OK == response['status']:
-            self.next_max_id = response['next_max_id']
+            self.next_max_id = response['next_max_id'] \
+                if 'next_max_id' in response and response['next_max_id'] \
+                else None
             comments = []
             for comment in response['comments']:
                 comments.append(Comment(comment))
