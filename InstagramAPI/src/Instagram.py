@@ -1213,7 +1213,7 @@ class Instagram:
         )
         return self.http.request("media/" + mediaId + "/unlike/", SignatureUtils.generateSignature(data))[1]
 
-    def getMediaComments(self, mediaId):
+    def getMediaComments(self, mediaId, maxid):
         """
         Get media comments.
         :type mediaId: str
@@ -1221,7 +1221,8 @@ class Instagram:
         :rtype: object
         :return: Media comments data
         """
-        return self.http.request("media/" + mediaId + "/comments/?")[1]
+        return CommentResponse(self.http.request("media/" + mediaId + "/comments/?max_id=" + str(maxid)
+                                                 + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION)[1])
 
     def setNameAndPhone(self, name='', phone=''):
         """
