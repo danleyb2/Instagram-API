@@ -784,7 +784,7 @@ class Instagram:
         :rtype: object
         :return: Username data
         """
-        return self.http.request("users/" + str(usernameId) + "/info/")[1]
+        return UsernameInfoResponse(self.http.request("users/" + str(usernameId) + "/info/")[1])
 
     def getSelfUsernameInfo(self):
         """
