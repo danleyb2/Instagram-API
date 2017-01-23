@@ -340,7 +340,7 @@ class Instagram:
 
     def direct_message(self, recipients, text):
         """
-        Send direct message to user by inbox
+        Send direct message to user by inbox.
 
         :type recipients: list|int
         :param recipients: Users id
@@ -497,7 +497,7 @@ class Instagram:
                 ])),
                 ('_csrftoken', self.token),
                 ('_uuid', self.uuid),
-                ('_uid', self.username_id)
+                ('_uid', self.username_id),
 
             ])
         )
@@ -1139,7 +1139,7 @@ class Instagram:
         :return: followers data
         """
         return FollowingResponse(self.http.request(
-            "friendships/" + usernameId + "/following/?max_id=" + maxid + "&ig_sig_key_version=" \
+            "friendships/" + usernameId + "/following/?max_id=" + maxid + "&ig_sig_key_version="
             + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1])
 
     def getUserFollowers(self, usernameId, maxid=''):
@@ -1152,7 +1152,7 @@ class Instagram:
         :return: followers data
         """
         return FollowerResponse(self.http.request(
-            "friendships/" + usernameId + "/followers/?max_id=" + maxid \
+            "friendships/" + usernameId + "/followers/?max_id=" + maxid
             + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1])
 
     def getSelfUserFollowers(self):
@@ -1262,7 +1262,7 @@ class Instagram:
                 myUploads = self.getSelfUserFeed()
             else:
                 myUploads = self.getSelfUserFeed(myUploads.getNextMaxId() if myUploads.getNextMaxId() else None)
-
+                # fixme local variable `myUploads` might be referenced before assignment
             if not os.path.isdir(self.IGDataPath + 'backup/'):
                 os.mkdir(self.IGDataPath + 'backup/')
 
@@ -1287,8 +1287,8 @@ class Instagram:
                     #    self.IGDataPath + 'backup/' + self.username + "-" + time.strftime('%Y-%m-%d') + '/' + item['id'] + '.jpg'
                     # )
             go = True
-
-            if not myUploads.getNextMaxId(): break
+            if not myUploads.getNextMaxId():
+                break
 
     def follow(self, userId):
         """
