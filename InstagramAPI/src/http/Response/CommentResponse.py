@@ -25,5 +25,5 @@ class CommentResponse(Response):
     def getNextMaxId(self):
         return self.next_max_id
 
-    def has_more_comments(self):
+    def hasMoreComments(self):
         return self.has_more_comments

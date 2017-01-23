@@ -1213,7 +1213,7 @@ class Instagram:
         )
         return self.http.request("media/" + mediaId + "/unlike/", SignatureUtils.generateSignature(data))[1]
 
-    def getMediaComments(self, mediaId, maxid):
+    def getMediaComments(self, mediaId, maxid=''):
         """
         Get media comments.
         :type mediaId: str
