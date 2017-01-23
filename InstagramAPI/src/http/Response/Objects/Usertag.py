@@ -8,7 +8,7 @@ class Usertag(object):
 
         ins = []
         for _in in data['in']:
-            _in.append(In(_in))  # todo possible bug `_in.append`
+            ins.append(In(_in))
 
         self._in = ins
 
