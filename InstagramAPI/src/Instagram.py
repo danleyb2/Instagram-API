@@ -360,7 +360,7 @@ class Instagram:
         :rtype: object
         :return: Direct Thread Data
         """
-        directThread = self.request("direct_v2/threads/" + str(threadId) + "/?")[1]
+        directThread = self.http.request("direct_v2/threads/" + str(threadId) + "/?")[1]
 
         if directThread['status'] != 'ok':
             raise InstagramException(directThread['message'] + "\n")
@@ -386,8 +386,10 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
-        return self.request("direct_v2/threads/" + str(threadId) + "/" + str(threadAction) + "/",
-                            self.generateSignature(data))[1]
+        return self.http.request(
+            "direct_v2/threads/" + str(threadId) + "/" + str(threadAction) + "/",
+            self.generateSignature(data)
+        )[1]
 
     def configureVideo(self, upload_id, video, caption='', customPreview=None):
 
