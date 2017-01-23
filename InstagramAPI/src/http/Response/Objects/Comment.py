@@ -10,7 +10,6 @@ class Comment(object):
         self.bit_flags = None
         self.user = None
         self.comment = None
-        self.media_id = None
         self.pk = None
 
         self.status = commentData['status']
@@ -20,7 +19,6 @@ class Comment(object):
         self.bit_flags = commentData['bit_flags']
         self.user = User(commentData['user'])
         self.comment = commentData['text']
-        self.media_id = commentData['media_id']
         self.pk = commentData['pk']
 
     def getStatus(self):
@@ -43,9 +41,6 @@ class Comment(object):
 
     def getComment(self):
         return self.comment
-
-    def getMediaId(self):
-        return self.media_id
 
     def getCommentId(self):
         return self.pk
