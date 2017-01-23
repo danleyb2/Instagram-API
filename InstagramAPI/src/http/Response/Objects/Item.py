@@ -64,6 +64,7 @@ class Item(object):
 
         self.image_versions2 = images
         self.original_width = item['original_width']
+        self.original_height = item['original_height']
         if 'view_count' in item and item['view_count']:
             self.view_count = item['view_count']
 
