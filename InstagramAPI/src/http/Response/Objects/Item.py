@@ -3,6 +3,7 @@ from InstagramAPI.src.http.Response.Objects.Comment import Comment
 from InstagramAPI.src.http.Response.Objects.Explore import Explore
 from InstagramAPI.src.http.Response.Objects.HdProfilePicUrlInfo import HdProfilePicUrlInfo
 from InstagramAPI.src.http.Response.Objects.User import User
+from InstagramAPI.src.http.Response.Objects.Usertag import Usertag
 from InstagramAPI.src.http.Response.Objects.VideoVersions import VideoVersions
 
 
@@ -114,7 +115,7 @@ class Item(object):
         if 'impression_token' in item and item['impression_token']:
             self.impression_token = item['impression_token']
         if 'usertags' in item and item['usertags']:
-            self.usertags = item['usertags']
+            self.usertags = Usertag(item['usertags'])
 
     def getTakenAt(self):
         return self.taken_at
