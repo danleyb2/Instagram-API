@@ -225,5 +225,5 @@ class Item(object):
     def getMediaId(self):
         return self.id
 
-    def getUsernameId(self):
+    def getPk(self):
         return self.pk
