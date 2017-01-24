@@ -1,19 +1,14 @@
-from InstagramAPI.src.http.Response.Objects.User import User
 from Response import Response
 
 
-class autoCompleteUserListResponse(Response):
-
+class RankedRecipientsResponse(Response):
     def __init__(self, response):
         self.expires = None
-        self.users = None
+        self.ranked_recipients = None
 
         if self.STATUS_OK == response['status']:
             self.expires = response['expires']
-            users = []
-            for user in response['users']:
-                users.append(User(user))
-            self.users = users
+            self.ranked_recipients = response['ranked_recipients']
         else:
             self.setMessage(response['message'])
         self.setStatus(response['status'])
@@ -21,5 +16,5 @@ class autoCompleteUserListResponse(Response):
     def getExpires(self):
         return self.expires
 
-    def getUsers(self):
-        return self.users
+    def getRankedRecipients(self):
+        return self.ranked_recipients

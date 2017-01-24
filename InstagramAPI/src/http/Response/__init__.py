@@ -16,6 +16,8 @@ from MediaInfoResponse import MediaInfoResponse
 from MediaLikersResponse import MediaLikersResponse
 from PendingInboxResponse import PendingInboxResponse
 from ProfileResponse import ProfileResponse
+from RankedRecipientsResponse import RankedRecipientsResponse
+from RecentRecipientsResponse import RecentRecipientsResponse
 from ReelsTrayFeedResponse import ReelsTrayFeedResponse
 from Response import Response
 from TagFeedResponse import TagFeedResponse

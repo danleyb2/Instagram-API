@@ -208,11 +208,14 @@ class Instagram:
             self.settings.set('token', self.token)
 
             self.syncFeatures()
-            self.timelineFeed()
-            self.getReelsTrayFeed()
             self.autoCompleteUserList()
+            self.timelineFeed()
+            self.getRankedRecipients()
+            self.getRecentRecipients()
+            # self.megaphoneLog()
             self.getv2Inbox()
             self.getRecentActivity()
+            self.getReelsTrayFeed()
             self.explore()
 
             return response
@@ -222,11 +225,16 @@ class Instagram:
         if check.getMessage() == 'login_required':
             self.login(True)
 
-        # self.getReelsTrayFeed()
-        # self.autoCompleteUserList()
+        self.autoCompleteUserList()
+        self.getReelsTrayFeed()
+        self.getRankedRecipients()
+        # push register
+        self.getRecentRecipients()
+        # push register
+        # self.megaphoneLog()
         self.getv2Inbox()
         self.getRecentActivity()
-        # self.explore()
+        self.explore()
 
     def syncFeatures(self):
         data = json.dumps(
@@ -264,6 +272,36 @@ class Instagram:
 
         return pendingInbox
 
+    def getRankedRecipients(self):
+        """
+        Ranked recipients.
+
+        :rtype:list
+        :return: Ranked recipients Data
+        """
+        ranked_recipients = RankedRecipientsResponse(self.http.request('direct_v2/ranked_recipients/')[1])
+
+        if not ranked_recipients.isOk():
+            raise InstagramException(ranked_recipients.getMessage() + "\n")
+            # return todo unreachable code
+
+        return ranked_recipients
+
+    def getRecentRecipients(self):
+        """
+        Recent recipients.
+
+        :rtype: list
+        :return: Ranked recipients Data
+        """
+        recent_recipients = RecentRecipientsResponse(self.http.request('direct_share/recent_recipients/')[1])
+
+        if not recent_recipients.isOk():
+            raise InstagramException(recent_recipients.getMessage() + "\n")
+            # return todo unreachable code
+
+        return recent_recipients
+
     def explore(self):
         """
         Explore Tab
@@ -271,7 +309,7 @@ class Instagram:
         :rtype: object
         :return: Explore data
         """
-        explore = ExploreResponse(self.http.request('discover/explore/?')[1])
+        explore = ExploreResponse(self.http.request('discover/explore/')[1])
 
         if not explore.isOk():
             raise InstagramException(explore.getMessage() + "\n")
