@@ -222,8 +222,8 @@ class Item(object):
     def getlikers(self):
         return self.likers
 
-    def getPk(self):
-        return self.pk
-
-    def getId(self):
+    def getMediaId(self):
         return self.id
+
+    def getUsernameId(self):
+        return self.pk
