@@ -29,6 +29,9 @@ the maintainers wont be able to **merge** because we believe (it's true :) ) it 
 
 **But you are always free to fork and do anything you want to your fork**
 
+Here is a video on an easy way to help do the translations 
+https://www.youtube.com/watch?v=ExFAUFcUN5I
+
 Thank you.
 
 
