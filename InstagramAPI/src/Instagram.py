@@ -249,7 +249,23 @@ class Instagram:
         return self.http.request('qe/sync/', SignatureUtils.generateSignature(data))[1]
 
     def autoCompleteUserList(self):
-        return autoCompleteUserListResponse(self.http.request('friendships/autocomplete_user_list/')[1])
+        return autoCompleteUserListResponse(self.http.request('friendships/autocomplete_user_list/?version=2')[1])
+
+    def pushRegister(self, deviceToken):
+        data = json.dumps(
+            OrderedDict([
+                ('_uuid', self.uuid),
+                ('device_id', self.device_id),
+                ('device_type', 'android'),
+                ('device_token', deviceToken),
+                ('_csrftoken', self.token),
+                ('users', self.username_id)
+            ])
+        )
+        return self.http.request(
+            'push/register/?platform=10&device_type=android',
+            SignatureUtils.generateSignature(data)
+        )[1]
 
     def timelineFeed(self):
         return TimelineFeedResponse(self.http.request('feed/timeline/')[1])
@@ -279,7 +295,9 @@ class Instagram:
         :rtype:list
         :return: Ranked recipients Data
         """
-        ranked_recipients = RankedRecipientsResponse(self.http.request('direct_v2/ranked_recipients/')[1])
+        ranked_recipients = RankedRecipientsResponse(
+            self.http.request('direct_v2/ranked_recipients/?show_threads=true')[1]
+        )
 
         if not ranked_recipients.isOk():
             raise InstagramException(ranked_recipients.getMessage() + "\n")
