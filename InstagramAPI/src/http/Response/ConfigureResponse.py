@@ -11,6 +11,8 @@ class ConfigureResponse(Response):
         if self.STATUS_OK == response['status']:
             self.upload_id = response['upload_id']
             self.media_id = response['media']['id']
+
+            # TODO see fix at danleyb2/Instagram-API#20
             self.image_url = response['media']['image_versions2']['candidates']['0']['url']
             self.media_code = response['media']['code']
         else:
