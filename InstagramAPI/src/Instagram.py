@@ -171,6 +171,7 @@ class Instagram:
         :rtype List:
         """
         if (not self.isLoggedIn) or force:
+            self.syncFeatures(True)
             fetch = self.http.request(
                 'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None, True)
             header = fetch[0]
@@ -212,7 +213,7 @@ class Instagram:
             self.timelineFeed()
             self.getRankedRecipients()
             self.getRecentRecipients()
-            # self.megaphoneLog()
+            self.megaphoneLog()
             self.getv2Inbox()
             self.getRecentActivity()
             self.getReelsTrayFeed()
@@ -231,39 +232,57 @@ class Instagram:
         # push register
         self.getRecentRecipients()
         # push register
-        # self.megaphoneLog()
+        self.megaphoneLog()
         self.getv2Inbox()
         self.getRecentActivity()
         self.explore()
 
-    def syncFeatures(self):
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('id', self.username_id),
-                ('_csrftoken', self.token),
-                ('experiments', Constants.EXPERIMENTS)
-            ])
-        )
-        return self.http.request('qe/sync/', SignatureUtils.generateSignature(data))[1]
+    def syncFeatures(self, prelogin=False):
+        if prelogin:
+            data = json.dumps(
+                OrderedDict([
+                    ('id', SignatureUtils.generateUUID(True)),
+                    ('experiments', Constants.LOGIN_EXPERIMENTS)
+                ])
+            )
+        else:
+
+            data = json.dumps(
+                OrderedDict([
+                    ('_uuid', self.uuid),
+                    ('_uid', self.username_id),
+                    ('_csrftoken', self.token),
+                    ('id', self.username_id),
+                    ('experiments', Constants.EXPERIMENTS)
+                ])
+            )
+        return SyncResponse(self.http.request('qe/sync/', SignatureUtils.generateSignature(data))[1])
 
     def autoCompleteUserList(self):
         return autoCompleteUserListResponse(self.http.request('friendships/autocomplete_user_list/?version=2')[1])
 
-    def pushRegister(self, deviceToken):
+    def pushRegister(self, gcmToken):
+        deviceToken = json.dumps(
+            OrderedDict([
+                ('k', gcmToken),
+                ('v', 0),
+                ('t', 'fbns-b64')
+            ])
+        )
         data = json.dumps(
             OrderedDict([
                 ('_uuid', self.uuid),
-                ('device_id', self.device_id),
-                ('device_type', 'android'),
+                ('guid', self.uuid),
+                ('phone_id', SignatureUtils.generateUUID(True)),
+                ('device_type', 'android_mqtt'),
                 ('device_token', deviceToken),
+                ('is_main_push_channel', True),
                 ('_csrftoken', self.token),
                 ('users', self.username_id)
             ])
         )
         return self.http.request(
-            'push/register/?platform=10&device_type=android',
+            'push/register/?platform=10&device_type=android_mqtt',
             SignatureUtils.generateSignature(data)
         )[1]
 
@@ -271,7 +290,18 @@ class Instagram:
         return TimelineFeedResponse(self.http.request('feed/timeline/')[1])
 
     def megaphoneLog(self):
-        return self.http.request('megaphone/log/')[1]
+        data = json.dumps(
+            OrderedDict([
+                ('type', 'feed_aysf'),
+                ('action', 'seen'),
+                ('reason', ''),
+                ('_uuid', self.uuid),
+                ('device_id', self.device_id),
+                ('_csrftoken', self.token),
+                ('uuid', hashlib.md5(str(int(time.time()))).hexdigest())
+            ])
+        )
+        return MegaphoneLogResponse(self.http.request('megaphone/log/', urllib.urlencode(data))[1])
 
     def getPendingInbox(self):
         """

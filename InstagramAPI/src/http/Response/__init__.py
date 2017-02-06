@@ -14,12 +14,14 @@ from LoginResponse import LoginResponse
 from LogoutResponse import LogoutResponse
 from MediaInfoResponse import MediaInfoResponse
 from MediaLikersResponse import MediaLikersResponse
+from MegaphoneLogResponse import MegaphoneLogResponse
 from PendingInboxResponse import PendingInboxResponse
 from ProfileResponse import ProfileResponse
 from RankedRecipientsResponse import RankedRecipientsResponse
 from RecentRecipientsResponse import RecentRecipientsResponse
 from ReelsTrayFeedResponse import ReelsTrayFeedResponse
 from Response import Response
+from SyncResponse import SyncResponse
 from TagFeedResponse import TagFeedResponse
 from TimelineFeedResponse import TimelineFeedResponse
 from UploadJobVideoResponse import UploadJobVideoResponse
