@@ -101,7 +101,7 @@ class Instagram:
             self.isLoggedIn = False
 
     def checkSettings(self, username):
-        if self.customPath:
+        if not self.customPath:
             self.IGDataPath = os.path.join(
                 os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
                 username,
@@ -1277,8 +1277,9 @@ class Instagram:
         :rtype: object
         :return: Media comments data
         """
-        return CommentResponse(self.http.request("media/" + str(mediaId) + "/comments/?max_id=" + str(maxid)
-                                                 + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION)[1])
+        return CommentResponse(self.http.request(
+            "media/" + str(mediaId) + "/comments/?max_id=" + str(maxid) +
+            "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION+ "&rank_token=" + self.rank_token)[1])
 
     def setNameAndPhone(self, name='', phone=''):
         """
