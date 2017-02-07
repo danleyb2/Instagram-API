@@ -245,6 +245,7 @@ class Instagram:
                     ('experiments', Constants.LOGIN_EXPERIMENTS)
                 ])
             )
+            return SyncResponse(self.http.request('qe/sync/', SignatureUtils.generateSignature(data), True)[1])
         else:
 
             data = json.dumps(
@@ -256,7 +257,7 @@ class Instagram:
                     ('experiments', Constants.EXPERIMENTS)
                 ])
             )
-        return SyncResponse(self.http.request('qe/sync/', SignatureUtils.generateSignature(data))[1])
+            return SyncResponse(self.http.request('qe/sync/', SignatureUtils.generateSignature(data))[1])
 
     def autoCompleteUserList(self):
         return autoCompleteUserListResponse(self.http.request('friendships/autocomplete_user_list/?version=2')[1])

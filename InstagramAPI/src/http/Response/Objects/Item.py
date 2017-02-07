@@ -70,15 +70,18 @@ class Item(object):
             self.view_count = item['view_count']
 
         self.organic_tracking_token = item['organic_tracking_token']
-        self.has_more_comments = item['has_more_comments']
-        self.max_num_visible_preview_comments = item['max_num_visible_preview_comments']
+        if 'has_more_comments' in item and len(item['has_more_comments']):
+            self.has_more_comments = item['has_more_comments']
+        if 'max_num_visible_preview_comments' in item and len(item['max_num_visible_preview_comments']):
+            self.max_num_visible_preview_comments = item['max_num_visible_preview_comments']
         comments = []
         if 'comments' in item and len(item['comments']):
             for comment in item['comments']:
                 comments.append(Comment(comment))
 
         self.comments = comments
-        self.comment_count = item['comment_count']
+        if 'comment_count' in item and len(item['comment_count']):
+            self.comment_count = item['comment_count']
         if item['caption']:
             self.caption = Caption(item['caption'])
         self.caption_is_edited = item['caption_is_edited']

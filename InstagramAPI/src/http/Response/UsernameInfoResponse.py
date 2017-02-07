@@ -65,7 +65,8 @@ class UsernameInfoResponse(Response):
 
             self.is_private = response['user']['is_private']
             self.is_favorite = response['user']['is_favorite']
-            self.is_favorite = response['user']['is_verified']  # todo possible typo bug
+            if 'is_verified' in response['user']:
+                self.is_favorite = response['user']['is_verified']  # todo possible typo bug
             if 'can_convert_to_business' in response['user']:
                 self.can_convert_to_business = response['user']['can_convert_to_business']
 
