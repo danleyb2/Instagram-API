@@ -101,7 +101,7 @@ class Instagram:
             self.isLoggedIn = False
 
     def checkSettings(self, username):
-        if self.customPath:
+        if not self.customPath:
             self.IGDataPath = os.path.join(
                 os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data'),
                 username,
