@@ -12,6 +12,7 @@ from FollowingResponse import FollowingResponse
 from LocationResponse import LocationResponse
 from LoginResponse import LoginResponse
 from LogoutResponse import LogoutResponse
+from MediaCommentsResponse import MediaCommentsResponse
 from MediaInfoResponse import MediaInfoResponse
 from MediaLikersResponse import MediaLikersResponse
 from MegaphoneLogResponse import MegaphoneLogResponse

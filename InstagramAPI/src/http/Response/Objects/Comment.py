@@ -11,15 +11,23 @@ class Comment(object):
         self.user = None
         self.comment = None
         self.pk = None
+        self.type = None
+        self.media_id = None
 
         self.status = commentData['status']
-        self.username_id = commentData['user_id']
+        if 'user_id' in commentData and commentData['user_id']:
+            self.username_id = commentData['user_id']
         self.created_at_utc = commentData['created_at_utc']
         self.created_at = commentData['created_at']
-        self.bit_flags = commentData['bit_flags']
+        if 'bit_flags' in commentData and commentData['bit_flags']:
+            self.bit_flags = commentData['bit_flags']
         self.user = User(commentData['user'])
         self.comment = commentData['text']
         self.pk = commentData['pk']
+        if 'type' in commentData and commentData['type']:
+            self.type = commentData['type']
+        if 'media_id' in commentData and commentData['media_id']:
+            self.media_id = commentData['media_id']
 
     def getStatus(self):
         return self.status
@@ -44,3 +52,9 @@ class Comment(object):
 
     def getCommentId(self):
         return self.pk
+
+    def getType(self):
+        return self.type
+
+    def getMediaId(self):
+        return self.media_id

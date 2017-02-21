@@ -613,7 +613,10 @@ class Instagram:
                 ('caption_text', captionText)
             ])
         )
-        return self.http.request("media/" + mediaId + "/edit_media/", SignatureUtils.generateSignature(data))[1]
+        # Unresolved Reference MediaResponse
+        return MediaResponse(
+            self.http.request("media/" + mediaId + "/edit_media/", SignatureUtils.generateSignature(data))[1]['media']
+        )
 
     def removeSelftag(self, mediaId):
         """
@@ -630,7 +633,11 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
-        return self.http.request("usertags/" + mediaId + "/remove/", SignatureUtils.generateSignature(data))[1]
+
+        # Unresolved Reference MediaResponse
+        return MediaResponse(
+            self.http.request("usertags/" + mediaId + "/remove/", SignatureUtils.generateSignature(data))[1]
+        )
 
     def mediaInfo(self, mediaId):
         """
@@ -687,7 +694,9 @@ class Instagram:
                 ('comment_text', commentText)
             ])
         )
-        return self.http.request("media/" + mediaId + "/comment/", SignatureUtils.generateSignature(data))[1]
+        return CommentResponse(
+            self.http.request("media/" + mediaId + "/comment/", SignatureUtils.generateSignature(data))[1]
+        )
 
     def deleteComment(self, mediaId, commentId):
         """
@@ -706,6 +715,7 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
+        # TODO unnecessary new keyword on PHP
         return \
             self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/",
                               SignatureUtils.generateSignature(data))[1]
@@ -1308,8 +1318,8 @@ class Instagram:
         :rtype: object
         :return: Media comments data
         """
-        return CommentResponse(self.http.request("media/" + str(mediaId) + "/comments/?max_id=" + str(maxid)
-                                                 + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION)[1])
+        return MediaCommentsResponse(self.http.request("media/" + str(mediaId) + "/comments/?max_id=" + str(maxid)
+                                                       + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION)[1])
 
     def setNameAndPhone(self, name='', phone=''):
         """
