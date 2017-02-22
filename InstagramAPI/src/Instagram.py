@@ -715,7 +715,6 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
-        # TODO unnecessary new keyword on PHP
         return \
             self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/",
                               SignatureUtils.generateSignature(data))[1]
