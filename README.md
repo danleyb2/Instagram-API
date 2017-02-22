@@ -9,7 +9,7 @@ PYTHON [![Latest Stable Version](http://img.shields.io/pypi/v/instagram-python.s
 
 
 
-Instagram's private API.
+This is Instagram's private API. It has all the features the Instagram app has, including media upload.
 
 **Read the [wiki](https://github.com/danleyb2/Instagram-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.  
 **Wiki for the PHP code should be 90% applicable too because the code is just translated, not transformed**
