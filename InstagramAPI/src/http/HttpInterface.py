@@ -70,16 +70,29 @@ class HttpInterface(object):
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
         header = resp[0: header_len]
         body = resp[header_len:]
-        ch.close()
+
 
         if self.parent.debug:
             import urllib
-            print "REQUEST: " + endpoint
+            if post:
+                print "\033[34m POST: \033[0m  " + endpoint
+            else:
+                print "\033[34m GET: \033[0m " + endpoint
+
             if post is not None:
                 if not isinstance(post, list):
                     print 'DATA: ' + urllib.unquote_plus(post)
-            print "RESPONSE: " + body + "\n"
 
+            bytes = Utils.formatBytes(ch.getinfo(pycurl.SIZE_DOWNLOAD))
+            httpCode = ch.getinfo(pycurl.HTTP_CODE)
+            print "\033[32m ← " + httpCode + " " + bytes + "\t \033[0m"
+
+            if self.parent.truncatedDebug and len(body) > 1000:
+                print "\033[36m RESPONSE: \033[0m" + body[0:1000] + "...\n"
+            else:
+                print "\033[36m RESPONSE: \033[0m" + body + "\n"
+
+        ch.close()
         return [header, json.loads(body)]
 
     def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, reel_flag=False):

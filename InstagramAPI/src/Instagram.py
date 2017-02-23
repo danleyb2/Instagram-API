@@ -23,7 +23,7 @@ locale.setlocale(locale.LC_NUMERIC, '')
 
 
 class Instagram:
-    def __init__(self, username, password, debug=False, IGDataPath=None):
+    def __init__(self, username, password, debug=False, IGDataPath=None, truncatedDebug=False):
 
         """
         Default class constructor.
@@ -37,6 +37,7 @@ class Instagram:
         self.username = None  # // Instagram username
         self.password = None  # // Instagram password
         self.debug = None  # // Debug
+        self.truncatedDebug = None
 
         self.uuid = None  # // UUID
         self.device_id = None  # // Device ID
@@ -53,6 +54,7 @@ class Instagram:
         self.proxyAuth = None  # Proxy User and Pass
 
         self.debug = debug
+        self.truncatedDebug = truncatedDebug
         self.device_id = SignatureUtils.generateDeviceId(hashlib.md5(username + password))
 
         if IGDataPath is not None:

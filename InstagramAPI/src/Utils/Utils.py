@@ -1,8 +1,7 @@
 import hashlib
-from tempfile import mkdtemp
-
 import os
 from PIL import Image
+from tempfile import mkdtemp
 
 from php import *
 
@@ -104,3 +103,13 @@ class Utils:
         image.close()
         # image_p.close()
         return i
+
+    @staticmethod
+    def formatBytes(bytes_, precision=2):
+        import math
+        units = ('B', 'kB', 'mB', 'gB', 'tB')
+        bytes_ = max(bytes_, 0)
+        pow_ = math.floor((math.log(bytes_) if bytes_ else 0) / math.log(1024))
+        pow_ = min(pow_, len(units) - 1)
+        bytes_ /= math.pow(1024, pow_)
+        return str(round(bytes_, precision)) + ' ' + units[int(pow_)]
