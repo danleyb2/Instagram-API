@@ -1,4 +1,4 @@
-from InstagramAPI.src.http.Response import Response
+from Response import Response
 
 
 class MegaphoneLogResponse(Response):

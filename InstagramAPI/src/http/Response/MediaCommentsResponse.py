@@ -1,5 +1,5 @@
-from InstagramAPI.src.http.Response import Response
 from InstagramAPI.src.http.Response.Objects.Item import Item
+from Response import Response
 
 
 class MediaCommentsResponse(Response):
