@@ -86,7 +86,7 @@ class HttpInterface(object):
 
             bytes = Utils.formatBytes(ch.getinfo(pycurl.SIZE_DOWNLOAD))
             httpCode = ch.getinfo(pycurl.HTTP_CODE)
-            print "\033[32m ← " + httpCode + " " + bytes + "\t \033[0m"
+            print "\033[32m ← " + str(httpCode) + " " + bytes + "\t \033[0m"
 
             if self.parent.truncatedDebug and len(body) > 1000:
                 print "\033[36m RESPONSE: \033[0m" + body[0:1000] + "...\n"
