@@ -76,9 +76,9 @@ class HttpInterface(object):
         if self.parent.debug:
             import urllib
             if post:
-                print "\033[34m POST: \033[0m  " + endpoint
+                print Utils.colouredString('POST:  ', 'light_blue') + endpoint
             else:
-                print "\033[34m GET: \033[0m " + endpoint
+                print Utils.colouredString('GET:  ', 'light_blue') + endpoint
 
             if post is not None:
                 if not isinstance(post, list):
@@ -86,12 +86,12 @@ class HttpInterface(object):
 
             bytes = Utils.formatBytes(ch.getinfo(pycurl.SIZE_DOWNLOAD))
             httpCode = ch.getinfo(pycurl.HTTP_CODE)
-            print "\033[32m ← " + str(httpCode) + " " + bytes + "\t \033[0m"
+            print Utils.colouredString("← " + str(httpCode) + " \t " + bytes, 'green')
 
             if self.parent.truncatedDebug and len(body) > 1000:
-                print "\033[36m RESPONSE: \033[0m" + body[0:1000] + "...\n"
+                print Utils.colouredString('RESPONSE: ', 'cyan') + body[0:1000] + "...\n"
             else:
-                print "\033[36m RESPONSE: \033[0m" + body + "\n"
+                print Utils.colouredString('RESPONSE: ', 'cyan') + body + "\n"
 
         ch.close()
         return [header, json.loads(body)]
