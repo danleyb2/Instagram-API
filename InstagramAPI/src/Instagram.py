@@ -293,8 +293,7 @@ class Instagram:
         return TimelineFeedResponse(self.http.request('feed/timeline/')[1])
 
     def megaphoneLog(self):
-        data = json.dumps(
-            OrderedDict([
+        data = OrderedDict([
                 ('type', 'feed_aysf'),
                 ('action', 'seen'),
                 ('reason', ''),
@@ -302,8 +301,8 @@ class Instagram:
                 ('device_id', self.device_id),
                 ('_csrftoken', self.token),
                 ('uuid', hashlib.md5(str(int(time.time()))).hexdigest())
-            ])
-        )
+        ])
+
         return MegaphoneLogResponse(self.http.request('megaphone/log/', urllib.urlencode(data))[1])
 
     def getPendingInbox(self):
