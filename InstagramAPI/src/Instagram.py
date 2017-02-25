@@ -1008,9 +1008,19 @@ class Instagram:
         """
         return self.getGeoMedia(self.username_id)
 
-    def searchLocation(self, latitude, longitude):
-        locations = LocationResponse(self.http.request(
-            "location_search/?rank_token=" + self.rank_token + "&latitude=" + latitude + "&longitude=" + longitude)[1])
+    def searchLocation(self, latitude, longitude, query=None):
+        locationQuery = OrderedDict([
+            ('rank_token', self.rank_token),
+            ('latitude', latitude),
+            ('longitude', longitude)
+        ])
+
+        if query:
+            locationQuery['timestamp'] = int(time.time())
+        else:
+            locationQuery['search_query'] = query  # TODO possible bug, query is None
+
+        locations = LocationResponse(self.http.request("location_search/?" + urllib.urlencode(locationQuery))[1])
 
         if not locations.isOk():
             raise InstagramException(locations.getMessage() + "\n")
