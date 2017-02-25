@@ -7,7 +7,8 @@ class MediaCommentsResponse(Response):
         self.item = None
 
         if self.STATUS_OK == response['status']:
-            self.item = Item(response['media'])
+            if 'media' in response and response['media']:
+                self.item = Item(response['media'])
         else:
             self.setMessage(response['message'])
         self.setStatus(response['status'])
