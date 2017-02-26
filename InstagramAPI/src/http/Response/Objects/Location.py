@@ -9,7 +9,8 @@ class Location(object):
 
         self.name = location['name']
         self.external_id_source = location['external_id_source']
-        self.address = location['address']
+        if 'address' in location and location['address']:
+            self.address = location['address']
         self.lat = location['lat']
         self.lng = location['lng']
         self.external_id = location['external_id']

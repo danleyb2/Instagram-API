@@ -96,7 +96,7 @@ class HttpInterface(object):
         ch.close()
         return [header, json.loads(body)]
 
-    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, reel_flag=False):
+    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, location=None, reel_flag=False):
         """
         Upload photo to Instagram.
 
@@ -205,7 +205,7 @@ class HttpInterface(object):
         if reel_flag:
             configure = self.parent.configureToReel(upload.getUploadId(), photo)
         else:
-            configure = self.parent.configure(upload.getUploadId(), photo, caption)
+            configure = self.parent.configure(upload.getUploadId(), photo, caption, location)
 
         if not configure.isOk():
             raise InstagramException(configure.getMessage())

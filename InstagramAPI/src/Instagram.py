@@ -393,7 +393,7 @@ class Instagram:
         else:
             return False
 
-    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None):
+    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, location=None):
         """
         Upload photo to Instagram.
 
@@ -404,11 +404,11 @@ class Instagram:
         :rtype: object
         :return: Upload data
         """
-        return self.http.uploadPhoto(photo, caption, upload_id, customPreview)
+        return self.http.uploadPhoto(photo, caption, upload_id, customPreview, location)
 
     def uploadPhotoReel(self, photo, caption=None, upload_id=None, customPreview=None):
 
-        return self.http.uploadPhoto(photo, caption, upload_id, customPreview, True)
+        return self.http.uploadPhoto(photo, caption, upload_id, customPreview, None, True)
 
     def uploadVideo(self, video, caption=None, customPreview=None):
         """
@@ -523,12 +523,11 @@ class Instagram:
         return ConfigureVideoResponse(
             self.http.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1])
 
-    def configure(self, upload_id, photo, caption=''):
-
+    def configure(self, upload_id, photo, caption='', location=None):
+        caption = caption if caption else ''
         size = Image.open(photo).size[0]
 
-        post = json.dumps(
-            OrderedDict([
+        post = OrderedDict([
                 ('upload_id', upload_id),
                 ('camera_model', self.settings.get('model').replace(" ", "")),
                 ('source_type', 3),
@@ -555,8 +554,25 @@ class Instagram:
                 ('_uid', self.username_id),
                 ('caption', caption)
 
+        ])
+        if location:
+            loc = OrderedDict([
+                (str(location.getExternalIdSource()) + '_id', location.getExternalId()),
+                ('name', location.getName()),
+                ('lat', location.getLatitude()),
+                ('lng', location.getLongitude()),
+                ('address', location.getAddress()),
+                ('external_source', location.getExternalIdSource())
             ])
-        )
+            post['location'] = json.dumps(loc)
+            post['geotag_enabled'] = True
+            post['media_latitude'] = location.getLatitude()
+            post['posting_latitude'] = location.getLatitude()
+            post['media_longitude'] = location.getLongitude()
+            post['posting_longitude'] = location.getLongitude()
+            post['altitude'] = mt_rand(10, 800)
+
+        post = json.dumps(post)
         post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]')
 
         return ConfigureResponse(self.http.request('media/configure/', SignatureUtils.generateSignature(post))[1])
