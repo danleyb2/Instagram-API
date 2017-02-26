@@ -406,7 +406,7 @@ class Instagram:
         """
         return self.http.uploadPhoto(photo, caption, upload_id, customPreview, location, filter_)
 
-    def uploadPhotoReel(self, photo, caption=None, upload_id=None, customPreview=None):
+    def uploadPhotoStory(self, photo, caption=None, upload_id=None, customPreview=None):
 
         return self.http.uploadPhoto(photo, caption, upload_id, customPreview, None, None, True)
 
