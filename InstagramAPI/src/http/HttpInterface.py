@@ -97,16 +97,7 @@ class HttpInterface(object):
         return [header, json.loads(body)]
 
     def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, location=None, reel_flag=False):
-        """
-        Upload photo to Instagram.
 
-        :type photo: str
-        :param photo: Path to your photo
-        :type caption: str
-        :param caption: Caption to be included in your photo.
-        :rtype: object
-        :return: Upload data
-        """
         endpoint = Constants.API_URL + 'upload/photo/'
         boundary = self.parent.uuid
 
@@ -351,11 +342,7 @@ class HttpInterface(object):
         return configure[1]
 
     def changeProfilePicture(self, photo):
-        """
-        Sets account to public.
-        :type photo: str
-        :param photo: Path to photo
-        """
+
         if photo is None:
             print ("Photo not valid")
             return
