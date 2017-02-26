@@ -393,7 +393,7 @@ class Instagram:
         else:
             return False
 
-    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, location=None):
+    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, location=None, filter_=None):
         """
         Upload photo to Instagram.
 
@@ -404,11 +404,11 @@ class Instagram:
         :rtype: object
         :return: Upload data
         """
-        return self.http.uploadPhoto(photo, caption, upload_id, customPreview, location)
+        return self.http.uploadPhoto(photo, caption, upload_id, customPreview, location, filter_)
 
     def uploadPhotoReel(self, photo, caption=None, upload_id=None, customPreview=None):
 
-        return self.http.uploadPhoto(photo, caption, upload_id, customPreview, None, True)
+        return self.http.uploadPhoto(photo, caption, upload_id, customPreview, None, None, True)
 
     def uploadVideo(self, video, caption=None, customPreview=None):
         """
@@ -523,7 +523,7 @@ class Instagram:
         return ConfigureVideoResponse(
             self.http.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1])
 
-    def configure(self, upload_id, photo, caption='', location=None):
+    def configure(self, upload_id, photo, caption='', location=None, filter_=None):
         caption = caption if caption else ''
         size = Image.open(photo).size[0]
 
@@ -571,6 +571,9 @@ class Instagram:
             post['media_longitude'] = location.getLongitude()
             post['posting_longitude'] = location.getLongitude()
             post['altitude'] = mt_rand(10, 800)
+
+        if filter_:
+            post['edits']['filter_type'] = Utils.getFilterCode(filter)
 
         post = json.dumps(post)
         post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]')

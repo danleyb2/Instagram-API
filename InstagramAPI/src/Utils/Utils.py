@@ -142,3 +142,51 @@ class Utils:
 
         colored_string += string + "\033[0m"
         return colored_string
+
+    @staticmethod
+    def getFilterCode():
+
+        filters = []
+        filters[108] = "Charmes"
+        filters[116] = "Ashby"
+        filters[117] = "Helena"
+        filters[115] = "Brooklyn"
+        filters[105] = "Dogpatch"
+        filters[113] = "Skyline"
+        filters[107] = "Ginza"
+        filters[118] = "Maven"
+        filters[16] = "Kelvin"
+        filters[14] = "1977"
+        filters[20] = "Walden"
+        filters[19] = "Toaster"
+        filters[18] = "Sutro"
+        filters[22] = "Brannan"
+        filters[3] = "Earlybird"
+        filters[106] = "Vesper"
+        filters[109] = "Stinson"
+        filters[15] = "Nashville"
+        filters[21] = "Hefe"
+        filters[10] = "Inkwell"
+        filters[2] = "Lo-Fi"
+        filters[28] = "Willow"
+        filters[27] = "Sierra"
+        filters[1] = "X Pro II"
+        filters[25] = "Valencia"
+        filters[26] = "Hudson"
+        filters[23] = "Rise"
+        filters[17] = "Mayfair"
+        filters[24] = "Amaro"
+        filters[608] = "Perpetua"
+        filters[612] = "Aden"
+        filters[603] = "Ludwig"
+        filters[616] = "Crema"
+        filters[605] = "Slumber"
+        filters[613] = "Juno"
+        filters[614] = "Reyes"
+        filters[615] = "Lark"
+        filters[111] = "Moon"
+        filters[114] = "Gingham"
+        filters[112] = "Clarendon"
+        filters[0] = "Normal"
+
+        return filters.index(filter)

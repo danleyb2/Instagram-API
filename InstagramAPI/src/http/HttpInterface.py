@@ -96,7 +96,8 @@ class HttpInterface(object):
         ch.close()
         return [header, json.loads(body)]
 
-    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, location=None, reel_flag=False):
+    def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, location=None, filter_=None,
+                    reel_flag=False):
 
         endpoint = Constants.API_URL + 'upload/photo/'
         boundary = self.parent.uuid
@@ -196,7 +197,7 @@ class HttpInterface(object):
         if reel_flag:
             configure = self.parent.configureToReel(upload.getUploadId(), photo)
         else:
-            configure = self.parent.configure(upload.getUploadId(), photo, caption, location)
+            configure = self.parent.configure(upload.getUploadId(), photo, caption, location, filter_)
 
         if not configure.isOk():
             raise InstagramException(configure.getMessage())
