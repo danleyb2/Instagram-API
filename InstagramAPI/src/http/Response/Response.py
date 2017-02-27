@@ -1,10 +1,13 @@
-class Response(object):
+from InstagramAPI.src.Utils import *
+
+class Response(AutoResponseFunctionSetter):
     STATUS_OK = "ok"
     STATUS_FAIL = "fail"
 
-    status = None
-    message = None
-    fullResponse = None
+    def __init__(self):
+        self.status = None
+        self.message = None
+        self.fullResponse = None
 
     def setStatus(self, status):
         self.status = status
