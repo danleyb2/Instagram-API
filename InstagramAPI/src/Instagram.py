@@ -3,6 +3,7 @@ import locale
 import re
 import time
 import urllib
+import inspect
 from collections import OrderedDict
 from distutils.version import LooseVersion
 
@@ -23,6 +24,8 @@ locale.setlocale(locale.LC_NUMERIC, '')
 
 
 class Instagram:
+    instance = None
+
     def __init__(self, username, password, debug=False, IGDataPath=None, truncatedDebug=False):
 
         """
@@ -1539,3 +1542,100 @@ class Instagram:
 
     def verifyHost(self, enable):
         self.http.verifyHost(enable)
+
+    @staticmethod
+    def getInstance():
+        if Instagram.instance == None:
+            Instagram.instance = Instagram()
+
+        return Instagram.instance
+
+
+class Request:
+    def __init__(self, url):
+        self.params = []
+        self.posts = []
+        self.requireLogin = False
+        self.floodWait = False
+        self.checkStatus = True
+        self.signedPost = True
+        self.replacePost = []
+
+        self.url = url
+
+    def addParams(self, key, value):
+        if value == True:
+            value = "true"
+
+        self.params[key] = value
+
+        return self
+
+    def addPost(self, key, value):
+        self.posts[key] = value
+
+        return self
+
+    # Here we deviate slightly from the PHP function name because of limitations in python
+    def setRequireLogin(self, requireLogin_=False):
+        self.requireLogin = requireLogin_
+
+        return self
+
+    def setFloodWait(self, floodWait=False):
+        self.floodWait = floodWait
+
+        return self
+
+    def setCheckStatus(self, checkStatus=True):
+        self.checkStatus = checkStatus
+
+        return self
+
+    def setReplacePost(self, replace=[]):
+        self.replacePost = replace
+
+        return self
+
+    def getResponse(self, obj, includeHeader = False):
+        instagramObj = Instagram.getInstance()
+
+        if self.params:
+            endPoint = self.url + "?" + compat_urllib_parse.urlencode(self.params)
+        else:
+            endPoint = self.url
+        if self.posts:
+            if self.signedPost:
+                post = SignatureUtils.generateSignature(json.dumps(data))
+            else:
+                post = compat_urllib_parse.urlencode(self.posts)
+        else:
+            post = None
+        if self.replacePost:
+            for key in self.replacePost:
+                post = post.replace(key, self.replacePost[key])
+
+        response = instagramObj.http.request(endPoint, post, self.requireLogin, self.floodWait, False)
+
+        if response[1] == None:
+            raise InstagramException('No response from server, connection or configure error', ErrorCode.EMPTY_RESPONSE)
+
+        # Here we deviate from the PHP function because JsonMapper doesn't exist for python AFAIK
+        def _map(obj, root):
+            for key in root:
+                if key in obj.__dict__ and inspect.isclass(obj.__dict__[key]):
+                    map(obj.__dict__[key], root[key])
+                else:
+                    obj.__dict__[key] = root[key]
+        _map(obj, response[1])
+        responseObject = obj
+
+        if self.checkStatus and not responseObject.isOk():
+            raise InstagramException(obj.__class__.__name__ + ' : ' + responseObject.getMessage())
+
+        if includeHeader:
+            responseObject.setFullResponse(response)
+        else:
+            responseObject.setFullResponse(response[1])
+
+        return responseObject
