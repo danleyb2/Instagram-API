@@ -11,13 +11,13 @@ try:
 except ImportError:
     from StringIO import StringIO as BytesIO
 
-from Utils import *
-from http import HttpInterface, UserAgent
-from http.Response import *
+from .Utils import *
+from .http import HttpInterface, UserAgent
+from .http.Response import *
 
-from InstagramException import InstagramException
-from Constants import Constants
-from SignatureUtils import SignatureUtils
+from .InstagramException import InstagramException
+from .Constants import Constants
+from .SignatureUtils import SignatureUtils
 
 locale.setlocale(locale.LC_NUMERIC, '')
 
@@ -67,7 +67,7 @@ class Instagram:
                 ''
             )
             if not os.path.isdir(self.IGDataPath):
-                os.mkdir(self.IGDataPath, 0777)
+                os.mkdir(self.IGDataPath, 0o777)
 
         self.checkSettings(username)
 
@@ -110,7 +110,7 @@ class Instagram:
                 ''
             )
 
-        if not os.path.isdir(self.IGDataPath): os.mkdir(self.IGDataPath, 0777)
+        if not os.path.isdir(self.IGDataPath): os.mkdir(self.IGDataPath, 0o777)
 
         self.settings = Settings(
             os.path.join(self.IGDataPath, 'settings-' + username + '.dat')

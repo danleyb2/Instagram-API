@@ -30,7 +30,7 @@ class Checkpoint(object):
                 username,
                 ''
             )
-            if not os.path.isdir(self.settingsPath): os.mkdir(self.settingsPath, 0777)
+            if not os.path.isdir(self.settingsPath): os.mkdir(self.settingsPath, 0o777)
 
         self.settings = Settings(self.settingsPath + 'settings-' + username + '.dat')
         self.userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_3 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G34 Instagram 8.5.2 (iPhone5,2; iPhone OS 9_3_3; es_ES; es-ES; scale=2.00; 640x1136)'
@@ -140,10 +140,10 @@ class Checkpoint(object):
 
         if self.debug:
             import urllib
-            print "REQUEST: " + endpoint
+            print("REQUEST: " + endpoint)
             if post is not None:
                 if not isinstance(post, list):
-                    print 'DATA: ' + urllib.unquote_plus(json.dumps(post))
-            print "RESPONSE: " + body + "\n"
+                    print('DATA: ' + urllib.unquote_plus(json.dumps(post)))
+            print("RESPONSE: " + body + "\n")
 
         return [header, json_decode(body)]

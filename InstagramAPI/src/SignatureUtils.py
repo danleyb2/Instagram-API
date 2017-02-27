@@ -1,8 +1,8 @@
 import hmac
 import urllib
 
-from Constants import Constants
-from Utils import *
+from .Constants import Constants
+from .Utils import *
 
 
 class SignatureUtils:

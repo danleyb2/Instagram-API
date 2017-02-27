@@ -76,22 +76,22 @@ class HttpInterface(object):
         if self.parent.debug:
             import urllib
             if post:
-                print Utils.colouredString('POST:  ', 'light_blue') + endpoint
+                print(Utils.colouredString('POST:  ', 'light_blue') + endpoint)
             else:
-                print Utils.colouredString('GET:  ', 'light_blue') + endpoint
+                print(Utils.colouredString('GET:  ', 'light_blue') + endpoint)
 
             if post is not None:
                 if not isinstance(post, list):
-                    print 'DATA: ' + urllib.unquote_plus(post)
+                    print('DATA: ' + urllib.unquote_plus(post))
 
             bytes = Utils.formatBytes(ch.getinfo(pycurl.SIZE_DOWNLOAD))
             httpCode = ch.getinfo(pycurl.HTTP_CODE)
-            print Utils.colouredString("← " + str(httpCode) + " \t " + bytes, 'green')
+            print(Utils.colouredString("← " + str(httpCode) + " \t " + bytes, 'green'))
 
             if self.parent.truncatedDebug and len(body) > 1000:
-                print Utils.colouredString('RESPONSE: ', 'cyan') + body[0:1000] + "...\n"
+                print(Utils.colouredString('RESPONSE: ', 'cyan') + body[0:1000] + "...\n")
             else:
-                print Utils.colouredString('RESPONSE: ', 'cyan') + body + "\n"
+                print(Utils.colouredString('RESPONSE: ', 'cyan') + body + "\n")
 
         ch.close()
         return [header, json.loads(body)]
@@ -192,7 +192,7 @@ class HttpInterface(object):
             raise InstagramException(upload.getMessage())
 
         if self.parent.debug:
-            print 'RESPONSE: ' + resp[header_len:] + "\n"
+            print('RESPONSE: ' + resp[header_len:] + "\n")
 
         if reel_flag:
             configure = self.parent.configureToReel(upload.getUploadId(), photo)
@@ -335,7 +335,7 @@ class HttpInterface(object):
         ch.close()
 
         if self.parent.debug:
-            print 'RESPONSE: ' + resp[header_len:] + "\n"
+            print('RESPONSE: ' + resp[header_len:] + "\n")
 
         configure = self.parent.configureVideo(upload['upload_id'], video, caption, customPreview)
         self.parent.expose()
@@ -345,7 +345,7 @@ class HttpInterface(object):
     def changeProfilePicture(self, photo):
 
         if photo is None:
-            print ("Photo not valid")
+            print("Photo not valid")
             return
 
         uData = json.dumps(

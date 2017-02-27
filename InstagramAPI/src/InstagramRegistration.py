@@ -17,8 +17,8 @@ try:
 except ImportError:
     from io import BytesIO
 
-from Constants import Constants
-from Utils import *
+from .Constants import Constants
+from .Utils import *
 
 
 class InstagramRegistration(object):
@@ -231,10 +231,10 @@ class InstagramRegistration(object):
         ch.close()
 
         if self.debug:
-            print "REQUEST: " + endpoint
+            print("REQUEST: " + endpoint)
             if post is not None:
                 if not isinstance(post, list):
-                    print "DATA: " + str(post)
-            print "RESPONSE: " + body
+                    print("DATA: " + str(post))
+            print("RESPONSE: " + body)
 
         return [header, json_decode(body)]

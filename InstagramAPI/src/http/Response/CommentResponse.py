@@ -1,5 +1,5 @@
 from InstagramAPI.src.http.Response.Objects.Comment import Comment
-from Response import Response
+from .Response import Response
 
 
 class CommentResponse(Response):

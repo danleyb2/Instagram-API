@@ -1,5 +1,5 @@
 from InstagramAPI.src.http.Response.Objects.Item import Item
-from Response import Response
+from .Response import Response
 
 
 class TagFeedResponse(Response):

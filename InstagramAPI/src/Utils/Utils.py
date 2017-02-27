@@ -3,7 +3,7 @@ import os
 from PIL import Image
 from tempfile import mkdtemp
 
-from php import *
+from .php import *
 
 
 class Utils:

@@ -1,5 +1,5 @@
 from InstagramAPI.src.http.Response.Objects.Inbox import Inbox
-from Response import Response
+from .Response import Response
 
 
 class V2InboxResponse(Response):

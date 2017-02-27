@@ -1,5 +1,5 @@
 from InstagramAPI.src.http.Response.Objects.HdProfilePicUrlInfo import HdProfilePicUrlInfo
-from Response import Response
+from .Response import Response
 
 
 class AccountCreationResponse(Response):

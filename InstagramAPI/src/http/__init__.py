@@ -1,2 +1,2 @@
-from HttpInterface import HttpInterface
-from UserAgent import UserAgent
+from .HttpInterface import HttpInterface
+from .UserAgent import UserAgent

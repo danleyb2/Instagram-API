@@ -1,7 +1,7 @@
 from InstagramAPI.src.http.Response.Objects.FeedAysf import FeedAysf
 from InstagramAPI.src.http.Response.Objects.Item import Item
 from InstagramAPI.src.http.Response.Objects._Message import _Message
-from Response import Response
+from .Response import Response
 
 
 class TimelineFeedResponse(Response):

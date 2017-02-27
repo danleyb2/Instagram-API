@@ -1,6 +1,6 @@
 from InstagramAPI.src.http.Response.Objects.Item import Item
 from InstagramAPI.src.http.Response.Objects.Tray import Tray
-from Response import Response
+from .Response import Response
 
 
 class ReelsTrayFeedResponse(Response):
