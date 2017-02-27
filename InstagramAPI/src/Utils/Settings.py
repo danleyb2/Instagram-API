@@ -12,6 +12,7 @@ class Settings:
         if (os.path.isfile(path)):
             with open(path, 'rb') as fp:
                 for line in fp.readlines():
+                    line = line.decode("utf-8")
                     line = line.strip(' ')
                     if line[0] == '#':  continue;
                     kv = line.split('=', 2)

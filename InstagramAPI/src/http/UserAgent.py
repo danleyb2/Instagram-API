@@ -17,7 +17,7 @@ class UserAgent:
             for line in file_handle.readlines():
                 line_of_text.append(line.strip())
         # todo doesn't look like original
-        deviceData = (line_of_text[mt_rand(0, 11867)]).split(';')
+        deviceData = (line_of_text[mt_rand(0, 11867)]).decode("utf-8").split(';')
         return deviceData
 
     def buildUserAgent(self):
