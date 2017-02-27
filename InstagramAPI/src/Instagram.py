@@ -300,10 +300,10 @@ class Instagram:
                 ('_uuid', self.uuid),
                 ('device_id', self.device_id),
                 ('_csrftoken', self.token),
-                ('uuid', hashlib.md5(str(int(time.time()))).hexdigest())
+                ('uuid', hashlib.md5(str(int(time.time())).encode("utf-8")).hexdigest())
         ])
 
-        return MegaphoneLogResponse(self.http.request('megaphone/log/', urllib.urlencode(data))[1])
+        return MegaphoneLogResponse(self.http.request('megaphone/log/', compat_urllib_parse.urlencode(data))[1])
 
     def getPendingInbox(self):
         """
