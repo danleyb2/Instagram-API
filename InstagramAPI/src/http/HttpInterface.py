@@ -67,14 +67,13 @@ class HttpInterface(object):
                 ch.setopt(pycurl.PROXYUSERPWD, self.parent.proxyAuth)
 
         ch.perform()
-        resp = buffer.getvalue()
+        resp = buffer.getvalue().decode("utf-8")
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
         header = resp[0: header_len]
         body = resp[header_len:]
 
 
         if self.parent.debug:
-            import urllib
             if post:
                 print(Utils.colouredString('POST:  ', 'light_blue') + endpoint)
             else:
@@ -82,7 +81,7 @@ class HttpInterface(object):
 
             if post is not None:
                 if not isinstance(post, list):
-                    print('DATA: ' + urllib.unquote_plus(post))
+                    print('DATA: ' + compat_urllib_parse.unquote_plus(post))
 
             bytes = Utils.formatBytes(ch.getinfo(pycurl.SIZE_DOWNLOAD))
             httpCode = ch.getinfo(pycurl.HTTP_CODE)

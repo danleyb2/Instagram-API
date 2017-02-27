@@ -1,5 +1,4 @@
 import hmac
-import urllib
 
 from .Constants import Constants
 from .Utils import *
@@ -8,10 +7,10 @@ from .Utils import *
 class SignatureUtils:
     @staticmethod
     def generateSignature(data):
-        hash = hmac.new(Constants.IG_SIG_KEY, data, hashlib.sha256).hexdigest()
+        hash = hmac.new(Constants.IG_SIG_KEY.encode("utf-8"), data.encode("utf-8"), hashlib.sha256).hexdigest()
 
         return 'ig_sig_key_version=' + Constants.SIG_KEY_VERSION + \
-               '&signed_body=' + hash + '.' + urllib.quote_plus(data)
+               '&signed_body=' + hash + '.' + compat_urllib_parse.quote_plus(data)
 
     @staticmethod
     def generateDeviceId(seed):
