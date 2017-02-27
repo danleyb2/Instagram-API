@@ -26,17 +26,13 @@ locale.setlocale(locale.LC_NUMERIC, '')
 class Instagram:
     instance = None
 
-    def __init__(self, username, password, debug=False, IGDataPath=None, truncatedDebug=False):
+    def __init__(self, debug=False, IGDataPath=None, truncatedDebug=False):
 
         """
         Default class constructor.
-        :type username: str
-        :param username: Your Instagram username.
-        :type password: str
-        :param password: Your Instagram password.
         :param debug: Debug on or off, False by default.
-        :param IGDataPath: Default folder to store data, you can change it.
         """
+        Instagram.instance = self
         self.username = None  # // Instagram username
         self.password = None  # // Instagram password
         self.debug = None  # // Debug
@@ -58,7 +54,7 @@ class Instagram:
 
         self.debug = debug
         self.truncatedDebug = truncatedDebug
-        self.device_id = SignatureUtils.generateDeviceId(hashlib.md5((username + password).encode("utf-8")))
+
 
         if IGDataPath is not None:
             self.IGDataPath = IGDataPath
@@ -72,12 +68,6 @@ class Instagram:
             if not os.path.isdir(self.IGDataPath):
                 os.mkdir(self.IGDataPath, 0o777)
 
-        self.checkSettings(username)
-
-        self.http = HttpInterface(self)
-
-        self.setUser(username, password)
-
     def setUser(self, username, password):
         """
          Set the user. Manage multiple accounts.
@@ -88,10 +78,14 @@ class Instagram:
         :param password: Your Instagram password.
         :
         """
+        self.device_id = SignatureUtils.generateDeviceId(hashlib.md5((username + password).encode("utf-8")))
+
         self.username = username
         self.password = password
 
         self.checkSettings(username)
+
+        self.http = HttpInterface(self)
 
         self.uuid = SignatureUtils.generateUUID(True)
 
@@ -177,7 +171,7 @@ class Instagram:
         """
         if (not self.isLoggedIn) or force:
             self.syncFeatures(True)
-            fetch = self.http.request(
+            fetch = self.request(
                 'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None, True)
             header = fetch[0]
             response = ChallengeResponse(fetch[1])
@@ -200,7 +194,7 @@ class Instagram:
                 ('login_attempt_count', 0)
             ])
 
-            login = self.http.request('accounts/login/', SignatureUtils.generateSignature(json.dumps(data)), True)
+            login = self.request('accounts/login/', SignatureUtils.generateSignature(json.dumps(data)), True)
             response = LoginResponse(login[1])
 
             if not response.isOk(): raise InstagramException(response.getMessage())
@@ -244,28 +238,29 @@ class Instagram:
 
     def syncFeatures(self, prelogin=False):
         if prelogin:
-            data = json.dumps(
-                OrderedDict([
-                    ('id', SignatureUtils.generateUUID(True)),
-                    ('experiments', Constants.LOGIN_EXPERIMENTS)
-                ])
+            return (
+                self.request('qe/sync/')
+                .requireLogin(True)
+                .addPost('id', SignatureUtils.generateUUID(True))
+                .addPost('experiments', Constants.LOGIN_EXPERIMENTS)
+                .getResponse(SyncResponse())
             )
-            return SyncResponse(self.http.request('qe/sync/', SignatureUtils.generateSignature(data), True)[1])
         else:
-
-            data = json.dumps(
-                OrderedDict([
-                    ('_uuid', self.uuid),
-                    ('_uid', self.username_id),
-                    ('_csrftoken', self.token),
-                    ('id', self.username_id),
-                    ('experiments', Constants.EXPERIMENTS)
-                ])
+            return (
+                self.request('qe/sync/')
+                .addPost('_uuid', self.uuid)
+                .addPost('_uid', self.username_id)
+                .addPost('_csrftoken', self.token)
+                .addPost('id', self.username_id)
+                .addPost('experiments', Constants.EXPERIMENTS)
+                .getResponse(SyncResponse())
             )
-            return SyncResponse(self.http.request('qe/sync/', SignatureUtils.generateSignature(data))[1])
 
     def autoCompleteUserList(self):
-        return autoCompleteUserListResponse(self.http.request('friendships/autocomplete_user_list/?version=2')[1])
+        (self.request('friendships/autocomplete_user_list/')
+         .setCheckStatus(False)
+         .addParams('version', '2')
+         .getResponse(autoCompleteUserListResponse()))
 
     def pushRegister(self, gcmToken):
         deviceToken = json.dumps(
@@ -287,26 +282,27 @@ class Instagram:
                 ('users', self.username_id)
             ])
         )
-        return self.http.request(
+        return self.request(
             'push/register/?platform=10&device_type=android_mqtt',
             SignatureUtils.generateSignature(data)
         )[1]
 
     def timelineFeed(self):
-        return TimelineFeedResponse(self.http.request('feed/timeline/')[1])
+        return self.request('feed/timeline/').getResponse(TimelineFeedResponse())
 
     def megaphoneLog(self):
-        data = OrderedDict([
-                ('type', 'feed_aysf'),
-                ('action', 'seen'),
-                ('reason', ''),
-                ('_uuid', self.uuid),
-                ('device_id', self.device_id),
-                ('_csrftoken', self.token),
-                ('uuid', hashlib.md5(str(int(time.time())).encode("utf-8")).hexdigest())
-        ])
-
-        return MegaphoneLogResponse(self.http.request('megaphone/log/', compat_urllib_parse.urlencode(data))[1])
+        return (
+            self.request('megaphone/log/')
+            .setSignedPost(False)
+            .addPost('type', 'feed_aysf')
+            .addPost('action', 'seen')
+            .addPost('reason', '')
+            .addPost('_uuid', self.uuid)
+            .addPost('device_id', self.device_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('uuid', hashlib.md5(str(int(time.time())).encode("utf-8")).hexdigest())
+            .getResponse(MegaphoneLogResponse())
+        )
 
     def getPendingInbox(self):
         """
@@ -315,7 +311,7 @@ class Instagram:
         :rtype: object
         :return: Pending Inbox Data
         """
-        pendingInbox = PendingInboxResponse(self.http.request('direct_v2/pending_inbox/?')[1])
+        pendingInbox = PendingInboxResponse(self.request('direct_v2/pending_inbox/?')[1])
 
         if not pendingInbox.isOk():
             raise InstagramException(pendingInbox.getMessage() + "\n")
@@ -330,8 +326,9 @@ class Instagram:
         :rtype:list
         :return: Ranked recipients Data
         """
-        ranked_recipients = RankedRecipientsResponse(
-            self.http.request('direct_v2/ranked_recipients/?show_threads=true')[1]
+        ranked_recipients = (
+            self.request('direct_v2/ranked_recipients/?show_threads=true')
+            .getResponse(RankedRecipientsResponse())
         )
 
         if not ranked_recipients.isOk():
@@ -347,7 +344,10 @@ class Instagram:
         :rtype: list
         :return: Ranked recipients Data
         """
-        recent_recipients = RecentRecipientsResponse(self.http.request('direct_share/recent_recipients/')[1])
+        recent_recipients = (
+            self.request('direct_share/recent_recipients/')
+            .getResponse(RecentRecipientsResponse())
+        )
 
         if not recent_recipients.isOk():
             raise InstagramException(recent_recipients.getMessage() + "\n")
@@ -362,13 +362,7 @@ class Instagram:
         :rtype: object
         :return: Explore data
         """
-        explore = ExploreResponse(self.http.request('discover/explore/')[1])
-
-        if not explore.isOk():
-            raise InstagramException(explore.getMessage() + "\n")
-
-            # return todo unreachable code
-        return explore
+        return self.request('discover/explore/').getResponse(ExploreResponse())
 
     def expose(self):
         data = json.dumps(
@@ -380,7 +374,7 @@ class Instagram:
                 ('experiment', 'ig_android_profile_contextual_feed')
             ])
         )
-        return ExposeResponse(self.http.request('qe/expose/', SignatureUtils.generateSignature(data))[1])
+        return ExposeResponse(self.request('qe/expose/', SignatureUtils.generateSignature(data))[1])
 
     def logout(self):
         """
@@ -389,7 +383,7 @@ class Instagram:
         :rtype: bool
         :return: Returns true if logged out correctly
         """
-        logout = LogoutResponse(self.http.request('accounts/logout/')[1])
+        logout = LogoutResponse(self.request('accounts/logout/')[1])
 
         if logout.isOk():
             return True
@@ -451,7 +445,7 @@ class Instagram:
         :rtype: object
         :return: Direct Thread Data
         """
-        directThread = self.http.request("direct_v2/threads/" + str(threadId) + "/?")[1]
+        directThread = self.request("direct_v2/threads/" + str(threadId) + "/?")[1]
 
         if directThread['status'] != 'ok':
             raise InstagramException(directThread['message'] + "\n")
@@ -477,7 +471,7 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
-        return self.http.request(
+        return self.request(
             "direct_v2/threads/" + str(threadId) + "/" + str(threadAction) + "/",
             self.generateSignature(data)  # todo Unresolved reference
         )[1]
@@ -524,7 +518,7 @@ class Instagram:
         post = post.replace('"length":0', '"length":0.00')
 
         return ConfigureVideoResponse(
-            self.http.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1])
+            self.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1])
 
     def configure(self, upload_id, photo, caption='', location=None, filter_=None):
         caption = caption if caption else ''
@@ -581,7 +575,7 @@ class Instagram:
         post = json.dumps(post)
         post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]')
 
-        return ConfigureResponse(self.http.request('media/configure/', SignatureUtils.generateSignature(post))[1])
+        return ConfigureResponse(self.request('media/configure/', SignatureUtils.generateSignature(post))[1])
 
     def configureToReel(self, upload_id, photo):
 
@@ -616,7 +610,7 @@ class Instagram:
         post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]')
 
         return ConfigureResponse(
-            self.http.request('media/configure_to_reel/', SignatureUtils.generateSignature(post))[1])
+            self.request('media/configure_to_reel/', SignatureUtils.generateSignature(post))[1])
 
     def editMedia(self, mediaId, captionText=''):
         """
@@ -638,7 +632,7 @@ class Instagram:
         )
         # Unresolved Reference MediaResponse
         return MediaResponse(
-            self.http.request("media/" + mediaId + "/edit_media/", SignatureUtils.generateSignature(data))[1]['media']
+            self.request("media/" + mediaId + "/edit_media/", SignatureUtils.generateSignature(data))[1]['media']
         )
 
     def removeSelftag(self, mediaId):
@@ -659,7 +653,7 @@ class Instagram:
 
         # Unresolved Reference MediaResponse
         return MediaResponse(
-            self.http.request("usertags/" + mediaId + "/remove/", SignatureUtils.generateSignature(data))[1]
+            self.request("usertags/" + mediaId + "/remove/", SignatureUtils.generateSignature(data))[1]
         )
 
     def mediaInfo(self, mediaId):
@@ -679,7 +673,7 @@ class Instagram:
             ])
         )
         return MediaInfoResponse(
-            self.http.request("media/" + mediaId + "/info/", SignatureUtils.generateSignature(data))[1])
+            self.request("media/" + mediaId + "/info/", SignatureUtils.generateSignature(data))[1])
 
     def deleteMedia(self, mediaId):
         """
@@ -697,7 +691,7 @@ class Instagram:
                 ('media_id', mediaId)
             ])
         )
-        return self.http.request("media/" + mediaId + "/delete/", SignatureUtils.generateSignature(data))[1]
+        return self.request("media/" + mediaId + "/delete/", SignatureUtils.generateSignature(data))[1]
 
     def comment(self, mediaId, commentText):
         """
@@ -718,7 +712,7 @@ class Instagram:
             ])
         )
         return CommentResponse(
-            self.http.request("media/" + mediaId + "/comment/", SignatureUtils.generateSignature(data))[1]
+            self.request("media/" + mediaId + "/comment/", SignatureUtils.generateSignature(data))[1]
         )
 
     def deleteComment(self, mediaId, commentId):
@@ -739,7 +733,7 @@ class Instagram:
             ])
         )
         return \
-            self.http.request("media/" + mediaId + "/comment/" + commentId + "/delete/",
+            self.request("media/" + mediaId + "/comment/" + commentId + "/delete/",
                               SignatureUtils.generateSignature(data))[1]
 
     def deleteCommentsBulk(self, mediaId, commentIds):
@@ -770,7 +764,7 @@ class Instagram:
                 ('comment_ids_to_delete', comment_ids_to_delete)
             ])
         )
-        return self.http.request("media/" + mediaId + "/comment/bulk_delete/",
+        return self.request("media/" + mediaId + "/comment/bulk_delete/",
                                  SignatureUtils.generateSignature(data))[1]
 
     def changeProfilePicture(self, photo):
@@ -790,7 +784,7 @@ class Instagram:
         data = json.dumps(
             OrderedDict([('_uuid', self.uuid), ('_uid', self.username_id), ('_csrftoken', self.token)])
         )
-        return self.http.request('accounts/remove_profile_picture/', SignatureUtils.generateSignature(data))[1]
+        return self.request('accounts/remove_profile_picture/', SignatureUtils.generateSignature(data))[1]
 
     def setPrivateAccount(self):
         """
@@ -806,7 +800,7 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
-        return self.http.request('accounts/set_private/', SignatureUtils.generateSignature(data))[1]
+        return self.request('accounts/set_private/', SignatureUtils.generateSignature(data))[1]
 
     def setPublicAccount(self):
         """
@@ -821,7 +815,7 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
-        return self.http.request('accounts/set_public/', SignatureUtils.generateSignature(data))[1]
+        return self.request('accounts/set_public/', SignatureUtils.generateSignature(data))[1]
 
     def getProfileData(self):
         """
@@ -837,7 +831,7 @@ class Instagram:
             ])
         )
         return ProfileResponse(
-            self.http.request('accounts/current_user/?edit=true', SignatureUtils.generateSignature(data))[1])
+            self.request('accounts/current_user/?edit=true', SignatureUtils.generateSignature(data))[1])
 
     def editProfile(self, url, phone, first_name, biography, email, gender):
         """
@@ -870,7 +864,7 @@ class Instagram:
             ])
         )
 
-        return ProfileResponse(self.http.request('accounts/edit_profile/', SignatureUtils.generateSignature(data))[1])
+        return ProfileResponse(self.request('accounts/edit_profile/', SignatureUtils.generateSignature(data))[1])
 
     def changePassword(self, oldPassword, newPassword):
         """
@@ -894,7 +888,7 @@ class Instagram:
                 ('new_password2', newPassword)
             ])
         )
-        return self.http.request('accounts/change_password/', SignatureUtils.generateSignature(data))[1]
+        return self.request('accounts/change_password/', SignatureUtils.generateSignature(data))[1]
 
     def getUsernameInfo(self, usernameId):
         """
@@ -903,7 +897,7 @@ class Instagram:
         :rtype: object
         :return: Username data
         """
-        return UsernameInfoResponse(self.http.request("users/" + str(usernameId) + "/info/")[1])
+        return UsernameInfoResponse(self.request("users/" + str(usernameId) + "/info/")[1])
 
     def getSelfUsernameInfo(self):
         """
@@ -919,12 +913,7 @@ class Instagram:
         :rtype: object
         :return: Recent activity data
         """
-        activity = self.http.request('news/inbox/')[1]
-
-        if activity['status'] != 'ok':
-            raise InstagramException(activity['message'] + "\n")
-
-        return activity
+        return self.request('news/inbox/').addParams('activity_module', 'all').getResponse(ActivityNewsResponse())
 
     def getFollowingRecentActivity(self):
         """
@@ -933,7 +922,7 @@ class Instagram:
         :rtype: object
         :return: Recent activity data of follows
         """
-        activity = self.http.request('news/?')[1]
+        activity = self.request('news/?')[1]
         if activity['status'] != 'ok':
             raise InstagramException(activity['message'] + "\n")
 
@@ -945,12 +934,10 @@ class Instagram:
         :rtype: object
         :return: v2 inbox data
         """
-        inbox = V2InboxResponse(self.http.request('direct_v2/inbox/?')[1])
-
-        if not inbox.isOk():
-            raise InstagramException(inbox.getMessage() + "\n")
-
-        return inbox
+        return (
+            self.request('direct_v2/inbox/?')
+            .getResponse(V2InboxResponse())
+        )
 
     def getUserTags(self, usernameId):
         """
@@ -960,7 +947,7 @@ class Instagram:
         :rtype: object
         :return: user tags data
         """
-        tags = UsertagsResponse(self.http.request("usertags/" + str(usernameId) + "/feed/?rank_token=" + self.rank_token
+        tags = UsertagsResponse(self.request("usertags/" + str(usernameId) + "/feed/?rank_token=" + self.rank_token
                                                   + "&ranked_content=true&")[1])
         if not tags.isOk():
             raise InstagramException(tags.getMessage() + "\n")
@@ -984,7 +971,7 @@ class Instagram:
         :return:
         """
         userFeed = TagFeedResponse(
-            self.http.request("feed/tag/" + tag + "/?rank_token=" + self.rank_token + "&ranked_content=true&")[1])
+            self.request("feed/tag/" + tag + "/?rank_token=" + self.rank_token + "&ranked_content=true&")[1])
 
         if not userFeed.isOk():
             raise InstagramException(userFeed.getMessage() + "\n")
@@ -999,7 +986,7 @@ class Instagram:
         :rtype: object
         :return:
         """
-        likers = MediaLikersResponse(self.http.request("media/" + mediaId + "/likers/")[1])
+        likers = MediaLikersResponse(self.request("media/" + mediaId + "/likers/")[1])
         if not likers.isOk():
             raise InstagramException(likers.getMessage() + "\n")
             # return #fixme unreachable code
@@ -1014,7 +1001,7 @@ class Instagram:
         :rtype: object
         :return: Geo Media data
         """
-        locations = self.http.request("maps/user/" + str(usernameId) + "/")[1]
+        locations = self.request("maps/user/" + str(usernameId) + "/")[1]
 
         if locations['status'] != 'ok':
             raise InstagramException(locations['message'] + "\n")
@@ -1041,7 +1028,7 @@ class Instagram:
         else:
             locationQuery['search_query'] = query  # TODO possible bug, query is None
 
-        locations = LocationResponse(self.http.request("location_search/?" + urllib.urlencode(locationQuery))[1])
+        locations = LocationResponse(self.request("location_search/?" + urllib.urlencode(locationQuery))[1])
 
         if not locations.isOk():
             raise InstagramException(locations.getMessage() + "\n")
@@ -1059,7 +1046,7 @@ class Instagram:
         """
         query = urllib.quote(query)
         query = \
-            self.http.request("fbsearch/topsearch/?context=blended&query=" + query + "&rank_token=" + self.rank_token)[
+            self.request("fbsearch/topsearch/?context=blended&query=" + query + "&rank_token=" + self.rank_token)[
                 1]
 
         if query['status'] != 'ok':
@@ -1075,7 +1062,7 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = self.http.request(
+        query = self.request(
             'users/search/?ig_sig_key_version=' + Constants.SIG_KEY_VERSION \
             + "&is_typeahead=true&query=" + query + "&rank_token=" + self.rank_token)[1]
 
@@ -1094,7 +1081,7 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = UsernameInfoResponse(self.http.request("users/" + usernameName + "/usernameinfo/")[1])
+        query = UsernameInfoResponse(self.request("users/" + usernameName + "/usernameinfo/")[1])
 
         if not query.isOk():
             raise InstagramException(query.getMessage() + "\n")
@@ -1115,7 +1102,7 @@ class Instagram:
         data = OrderedDict([(
             ('contacts=', json.dumps(contacts))
         )])
-        return self.http.request('address_book/link/?include=extra_display_name,thumbnails', data)[1]
+        return self.request('address_book/link/?include=extra_display_name,thumbnails', data)[1]
 
     def searchTags(self, query):
         """
@@ -1125,7 +1112,7 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = self.http.request("tags/search/?is_typeahead=true&q=" + query + "&rank_token=" + self.rank_token)[1]
+        query = self.request("tags/search/?is_typeahead=true&q=" + query + "&rank_token=" + self.rank_token)[1]
 
         if query['status'] != 'ok':
             raise InstagramException(query['message'] + "\n")
@@ -1138,7 +1125,7 @@ class Instagram:
         :rtype: object
         :return: timeline data
         """
-        timeline = self.http.request(
+        timeline = self.request(
             "feed/timeline/?rank_token=" + self.rank_token + "&ranked_content=true" +
             (("&max_id=" + str(maxid)) if maxid is not None else '')
         )[1]
@@ -1149,7 +1136,7 @@ class Instagram:
         return timeline
 
     def getReelsTrayFeed(self):
-        feed = ReelsTrayFeedResponse(self.http.request('feed/reels_tray/')[1])
+        feed = self.request('feed/reels_tray/').getResponse(ReelsTrayFeedResponse())
         if not feed.isOk():
             raise InstagramException(feed.getMessage() + "\n")
             # return todo Unreachable code
@@ -1169,7 +1156,7 @@ class Instagram:
         :return: User feed data
         :raises: InstagramException
         """
-        userFeed = UserFeedResponse(self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
+        userFeed = UserFeedResponse(self.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
                                                       + (("&max_id=" + str(maxid)) if maxid is not None else '') \
                                                       + (("&minTimestamp=" + str(minTimestamp)) if minTimestamp is not None else '') \
                                                       + "&ranked_content=true"
@@ -1193,7 +1180,7 @@ class Instagram:
         else:
             endpoint = "feed/tag/" + hashtagString + "/?max_id=" \
                        + maxid + "&rank_token=" + self.rank_token + "&ranked_content=true&"
-        hashtagFeed = self.http.request(endpoint)[1]
+        hashtagFeed = self.request(endpoint)[1]
         if hashtagFeed['status'] != 'ok':
             raise InstagramException(hashtagFeed['message'] + "\n")
 
@@ -1210,7 +1197,7 @@ class Instagram:
         query = urllib.quote(query)
         endpoint = "fbsearch/places/?rank_token=" + self.rank_token + "&query=" + query
 
-        locationFeed = self.http.request(endpoint)[1]
+        locationFeed = self.request(endpoint)[1]
 
         if locationFeed['status'] != 'ok':
             raise InstagramException(locationFeed['message'] + "\n")
@@ -1231,7 +1218,7 @@ class Instagram:
             endpoint = "feed/location/" + locationId + "/?max_id=" \
                        + maxid + "&rank_token=" + self.rank_token + "&ranked_content=true&"
 
-        locationFeed = self.http.request(endpoint)[1]
+        locationFeed = self.request(endpoint)[1]
 
         if locationFeed['status'] != 'ok':
             raise InstagramException(locationFeed['message'] + "\n")
@@ -1252,7 +1239,7 @@ class Instagram:
         :rtype: object
         :return: popular feed data
         """
-        popularFeed = self.http.request("feed/popular/?people_teaser_supported=1&rank_token=" \
+        popularFeed = self.request("feed/popular/?people_teaser_supported=1&rank_token=" \
                                         + self.rank_token + "&ranked_content=true&")[1]
 
         if popularFeed['status'] != 'ok':
@@ -1269,7 +1256,7 @@ class Instagram:
         :rtype: object
         :return: followers data
         """
-        return FollowingResponse(self.http.request(
+        return FollowingResponse(self.request(
             "friendships/" + usernameId + "/following/?max_id=" + maxid + "&ig_sig_key_version="
             + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1])
 
@@ -1282,7 +1269,7 @@ class Instagram:
         :rtype: object
         :return: followers data
         """
-        return FollowerResponse(self.http.request(
+        return FollowerResponse(self.request(
             "friendships/" + usernameId + "/followers/?max_id=" + maxid
             + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1])
 
@@ -1321,7 +1308,7 @@ class Instagram:
                 ('media_id', mediaId)
             ])
         )
-        return self.http.request("media/" + mediaId + "/like/", SignatureUtils.generateSignature(data))[1]
+        return self.request("media/" + mediaId + "/like/", SignatureUtils.generateSignature(data))[1]
 
     def unlike(self, mediaId):
         """
@@ -1340,7 +1327,7 @@ class Instagram:
                 ('media_id', mediaId)
             ])
         )
-        return self.http.request("media/" + mediaId + "/unlike/", SignatureUtils.generateSignature(data))[1]
+        return self.request("media/" + mediaId + "/unlike/", SignatureUtils.generateSignature(data))[1]
 
     def getMediaComments(self, mediaId, maxid=''):
         """
@@ -1350,7 +1337,7 @@ class Instagram:
         :rtype: object
         :return: Media comments data
         """
-        return MediaCommentsResponse(self.http.request("media/" + str(mediaId) + "/comments/?max_id=" + str(maxid)
+        return MediaCommentsResponse(self.request("media/" + str(mediaId) + "/comments/?max_id=" + str(maxid)
                                                        + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION)[1])
 
     def setNameAndPhone(self, name='', phone=''):
@@ -1373,7 +1360,7 @@ class Instagram:
             ])
         )
 
-        return self.http.request("accounts/set_phone_and_name/", SignatureUtils.generateSignature(data))[1]
+        return self.request("accounts/set_phone_and_name/", SignatureUtils.generateSignature(data))[1]
 
     def getDirectShare(self):
         """
@@ -1382,7 +1369,7 @@ class Instagram:
         :rtype: object
         :return: Direct share data
         """
-        return self.http.request('direct_share/inbox/?')[1]
+        return self.request('direct_share/inbox/?')[1]
 
     def backup(self):
         """
@@ -1442,7 +1429,7 @@ class Instagram:
             ])
         )
 
-        return self.http.request("friendships/create/" + userId + "/", SignatureUtils.generateSignature(data))[1]
+        return self.request("friendships/create/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def unfollow(self, userId):
         """
@@ -1462,7 +1449,7 @@ class Instagram:
             ])
         )
 
-        return self.http.request("friendships/destroy/" + userId + "/", SignatureUtils.generateSignature(data))[1]
+        return self.request("friendships/destroy/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def block(self, userId):
         """
@@ -1483,7 +1470,7 @@ class Instagram:
             ])
         )
 
-        return self.http.request("friendships/block/" + userId + "/", SignatureUtils.generateSignature(data))[1]
+        return self.request("friendships/block/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def unblock(self, userId):
         """
@@ -1504,7 +1491,7 @@ class Instagram:
             ])
         )
 
-        return self.http.request("friendships/unblock/" + userId + "/", SignatureUtils.generateSignature(data))[1]
+        return self.request("friendships/unblock/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def userFriendship(self, userId):
         """
@@ -1525,7 +1512,7 @@ class Instagram:
             ])
         )
 
-        return self.http.request("friendships/show/" + userId + "/", SignatureUtils.generateSignature(data))[1]
+        return self.request("friendships/show/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def getLikedMedia(self, maxid=None):
         """
@@ -1535,13 +1522,16 @@ class Instagram:
         :return: Liked media data
         """
         endpoint = 'feed/liked/?' + (('max_id=' + str(maxid) + '&') if maxid is not None else '')
-        return self.http.request(endpoint)[1]
+        return self.request(endpoint)[1]
 
     def verifyPeer(self, enable):
         self.http.verifyPeer(enable)
 
     def verifyHost(self, enable):
         self.http.verifyHost(enable)
+
+    def request(self, url):
+        return Request(url)
 
     @staticmethod
     def getInstance():
@@ -1553,13 +1543,13 @@ class Instagram:
 
 class Request:
     def __init__(self, url):
-        self.params = []
-        self.posts = []
+        self.params = OrderedDict()
+        self.posts = OrderedDict()
         self.requireLogin = False
         self.floodWait = False
         self.checkStatus = True
         self.signedPost = True
-        self.replacePost = []
+        self.replacePost = {}
 
         self.url = url
 
@@ -1589,6 +1579,11 @@ class Request:
 
     def setCheckStatus(self, checkStatus=True):
         self.checkStatus = checkStatus
+
+        return self
+
+    def setSignedPost(self, signedPost=True):
+        self.signedPost = signedPost
 
         return self
 

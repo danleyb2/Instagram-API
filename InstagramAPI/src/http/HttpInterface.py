@@ -29,10 +29,10 @@ class HttpInterface(object):
         self.parent = parent
         self.userAgent = self.parent.settings.get('user_agent')
 
-    def request(self, endpoint, post=None, login=False):
+    def request(self, endpoint, post=None, login=False, flood_wait=False, assoc=True):
         buffer = BytesIO()
         if (not self.parent.isLoggedIn) and not login:
-            raise InstagramException("Not logged in\n")
+            raise InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", ErrorCode.INTERNAL_LOGIN_REQUIRED)
 
         headers = [
             'Connection: close',

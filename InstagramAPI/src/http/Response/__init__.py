@@ -1,4 +1,5 @@
 from .AccountCreationResponse import AccountCreationResponse
+from .ActivityNewsResponse import ActivityNewsResponse
 from .ChallengeResponse import ChallengeResponse
 from .CheckEmailResponse import CheckEmailResponse
 from .CheckUsernameResponse import CheckUsernameResponse
