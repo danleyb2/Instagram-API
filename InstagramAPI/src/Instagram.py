@@ -55,7 +55,7 @@ class Instagram:
 
         self.debug = debug
         self.truncatedDebug = truncatedDebug
-        self.device_id = SignatureUtils.generateDeviceId(hashlib.md5(username + password))
+        self.device_id = SignatureUtils.generateDeviceId(hashlib.md5((username + password).encode("utf-8")))
 
         if IGDataPath is not None:
             self.IGDataPath = IGDataPath
