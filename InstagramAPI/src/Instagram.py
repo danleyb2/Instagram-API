@@ -3,7 +3,6 @@ import locale
 import re
 import time
 import urllib
-import inspect
 from collections import OrderedDict
 from distutils.version import LooseVersion
 
@@ -897,7 +896,7 @@ class Instagram:
         :rtype: object
         :return: Username data
         """
-        return UsernameInfoResponse(self.request("users/" + str(usernameId) + "/info/")[1])
+        return self.request("users/" + str(usernameId) + "/info").getResponse(UsernameInfoResponse())
 
     def getSelfUsernameInfo(self):
         """
@@ -1081,15 +1080,10 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = UsernameInfoResponse(self.request("users/" + usernameName + "/usernameinfo/")[1])
-
-        if not query.isOk():
-            raise InstagramException(query.getMessage() + "\n")
-
-        return query
+        return self.request("users/" + usernameName + "/usernameinfo").getResponse(UsernameInfoResponse())
 
     def getUsernameId(self, username):
-        return self.searchUsername(username).getUsernameId()
+        return self.searchUsername(username).getUser().getPk()
 
     def syncFromAdressBook(self, contacts):
         """
@@ -1156,16 +1150,14 @@ class Instagram:
         :return: User feed data
         :raises: InstagramException
         """
-        userFeed = UserFeedResponse(self.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
-                                                      + (("&max_id=" + str(maxid)) if maxid is not None else '') \
-                                                      + (("&minTimestamp=" + str(minTimestamp)) if minTimestamp is not None else '') \
-                                                      + "&ranked_content=true"
-                                                      )[1])
-
-        if not userFeed.isOk():
-            raise InstagramException(userFeed.getMessage() + "\n")
-
-        return userFeed
+        return (
+            self.request("feed/user/" + str(usernameId) + "/")
+            .addParams('rank_token', self.rank_token)
+            .addParams('ranked_content', 'true')
+            .addParams('max_id', str(maxid) if maxid is not None else '')
+            .addParams('min_timestamp', str(minTimestamp) if minTimestamp is not None else '')
+            .getResponse(UserFeedResponse())
+        )
 
     def getHashtagFeed(self, hashtagString, maxid=''):
         """
@@ -1617,9 +1609,28 @@ class Request:
 
         # Here we deviate from the PHP function because JsonMapper doesn't exist for python AFAIK
         def _map(obj, root):
+            if root is None:
+                obj = None
+                return
+            if type(root) in [str, int, float]:
+                obj = root
+                return
+            if type(root) is list:
+                keys = list(obj.__dict__.keys())
+                for i in range(len(root)):
+                    obj.__dict__[keys[i]] = root[i]
+                return
             for key in root:
-                if key in obj.__dict__ and inspect.isclass(obj.__dict__[key]):
-                    map(obj.__dict__[key], root[key])
+                if "_types" in obj.__dict__ and key in obj._types:
+                    if type(obj._types[key]) is list:
+                        obj.__dict__[key] = []
+                        # TODO: check if root[key] is list
+                        for i in range(len(root[key])):
+                            obj.__dict__[key].append(obj._types[key][0]())
+                            _map(obj.__dict__[key][i], root[key][i])
+                    else:
+                        obj.__dict__[key] = obj._types[key]()
+                        _map(obj.__dict__[key], root[key])
                 else:
                     obj.__dict__[key] = root[key]
         _map(obj, response[1])

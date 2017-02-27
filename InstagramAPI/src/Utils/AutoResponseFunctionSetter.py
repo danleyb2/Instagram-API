@@ -5,9 +5,9 @@ class AutoResponseFunctionSetter(object):
         underScoreNames = self.camelCaseToUnderScore(function)
         if "_" not in underScoreNames:
             return False
-        _temp = '_'.split(underScoreNames)
+        _temp = underScoreNames.split('_', 2)
         functionType = _temp[0]
-        propName = _temp[1]
+        propName = '_'.join(_temp[1:])
 
         if functionType == 'get':
             if propName not in self.__dict__:
@@ -22,14 +22,15 @@ class AutoResponseFunctionSetter(object):
                 raise Exception("Wrong function " + function)
             return self.__dict__[underScoreNames]
 
-    def camelCaseToUnderScore(input):
-        matches = re.findall('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', input)
-        ret = matches[0]
-        for match in ret:
+    def camelCaseToUnderScore(self, input):
+        matches = re.findall('([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)', input)
+        ret = matches
+        for match_i in range(len(ret)):
+            match = ret[match_i]
             if match == match.upper():
-                match = match.lower()
+                ret[match_i] = match.lower()
             else:
-                match = match[0].lower() + match[1:]
+                ret[match_i] = match[0].lower() + match[1:]
 
         return '_'.join(ret)
 
