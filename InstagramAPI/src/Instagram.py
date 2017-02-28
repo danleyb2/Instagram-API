@@ -828,22 +828,20 @@ class Instagram:
         :rtype: object
         :return: edit profile data
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('external_url', url),
-                ('phone_number', phone),
-                ('username', self.username),
-                ('first_name', first_name),
-                ('biography', biography),
-                ('email', email),
-                ('gender', gender)
-            ])
+        return (
+            self.request('accounts/edit_profile/')
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('external_url', url)
+            .addPost('phone_number', phone)
+            .addPost('username', self.username)
+            .addPost('first_name', first_name)
+            .addPost('biography', biography)
+            .addPost('email', email)
+            .addPost('gender', gender)
+            .getResponse(ProfileResponse())
         )
-
-        return ProfileResponse(self.request('accounts/edit_profile/', SignatureUtils.generateSignature(data))[1])
 
     def changePassword(self, oldPassword, newPassword):
         """
