@@ -967,24 +967,19 @@ class Instagram:
         return self.getGeoMedia(self.username_id)
 
     def searchLocation(self, latitude, longitude, query=None):
-        locationQuery = OrderedDict([
-            ('rank_token', self.rank_token),
-            ('latitude', latitude),
-            ('longitude', longitude)
-        ])
+        locations = (
+            self.request('location_search/')
+            .addParams('rank_token', self.rank_token)
+            .addParams('latitude', latitude)
+            .addParams('longitude', longitude)
+        )
 
-        if query:
-            locationQuery['timestamp'] = int(time.time())
+        if query is None:
+            locations.addParams('timestamp', int(time.time()))
         else:
-            locationQuery['search_query'] = query  # TODO possible bug, query is None
+            locations.addParams('search_query', query)
 
-        locations = LocationResponse(self.request("location_search/?" + urllib.urlencode(locationQuery))[1])
-
-        if not locations.isOk():
-            raise InstagramException(locations.getMessage() + "\n")
-            # return fixme unreachable code
-
-        return locations
+        return locations.getResponse(LocationResponse())
 
     def fbUserSearch(self, query):
         """
