@@ -93,7 +93,7 @@ class Instagram:
                 (self.settings.get('token') != None):
             self.isLoggedIn = True
             self.username_id = self.settings.get('username_id')
-            self.rank_token = self.username_id + '_' + self.uuid
+            self.rank_token = str(self.username_id) + '_' + self.uuid
             self.token = self.settings.get('token')
         else:
             self.isLoggedIn = False
@@ -170,41 +170,40 @@ class Instagram:
         """
         if (not self.isLoggedIn) or force:
             self.syncFeatures(True)
-            fetch = self.request(
-                'si/fetch_headers/?challenge_type=signup&guid=' + SignatureUtils.generateUUID(False), None, True)
-            header = fetch[0]
-            response = ChallengeResponse(fetch[1])
 
-            if not header or not response.isOk():
-                raise InstagramException("Couldn't get challenge, check your connection")
-                # return response #FIXME unreachable code
+            response = (
+                self.request('si/fetch_headers')
+                .requireLogin(True)
+                .addParams('challenge_type', 'signup')
+                .addParams('guid', SignatureUtils.generateUUID(False))
+                .getResponse(ChallengeResponse(), True)
+            )
 
-            match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', fetch[0], re.MULTILINE)
-            if match:
-                self.token = match.group(1)
-            else:
-                raise InstagramException('Missing csfrtoken')
+            token = re.search(r'^Set-Cookie: csrftoken=([^;]+)', response.getFullResponse()[0], re.MULTILINE)
+            if not token:
+                raise InstagramException('Missing csfrtoken', ErrorCode.INTERNAL_CSRF_TOKEN_ERROR)
 
-            data = OrderedDict([
-                ('username', self.username),
-                ('guid', self.uuid),
-                ('device_id', self.device_id),
-                ('password', self.password),
-                ('login_attempt_count', 0)
-            ])
-
-            login = self.request('accounts/login/', SignatureUtils.generateSignature(json.dumps(data)), True)
-            response = LoginResponse(login[1])
-
-            if not response.isOk(): raise InstagramException(response.getMessage())
+            response = (
+                self.request('accounts/login/')
+                .requireLogin(True)
+                .addPost('phone_id', SignatureUtils.generateUUID(True))
+                .addPost('_csrftoken', token[0])
+                .addPost('username', self.username)
+                .addPost('guid', self.uuid)
+                .addPost('device_id', self.device_id)
+                .addPost('password', self.password)
+                .addPost('login_attempt_count', 0)
+                .getResponse(LoginResponse(), True)
+            )
 
             self.isLoggedIn = True
-            self.username_id = response.getUsernameId()
-            self.settings.set('username_id', self.username_id)
-            self.rank_token = self.username_id + '_' + self.uuid
-            match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', login[0], re.MULTILINE)
+            self.username_id = response.getLoggedInUser().getPk()
+            self.settings.set('username_id', str(self.username_id))
+            self.rank_token = str(self.username_id) + '_' + self.uuid
+            match = re.search(r'^Set-Cookie: csrftoken=([^;]+)', response.getFullResponse()[0], re.MULTILINE)
             if match: self.token = match.group(1)
             self.settings.set('token', self.token)
+            self.settings.set('last_login', str(int(time.time())))
 
             self.syncFeatures()
             self.autoCompleteUserList()
@@ -215,25 +214,29 @@ class Instagram:
             self.getv2Inbox()
             self.getRecentActivity()
             self.getReelsTrayFeed()
-            self.explore()
 
-            return response
+            return self.explore()
+
+        if self.settings.get('last_login') is None:
+            self.settings.set('last_login', str(int(time.time())))
 
         check = self.timelineFeed()
-
         if check.getMessage() == 'login_required':
             self.login(True)
+        if ((int(time.time()) - int(self.settings.get('last_login'))) > 1800):
+            self.settings.set('last_login', str(int(time.time())))
 
-        self.autoCompleteUserList()
-        self.getReelsTrayFeed()
-        self.getRankedRecipients()
-        # push register
-        self.getRecentRecipients()
-        # push register
-        self.megaphoneLog()
-        self.getv2Inbox()
-        self.getRecentActivity()
-        self.explore()
+            self.autoCompleteUserList()
+            self.getReelsTrayFeed()
+            self.getRankedRecipients()
+            # push register
+            self.getRecentRecipients()
+            # push register
+            self.megaphoneLog()
+            self.getv2Inbox()
+            self.getRecentActivity()
+
+            return self.explore()
 
     def syncFeatures(self, prelogin=False):
         if prelogin:
@@ -1478,7 +1481,7 @@ class Request:
     def __init__(self, url):
         self.params = OrderedDict()
         self.posts = OrderedDict()
-        self.requireLogin = False
+        self.requireLogin_ = False
         self.floodWait = False
         self.checkStatus = True
         self.signedPost = True
@@ -1499,9 +1502,8 @@ class Request:
 
         return self
 
-    # Here we deviate slightly from the PHP function name because of limitations in python
-    def setRequireLogin(self, requireLogin_=False):
-        self.requireLogin = requireLogin_
+    def requireLogin(self, requireLogin_=False):
+        self.requireLogin_ = requireLogin_
 
         return self
 
@@ -1534,7 +1536,7 @@ class Request:
             endPoint = self.url
         if self.posts:
             if self.signedPost:
-                post = SignatureUtils.generateSignature(json.dumps(data))
+                post = SignatureUtils.generateSignature(json.dumps(self.posts))
             else:
                 post = compat_urllib_parse.urlencode(self.posts)
         else:
@@ -1543,7 +1545,7 @@ class Request:
             for key in self.replacePost:
                 post = post.replace(key, self.replacePost[key])
 
-        response = instagramObj.http.request(endPoint, post, self.requireLogin, self.floodWait, False)
+        response = instagramObj.http.request(endPoint, post, self.requireLogin_, self.floodWait, False)
 
         if response[1] == None:
             raise InstagramException('No response from server, connection or configure error', ErrorCode.EMPTY_RESPONSE)
