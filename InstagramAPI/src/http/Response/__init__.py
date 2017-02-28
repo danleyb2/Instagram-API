@@ -30,6 +30,7 @@ from .RecentRecipientsResponse import RecentRecipientsResponse
 from .ReelsTrayFeedResponse import ReelsTrayFeedResponse
 from .Response import Response
 from .SearchUserResponse import SearchUserResponse
+from .SearchTagResponse import SearchTagResponse
 from .SyncResponse import SyncResponse
 from .TagFeedResponse import TagFeedResponse
 from .TimelineFeedResponse import TimelineFeedResponse

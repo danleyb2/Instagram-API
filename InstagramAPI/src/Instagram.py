@@ -1041,7 +1041,7 @@ class Instagram:
         return (
             self.request('address_book/link/?include=extra_display_name,thumbnails')
             .setSignedPost(False)
-            .addPost('contacts', json_encode(contacts, true))
+            .addPost('contacts', json.dumps(contacts))
             .getResponse(AddressBookResponse())
         )
 
@@ -1053,12 +1053,13 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = self.request("tags/search/?is_typeahead=true&q=" + query + "&rank_token=" + self.rank_token)[1]
-
-        if query['status'] != 'ok':
-            raise InstagramException(query['message'] + "\n")
-
-        return query
+        return (
+            self.request('tags/search/')
+            .addParams('is_typeahead', True)
+            .addParams('q', query)
+            .addParams('rank_token', self.rank_token)
+            .getResponse(SearchTagResponse())
+        )
 
     def getTimeline(self, maxid=None):
         """
