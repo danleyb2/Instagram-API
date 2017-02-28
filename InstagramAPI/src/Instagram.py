@@ -630,17 +630,12 @@ class Instagram:
         :rtype: object
         :return: edit media data
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token)
-            ])
-        )
-
-        # Unresolved Reference MediaResponse
-        return MediaResponse(
-            self.request("usertags/" + mediaId + "/remove/", SignatureUtils.generateSignature(data))[1]
+        return (
+            self.request("usertags/$mediaId/remove/")
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .getResponse(MediaResponse()) # FIXME MediaResponse is currently non-existant in PHP
         )
 
     def mediaInfo(self, mediaId):
