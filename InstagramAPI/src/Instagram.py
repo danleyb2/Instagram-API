@@ -803,15 +803,14 @@ class Instagram:
         :rtype: object
         :return:
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token)
-            ])
+        return (
+            self.request('accounts/current_user/')
+            .addParams('edit', true)
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .getResponse(ProfileResponse())
         )
-        return ProfileResponse(
-            self.request('accounts/current_user/?edit=true', SignatureUtils.generateSignature(data))[1])
 
     def editProfile(self, url, phone, first_name, biography, email, gender):
         """
