@@ -1061,22 +1061,6 @@ class Instagram:
             .getResponse(SearchTagResponse())
         )
 
-    def getTimeline(self, maxid=None):
-        """
-        Get timeline data.
-        :rtype: object
-        :return: timeline data
-        """
-        timeline = self.request(
-            "feed/timeline/?rank_token=" + self.rank_token + "&ranked_content=true" +
-            (("&max_id=" + str(maxid)) if maxid is not None else '')
-        )[1]
-
-        if timeline['status'] != 'ok':
-            raise InstagramException(timeline['message'] + "\n")
-
-        return timeline
-
     def getReelsTrayFeed(self):
         return self.request('feed/reels_tray/').getResponse(ReelsTrayFeedResponse())
 
