@@ -310,13 +310,7 @@ class Instagram:
         :rtype: object
         :return: Pending Inbox Data
         """
-        pendingInbox = PendingInboxResponse(self.request('direct_v2/pending_inbox/?')[1])
-
-        if not pendingInbox.isOk():
-            raise InstagramException(pendingInbox.getMessage() + "\n")
-            # return FIXME unreachable code
-
-        return pendingInbox
+        return self.request('direct_v2/pending_inbox').getResponse(PendingInboxResponse())
 
     def getRankedRecipients(self):
         """
@@ -325,16 +319,11 @@ class Instagram:
         :rtype:list
         :return: Ranked recipients Data
         """
-        ranked_recipients = (
-            self.request('direct_v2/ranked_recipients/?show_threads=true')
+        return (
+            self.request('direct_v2/ranked_recipients')
+            .addParams('show_threads', True)
             .getResponse(RankedRecipientsResponse())
         )
-
-        if not ranked_recipients.isOk():
-            raise InstagramException(ranked_recipients.getMessage() + "\n")
-            # return todo unreachable code
-
-        return ranked_recipients
 
     def getRecentRecipients(self):
         """
@@ -343,16 +332,10 @@ class Instagram:
         :rtype: list
         :return: Ranked recipients Data
         """
-        recent_recipients = (
+        return (
             self.request('direct_share/recent_recipients/')
             .getResponse(RecentRecipientsResponse())
         )
-
-        if not recent_recipients.isOk():
-            raise InstagramException(recent_recipients.getMessage() + "\n")
-            # return todo unreachable code
-
-        return recent_recipients
 
     def explore(self):
         """
@@ -364,16 +347,15 @@ class Instagram:
         return self.request('discover/explore/').getResponse(ExploreResponse())
 
     def expose(self):
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('id', self.username_id),
-                ('_csrftoken', self.token),
-                ('experiment', 'ig_android_profile_contextual_feed')
-            ])
+        return (
+            self.request('qe/expose/')
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('id', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('experiment', 'ig_android_profile_contextual_feed')
+            .getResponse(ExposeResponse())
         )
-        return ExposeResponse(self.request('qe/expose/', SignatureUtils.generateSignature(data))[1])
 
     def logout(self):
         """
@@ -382,12 +364,7 @@ class Instagram:
         :rtype: bool
         :return: Returns true if logged out correctly
         """
-        logout = LogoutResponse(self.request('accounts/logout/')[1])
-
-        if logout.isOk():
-            return True
-        else:
-            return False
+        return self.request('accounts/logout/').getResponse(LogoutResponse())
 
     def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, location=None, filter_=None):
         """
@@ -403,7 +380,6 @@ class Instagram:
         return self.http.uploadPhoto(photo, caption, upload_id, customPreview, location, filter_)
 
     def uploadPhotoStory(self, photo, caption=None, upload_id=None, customPreview=None):
-
         return self.http.uploadPhoto(photo, caption, upload_id, customPreview, None, None, True)
 
     def uploadVideo(self, video, caption=None, customPreview=None):
@@ -417,7 +393,7 @@ class Instagram:
         :rtype: object
         :return: Upload data
         """
-        return self.http.uploadVideo(video, caption), customPreview
+        return self.http.uploadVideo(video, caption, customPreview)
 
     def direct_share(self, media_id, recipients, text=None):
         self.http.direct_share(media_id, recipients, text)
@@ -444,7 +420,7 @@ class Instagram:
         :rtype: object
         :return: Direct Thread Data
         """
-        directThread = self.request("direct_v2/threads/" + str(threadId) + "/?")[1]
+        directThread = self.http.request("direct_v2/threads/" + str(threadId) + "/?")[1]
 
         if directThread['status'] != 'ok':
             raise InstagramException(directThread['message'] + "\n")
@@ -480,138 +456,132 @@ class Instagram:
         self.uploadPhoto(video, caption, upload_id, customPreview)
         size = Image.open(video).size[0]
 
-        post = json.dumps(
-            OrderedDict([
-                ('upload_id', upload_id),
-                ('source_type', 3),
-                ('poster_frame_index', 0),
-                ('length', 0.00),
-                ('audio_muted', False),
-                ('filter_type', '0'),
-                ('video_result', 'deprecated'),
-                ('clips', OrderedDict([
-                    ('length', Utils.getSeconds(video)),
-                    ('source_type', '3'),
-                    ('camera_position', 'back')
-                ])),
-                ('extra', OrderedDict([
-                    ('source_width', 960),
-                    ('source_height', 1280)
-                ])),
-
-                ('device', OrderedDict([
-                    ('manufacturer', self.settings.get('manufacturer')),
-                    ('model', self.settings.get('model')),
-                    ('android_version', Constants.ANDROID_VERSION),
-                    ('android_release', Constants.ANDROID_RELEASE)
-                ])),
-                ('_csrftoken', self.token),
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('caption', caption)
-
-            ])
-
+        return (
+            self.request('media/configure/')
+            .addParams('video', 1)
+            .addPost('upload_id', upload_id)
+            .addPost('source_type', '3')
+            .addPost('poster_frame_index', 0)
+            .addPost('length', 0.00)
+            .addPost('audio_muted', False)
+            .addPost('filter_type', '0')
+            .addPost('video_result', 'deprecated')
+            .addPost('clips', OrderedDict([
+                ('length',          Utils.getSeconds(video)),
+                ('source_type',     '3'),
+                ('camera_position', 'back')
+            ]))
+            .addPost('extra', OrderedDict([
+                ('source_width',  960),
+                ('source_height', 1280)
+            ]))
+            .addPost('device', OrderedDict([
+                ('manufacturer',     self.settings.get('manufacturer')),
+                ('model',            self.settings.get('model')),
+                ('android_version',  Constants.ANDROID_VERSION),
+                ('android_release',  Constants.ANDROID_RELEASE)
+            ]))
+            .addPost('_csrftoken', self.token)
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('caption', caption)
+            .setReplacePost({'"length":0': '"length":0.00'})
+            .getResponse(ConfigureVideoResponse())
         )
-
-        post = post.replace('"length":0', '"length":0.00')
-
-        return ConfigureVideoResponse(
-            self.request('media/configure/?video=1', SignatureUtils.generateSignature(post))[1])
 
     def configure(self, upload_id, photo, caption='', location=None, filter_=None):
-        caption = caption if caption else ''
         size = Image.open(photo).size[0]
+        if caption is None:
+            caption = ''
 
-        post = OrderedDict([
-                ('upload_id', upload_id),
-                ('camera_model', self.settings.get('model').replace(" ", "")),
-                ('source_type', 3),
-                ('date_time_original', time.strftime('%Y:%m:%d %H:%M:%S')),
-                ('camera_make', self.settings.get('manufacturer')),
-                ('edits', OrderedDict([
-                    ('crop_original_size', [size, size]),
-                    ('crop_zoom', 1.3333334),
-                    ('crop_center', [0.0, -0.0])
-                ])),
-                ('extra', OrderedDict([
-                    ('source_width', size),
-                    ('source_height', size)
-                ])),
+        requestData = (
+            self.request('media/configure/')
+            .addPost('_csrftoken', self.token)
+            .addPost('media_folder', 'Instagram')
+            .addPost('source_type', 4)
+            .addPost('_uid', self.username_id)
+            .addPost('_uuid', self.uuid)
+            .addPost('caption', caption)
+            .addPost('upload_id', upload_id)
+            .addPost('device', OrderedDict([
+                ('manufacturer',     self.settings.get('manufacturer')),
+                ('model',            self.settings.get('model')),
+                ('android_version',  Constants.ANDROID_VERSION),
+                ('android_release',  Constants.ANDROID_RELEASE)
+            ]))
+            .addPost('edits', OrderedDict([
+                ('crop_original_size',  [size, size]),
+                ('crop_center',         [0, 0]),
+                ('crop_zoom',           1)
+            ]))
+            .addPost('extra', OrderedDict([
+                ('source_width',   size),
+                ('source_height',  size)
+            ]))
+        )
 
-                ('device', OrderedDict([
-                    ('manufacturer', self.settings.get('manufacturer')),
-                    ('model', self.settings.get('model')),
-                    ('android_version', Constants.ANDROID_VERSION),
-                    ('android_release', Constants.ANDROID_RELEASE)
-                ])),
-                ('_csrftoken', self.token),
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('caption', caption)
-
-        ])
-        if location:
+        if location is not None:
             loc = OrderedDict([
-                (str(location.getExternalIdSource()) + '_id', location.getExternalId()),
-                ('name', location.getName()),
-                ('lat', location.getLatitude()),
-                ('lng', location.getLongitude()),
-                ('address', location.getAddress()),
-                ('external_source', location.getExternalIdSource())
+                (location.getExternalIdSource() +'_id',     location.getExternalId()),
+                ('name',                                    location.getName()),
+                ('lat',                                     location.getLat()),
+                ('lng',                                     location.getLng()),
+                ('address',                                 location.getAddress()),
+                ('external_source',                         location.getExternalIdSource())
             ])
-            post['location'] = json.dumps(loc)
-            post['geotag_enabled'] = True
-            post['media_latitude'] = location.getLatitude()
-            post['posting_latitude'] = location.getLatitude()
-            post['media_longitude'] = location.getLongitude()
-            post['posting_longitude'] = location.getLongitude()
-            post['altitude'] = mt_rand(10, 800)
 
-        if filter_:
-            post['edits']['filter_type'] = Utils.getFilterCode(filter)
+            (requestData.addPost('location', json.dumps(loc))
+             .addPost('geotag_enabled', true)
+             .addPost('media_latitude', location.getLat())
+             .addPost('posting_latitude', location.getLat())
+             .addPost('media_longitude', location.getLng())
+             .addPost('posting_longitude', location.getLng())
+             .addPost('altitude', random.rand_int(10, 800)))
 
-        post = json.dumps(post)
-        post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]')
+        if filter_ is not None:
+            requestData.addPost('edits', {'filter_type': Utils.getFilterCode(filter_)})
 
-        return ConfigureResponse(self.request('media/configure/', SignatureUtils.generateSignature(post))[1])
+        return (
+            requestData.setReplacePost(OrderedDict([
+                '"crop_center":[0,0]',                    '"crop_center":[0.0,-0.0]',
+                '"crop_zoom":1' ,                         '"crop_zoom":1.0',
+                '"crop_original_size":'+"["+str(size)+","+str(size)+"]",  '"crop_original_size":'+"["+str(size)+".0,"+str(size)+".0]"
+            ]))
+            .getResponse(ConfigureResponse())
+        )
 
     def configureToReel(self, upload_id, photo):
-
         size = Image.open(photo).size[0]
 
-        post = json.dumps(
-            OrderedDict([
-                ('upload_id', upload_id),
-                ('source_type', 3),
-                ('edits', OrderedDict([
-                    ('crop_original_size', [size, size]),
-                    ('crop_zoom', 1.3333334),
-                    ('crop_center', [0.0, 0.0])
-                ])),
-                ('extra', OrderedDict([
-                    ('source_width', size),
-                    ('source_height', size)
-                ])),
-
-                ('device', OrderedDict([
-                    ('manufacturer', self.settings.get('manufacturer')),
-                    ('model', self.settings.get('model')),
-                    ('android_version', Constants.ANDROID_VERSION),
-                    ('android_release', Constants.ANDROID_RELEASE)
-                ])),
-                ('_csrftoken', self.token),
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-
-            ])
+        return (
+            self.request('media/configure_to_reel/')
+            .addPost('upload_id', upload_id)
+            .addPost('source_type', 3)
+            .addPost('edits', OrderedDict([
+                'crop_original_size',  [size, size],
+                'crop_zoom',           1.3333334,
+                'crop_center',         [0.0, 0.0]
+            ]))
+            .addPost('extra', OrderedDict([
+                'source_width',   size,
+                'source_height',  size
+            ]))
+            .addPost('device', OrderedDict([
+                'manufacturer',     self.settings.get('manufacturer'),
+                'model',            self.settings.get('model'),
+                'android_version',  Constants.ANDROID_VERSION,
+                'android_release',  Constants.ANDROID_RELEASE
+            ]))
+            .addPost('_csrftoken', self.token)
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .setReplacePost({
+                '"crop_center":[0,0]', '"crop_center":[0.0,0.0]'
+            })
+            .getResponse(ConfigureResponse())
         )
-        post = post.replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]')
 
-        return ConfigureResponse(
-            self.request('media/configure_to_reel/', SignatureUtils.generateSignature(post))[1])
-
-    def editMedia(self, mediaId, captionText=''):
+    def editMedia(self, mediaId, captionText='', usertags=None):
         """
         Edit media.
         :type mediaId: str
@@ -621,18 +591,25 @@ class Instagram:
         :rtype: object
         :return: edit media data
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('caption_text', captionText)
-            ])
-        )
-        # Unresolved Reference MediaResponse
-        return MediaResponse(
-            self.request("media/" + mediaId + "/edit_media/", SignatureUtils.generateSignature(data))[1]['media']
-        )
+        if usertags is None:
+            return (
+                self.request("media/" + mediaId + "/edit_media/")
+                .addPost('_uuid', self.uuid)
+                .addPost('_uid', self.username_id)
+                .addPost('_csrftoken', self.token)
+                .addPost('caption_text', captionText)
+                .getResponse(EditMediaResponse())
+            )
+        else:
+            return (
+                self.request("media/" + mediaId + "/edit_media/")
+                .addPost('_uuid', self.uuid)
+                .addPost('_uid', self.username_id)
+                .addPost('_csrftoken', self.token)
+                .addPost('caption_text', captionText)
+                .addPost('usertags', usertags)
+                .getResponse(EditMediaResponse())
+            )
 
     def removeSelftag(self, mediaId):
         """
