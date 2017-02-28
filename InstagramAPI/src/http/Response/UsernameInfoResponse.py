@@ -37,7 +37,8 @@ class UsernameInfoResponse(Response):
             self.has_anonymous_profile_picture = response['user']['has_anonymous_profile_picture']
             self.full_name = response['user']['full_name']
             self.following_count = response['user']['following_count']
-            self.auto_expand_chaining = response['user']['auto_expand_chaining']
+            if 'auto_expand_chaining' in response['user']:
+                self.auto_expand_chaining = response['user']['auto_expand_chaining']
             if 'external_lynx_url' in response['user']:
                 self.external_lynx_url = response['user']['external_lynx_url']
 
