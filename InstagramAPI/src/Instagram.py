@@ -1094,7 +1094,7 @@ class Instagram:
         :rtype: object
         :return: Hashtag feed data
         """
-        hashtagFeed = $this->request("feed/tag/" + hashtagString + "/");
+        hashtagFeed = self.request("feed/tag/" + hashtagString + "/")
         if maxid is not None:
             hashtagFeed.addParams('max_id', maxid)
 
@@ -1109,15 +1109,14 @@ class Instagram:
         :rtype: object
         :return: Location location data
         """
-        query = urllib.quote(query)
-        endpoint = "fbsearch/places/?rank_token=" + self.rank_token + "&query=" + query
+        query = compat_urllib_parse.quote(query)
 
-        locationFeed = self.request(endpoint)[1]
-
-        if locationFeed['status'] != 'ok':
-            raise InstagramException(locationFeed['message'] + "\n")
-
-        return locationFeed
+        return (
+            self.request('fbsearch/places/')
+            .addParams('rank_token', self.rank_token)
+            .addParams('query', query)
+            .getResponse(FBLocationResponse())
+        )
 
     def getLocationFeed(self, locationId, maxid=''):
         """
