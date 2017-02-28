@@ -854,18 +854,16 @@ class Instagram:
         :rtype: object
         :return: Change Password Data
         """
-
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('old_password', oldPassword),
-                ('new_password1', newPassword),
-                ('new_password2', newPassword)
-            ])
+        return (
+            self.request('accounts/change_password/')
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('old_password', oldPassword)
+            .addPost('new_password1', newPassword)
+            .addPost('new_password2', newPassword)
+            .getResponse(ChangePasswordResponse())
         )
-        return self.request('accounts/change_password/', SignatureUtils.generateSignature(data))[1]
 
     def getUsernameInfo(self, usernameId):
         """
