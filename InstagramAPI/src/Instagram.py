@@ -663,15 +663,14 @@ class Instagram:
         :rtype: object
         :return: delete request data
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('media_id', mediaId)
-            ])
+        return (
+            self.request("media/" + mediaId + "/delete/")
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('media_id', mediaId)
+            .getResponse(MediaDeleteResponse())
         )
-        return self.request("media/" + mediaId + "/delete/", SignatureUtils.generateSignature(data))[1]
 
     def comment(self, mediaId, commentText):
         """
