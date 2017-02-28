@@ -77,7 +77,7 @@ class Instagram:
         :param password: Your Instagram password.
         :
         """
-        self.device_id = SignatureUtils.generateDeviceId(hashlib.md5((username + password).encode("utf-8")))
+        self.device_id = SignatureUtils.generateDeviceId(md5(username + password))
 
         self.username = username
         self.password = password
@@ -310,7 +310,7 @@ class Instagram:
             .addPost('_uuid', self.uuid)
             .addPost('device_id', self.device_id)
             .addPost('_csrftoken', self.token)
-            .addPost('uuid', hashlib.md5(str(int(time.time())).encode("utf-8")).hexdigest())
+            .addPost('uuid', md5(str(int(time.time()))).hexdigest())
             .getResponse(MegaphoneLogResponse())
         )
 

@@ -1,4 +1,5 @@
 from PIL import Image
+import hashlib
 
 
 def file_get_contents(file):
@@ -40,3 +41,7 @@ def json_decode(json_string):
 
 def getimagesize(photo):
     return Image.open(photo).size
+
+
+def md5(string):
+    return hashlib.md5(string.encode("utf-8"))
