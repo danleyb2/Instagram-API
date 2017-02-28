@@ -682,16 +682,16 @@ class Instagram:
         :rtype: object
         :return: comment media data
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('comment_text', commentText)
-            ])
-        )
-        return CommentResponse(
-            self.request("media/" + mediaId + "/comment/", SignatureUtils.generateSignature(data))[1]
+        return (
+            self.request("media/" + mediaId + "/comment/")
+            .addPost('user_breadcrumb', Utils.generateUserBreadcrumb(len(commentText)))
+            .addPost('idempotence_token', SignatureUtils.generateUUID(True))
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('comment_text', commentText)
+            .addPost('containermodule', 'comments_feed_timeline')
+            .getResponse(CommentResponse())
         )
 
     def deleteComment(self, mediaId, commentId):
@@ -704,16 +704,13 @@ class Instagram:
         :rtype: object
         :return: Delete comment data
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token)
-            ])
+        return (
+            self.request("media/" + mediaId + "/comment/" + commentId + "/delete/")
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .getResponse(DeleteCommentResponse())
         )
-        return \
-            self.request("media/" + mediaId + "/comment/" + commentId + "/delete/",
-                              SignatureUtils.generateSignature(data))[1]
 
     def deleteCommentsBulk(self, mediaId, commentIds):
         """

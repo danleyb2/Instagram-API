@@ -6,6 +6,7 @@ from .CheckUsernameResponse import CheckUsernameResponse
 from .CommentResponse import CommentResponse
 from .ConfigureResponse import ConfigureResponse
 from .ConfigureVideoResponse import ConfigureVideoResponse
+from .DeleteCommentResponse import DeleteCommentResponse
 from .ExploreResponse import ExploreResponse
 from .ExposeResponse import ExposeResponse
 from .FBSearchResponse import FBSearchResponse
@@ -16,6 +17,7 @@ from .LocationResponse import LocationResponse
 from .LoginResponse import LoginResponse
 from .LogoutResponse import LogoutResponse
 from .MediaCommentsResponse import MediaCommentsResponse
+from .MediaDeleteResponse import MediaDeleteResponse
 from .MediaInfoResponse import MediaInfoResponse
 from .MediaLikersResponse import MediaLikersResponse
 from .MegaphoneLogResponse import MegaphoneLogResponse
