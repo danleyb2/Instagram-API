@@ -1,4 +1,3 @@
-from InstagramAPI.src.http.Response.Objects.Item import Item
 from .Response import Response
 
 
@@ -18,7 +17,7 @@ class UserFeedResponse(Response):
             self.auto_load_more_enabled = response['auto_load_more_enabled']
             items = []
             for item in response['items']:
-                items.append(Item(item))
+                items.append(item)
             self.items = items
             self.more_available = response['more_available']
         else:
