@@ -289,8 +289,16 @@ class Instagram:
             SignatureUtils.generateSignature(data)
         )[1]
 
-    def timelineFeed(self):
-        return self.request('feed/timeline/').getResponse(TimelineFeedResponse())
+    def timelineFeed(self, maxId=None):
+        request = (
+            self.request('feed/timeline')
+            .addParams('rank_token', self.rank_token)
+            .addParams('ranked_content', True)
+        )
+        if maxId is not None:
+            request.addParams('max_id', maxId)
+
+        return request.getResponse(TimelineFeedResponse())
 
     def megaphoneLog(self):
         return (
