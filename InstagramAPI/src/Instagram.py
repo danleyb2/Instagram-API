@@ -733,7 +733,7 @@ class Instagram:
         comment_ids_to_delete = ','.join(string)
 
         return (
-            self.request("media/$mediaId/comment/bulk_delete/")
+            self.request("media/" + mediaId + "/comment/bulk_delete/")
             .addPost('_uuid', self.uuid)
             .addPost('_uid', self.username_id)
             .addPost('_csrftoken', self.token)
@@ -747,7 +747,12 @@ class Instagram:
         :type photo: str
         :param photo: Path to photo
         """
-        self.http.changeProfilePicture(photo)
+
+        # FIXME This doesn't make sense.
+        # While this might be legal in PHP, this is illegal in python
+        #return ProfileResponse(self.http.changeProfilePicture(photo))
+
+        return self.http.changeProfilePicture(photo)
 
     def removeProfilePicture(self):
         """
@@ -755,10 +760,13 @@ class Instagram:
         :rtype: object
         :return: status request data
         """
-        data = json.dumps(
-            OrderedDict([('_uuid', self.uuid), ('_uid', self.username_id), ('_csrftoken', self.token)])
+        return (
+            self.request('accounts/remove_profile_picture/')
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .getResponse(ProfileResponse())
         )
-        return self.request('accounts/remove_profile_picture/', SignatureUtils.generateSignature(data))[1]
 
     def setPrivateAccount(self):
         """
