@@ -911,12 +911,9 @@ class Instagram:
         :rtype: object
         :return: v2 inbox data
         """
-        return (
-            self.request('direct_v2/inbox/?')
-            .getResponse(V2InboxResponse())
-        )
+        return self.request('direct_v2/inbox/?').getResponse(V2InboxResponse())
 
-    def getUserTags(self, usernameId):
+    def getUserTags(self, usernameId, maxid=None, minTimestamp=None):
         """
         Get user tags.
         :type usernameId: str
@@ -924,12 +921,14 @@ class Instagram:
         :rtype: object
         :return: user tags data
         """
-        tags = UsertagsResponse(self.request("usertags/" + str(usernameId) + "/feed/?rank_token=" + self.rank_token
-                                                  + "&ranked_content=true&")[1])
-        if not tags.isOk():
-            raise InstagramException(tags.getMessage() + "\n")
-
-        return tags
+        return (
+            self.request("usertags/$usernameId/feed/")
+            .addParams('rank_token', self.rank_token)
+            .addParams('ranked_content', 'true')
+            .addParams('max_id', maxid if maxid is not None else '')
+            .addParams('min_timestamp', minTimestamp if minTimestamp is not None else '')
+            .getResponse(UsertagsResponse())
+        )
 
     def getSelfUserTags(self):
         """
