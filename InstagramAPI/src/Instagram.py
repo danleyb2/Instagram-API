@@ -938,22 +938,6 @@ class Instagram:
         """
         return self.getUserTags(self.username_id)
 
-    def tagFeed(self, tag):
-        """
-        Get tagged media.
-        :type tag: str
-        :param tag:
-        :rtype: object
-        :return:
-        """
-        userFeed = TagFeedResponse(
-            self.request("feed/tag/" + tag + "/?rank_token=" + self.rank_token + "&ranked_content=true&")[1])
-
-        if not userFeed.isOk():
-            raise InstagramException(userFeed.getMessage() + "\n")
-
-        return userFeed
-
     def getMediaLikers(self, mediaId):
         """
         Get media likers.
