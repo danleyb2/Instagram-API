@@ -8,6 +8,7 @@ from .ConfigureResponse import ConfigureResponse
 from .ConfigureVideoResponse import ConfigureVideoResponse
 from .ExploreResponse import ExploreResponse
 from .ExposeResponse import ExposeResponse
+from .FBSearchResponse import FBSearchResponse
 from .FollowerResponse import FollowerResponse
 from .FollowingResponse import FollowingResponse
 from .FollowingRecentActivityResponse import FollowingRecentActivityResponse

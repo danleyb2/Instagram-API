@@ -990,14 +990,14 @@ class Instagram:
         :return: query data
         """
         query = urllib.quote(query)
-        query = \
-            self.request("fbsearch/topsearch/?context=blended&query=" + query + "&rank_token=" + self.rank_token)[
-                1]
 
-        if query['status'] != 'ok':
-            raise InstagramException(query['message'] + "\n")
-
-        return query
+        return (
+            self.request('fbsearch/topsearch/')
+            .addParams('context', 'blended')
+            .addParams('query', query)
+            .addParams('rank_token', self.rank_token)
+            .getResponse(FBSearchResponse())
+        )
 
     def searchUsers(self, query):
         """
