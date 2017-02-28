@@ -547,7 +547,7 @@ class Instagram:
              .addPost('posting_latitude', location.getLat())
              .addPost('media_longitude', location.getLng())
              .addPost('posting_longitude', location.getLng())
-             .addPost('altitude', random.rand_int(10, 800)))
+             .addPost('altitude', mt_rand(10, 800)))
 
         if filter_ is not None:
             requestData.addPost('edits', {'filter_type': Utils.getFilterCode(filter_)})
