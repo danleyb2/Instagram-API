@@ -1,3 +1,6 @@
+from PIL import Image
+
+
 def file_get_contents(file):
     with open(file, 'rb') as fFile:
         return fFile.read()
@@ -33,3 +36,7 @@ def json_decode(json_string):
         return json.loads(json_string)
     except ValueError:
         return None
+
+
+def getimagesize(photo):
+    return Image.open(photo).size

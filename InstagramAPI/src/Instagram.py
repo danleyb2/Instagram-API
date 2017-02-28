@@ -465,7 +465,7 @@ class Instagram:
     def configureVideo(self, upload_id, video, caption='', customPreview=None):
 
         self.uploadPhoto(video, caption, upload_id, customPreview)
-        size = Image.open(video).size[0]
+        size = getimagesize(video)[0]
 
         return (
             self.request('media/configure/')
@@ -501,7 +501,7 @@ class Instagram:
         )
 
     def configure(self, upload_id, photo, caption='', location=None, filter_=None):
-        size = Image.open(photo).size[0]
+        size = getimagesize(photo)[0]
         if caption is None:
             caption = ''
 
@@ -562,7 +562,7 @@ class Instagram:
         )
 
     def configureToReel(self, upload_id, photo):
-        size = Image.open(photo).size[0]
+        size = getimagesize(photo)[0]
 
         return (
             self.request('media/configure_to_reel/')
