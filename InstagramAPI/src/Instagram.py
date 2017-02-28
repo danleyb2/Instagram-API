@@ -457,7 +457,7 @@ class Instagram:
                 ('_csrftoken', self.token)
             ])
         )
-        return self.request(
+        return self.http.request(
             "direct_v2/threads/" + str(threadId) + "/" + str(threadAction) + "/",
             self.generateSignature(data)  # todo Unresolved reference
         )[1]
@@ -1038,10 +1038,12 @@ class Instagram:
         :rtype: object
         :return:
         """
-        data = OrderedDict([(
-            ('contacts=', json.dumps(contacts))
-        )])
-        return self.request('address_book/link/?include=extra_display_name,thumbnails', data)[1]
+        return (
+            self.request('address_book/link/?include=extra_display_name,thumbnails')
+            .setSignedPost(False)
+            .addPost('contacts', json_encode(contacts, true))
+            .getResponse(AddressBookResponse())
+        )
 
     def searchTags(self, query):
         """

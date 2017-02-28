@@ -1,4 +1,4 @@
-from .Objects.Item import item
+from .Objects.Item import Item
 from .Response import Response
 
 

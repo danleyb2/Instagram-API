@@ -1,5 +1,6 @@
 from .AccountCreationResponse import AccountCreationResponse
 from .ActivityNewsResponse import ActivityNewsResponse
+from .AddressBookResponse import AddressBookResponse
 from .ChallengeResponse import ChallengeResponse
 from .ChangePasswordResponse import ChangePasswordResponse
 from .CheckEmailResponse import CheckEmailResponse
