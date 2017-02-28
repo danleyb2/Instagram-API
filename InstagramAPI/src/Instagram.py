@@ -891,18 +891,19 @@ class Instagram:
         """
         return self.request('news/inbox/').addParams('activity_module', 'all').getResponse(ActivityNewsResponse())
 
-    def getFollowingRecentActivity(self):
+    def getFollowingRecentActivity(self, maxid=None):
         """
         Get recent activity from accounts followed.
 
         :rtype: object
         :return: Recent activity data of follows
         """
-        activity = self.request('news/?')[1]
-        if activity['status'] != 'ok':
-            raise InstagramException(activity['message'] + "\n")
 
-        return activity
+        activity = self.request('news/')
+        if maxid is not None:
+            activity.addParams('max_id', maxid)
+
+        return activity.getResponse(FollowingRecentActivityResponse())
 
     def getv2Inbox(self):
         """
