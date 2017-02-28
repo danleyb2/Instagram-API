@@ -732,16 +732,14 @@ class Instagram:
 
         comment_ids_to_delete = ','.join(string)
 
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('comment_ids_to_delete', comment_ids_to_delete)
-            ])
+        return (
+            self.request("media/$mediaId/comment/bulk_delete/")
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('comment_ids_to_delete', comment_ids_to_delete)
+            .getResponse(DeleteCommentResponse())
         )
-        return self.request("media/" + mediaId + "/comment/bulk_delete/",
-                                 SignatureUtils.generateSignature(data))[1]
 
     def changeProfilePicture(self, photo):
         """
