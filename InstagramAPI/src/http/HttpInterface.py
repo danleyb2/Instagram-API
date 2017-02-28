@@ -81,7 +81,7 @@ class HttpInterface(object):
 
             if post is not None:
                 if not isinstance(post, list):
-                    print('DATA: ' + compat_urllib_parse.unquote_plus(post))
+                    print('DATA: ' + urldecode(post))
 
             bytes = Utils.formatBytes(ch.getinfo(pycurl.SIZE_DOWNLOAD))
             httpCode = ch.getinfo(pycurl.HTTP_CODE)

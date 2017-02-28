@@ -988,7 +988,7 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = urllib.quote(query)
+        query = rawurlencode(query)
 
         return (
             self.request('fbsearch/topsearch/')
@@ -1109,7 +1109,7 @@ class Instagram:
         :rtype: object
         :return: Location location data
         """
-        query = compat_urllib_parse.quote(query)
+        query = urlencode(query)
 
         return (
             self.request('fbsearch/places/')
@@ -1509,14 +1509,14 @@ class Request:
         instagramObj = Instagram.getInstance()
 
         if self.params:
-            endPoint = self.url + "?" + compat_urllib_parse.urlencode(self.params)
+            endPoint = self.url + "?" + http_build_query(self.params)
         else:
             endPoint = self.url
         if self.posts:
             if self.signedPost:
                 post = SignatureUtils.generateSignature(json.dumps(self.posts))
             else:
-                post = compat_urllib_parse.urlencode(self.posts)
+                post = http_build_query(self.posts)
         else:
             post = None
         if self.replacePost:
