@@ -1076,12 +1076,7 @@ class Instagram:
         return timeline
 
     def getReelsTrayFeed(self):
-        feed = self.request('feed/reels_tray/').getResponse(ReelsTrayFeedResponse())
-        if not feed.isOk():
-            raise InstagramException(feed.getMessage() + "\n")
-            # return todo Unreachable code
-
-        return feed
+        return self.request('feed/reels_tray/').getResponse(ReelsTrayFeedResponse())
 
     def getUserFeed(self, usernameId, maxid=None, minTimestamp=None):
         """
