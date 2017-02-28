@@ -956,12 +956,7 @@ class Instagram:
         :rtype: object
         :return: Geo Media data
         """
-        locations = self.request("maps/user/" + str(usernameId) + "/")[1]
-
-        if locations['status'] != 'ok':
-            raise InstagramException(locations['message'] + "\n")
-
-        return locations
+        return self.request("maps/user/" + str(usernameId)).getResponse(GeoMediaResponse())
 
     def getSelfGeoMedia(self):
         """
