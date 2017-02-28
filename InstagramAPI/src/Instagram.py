@@ -1007,14 +1007,14 @@ class Instagram:
         :rtype: object
         :return: query data
         """
-        query = self.request(
-            'users/search/?ig_sig_key_version=' + Constants.SIG_KEY_VERSION \
-            + "&is_typeahead=true&query=" + query + "&rank_token=" + self.rank_token)[1]
-
-        if query['status'] != 'ok':
-            raise InstagramException(query['message'] + "\n")
-
-        return query
+        return (
+            self.request('users/search/')
+            .addParams('ig_sig_key_version', Constants.SIG_KEY_VERSION)
+            .addParams('is_typeahead', True)
+            .addParams('query', query)
+            .addParams('rank_token', self.rank_token)
+            .getResponse(SearchUserResponse())
+        )
 
     def searchUsername(self, usernameName):
         """
