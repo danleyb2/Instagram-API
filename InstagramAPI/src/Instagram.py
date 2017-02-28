@@ -284,7 +284,7 @@ class Instagram:
                 ('users', self.username_id)
             ])
         )
-        return self.request(
+        return self.http.request(
             'push/register/?platform=10&device_type=android_mqtt',
             SignatureUtils.generateSignature(data)
         )[1]
