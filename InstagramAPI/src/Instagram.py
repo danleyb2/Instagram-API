@@ -775,14 +775,13 @@ class Instagram:
         :rtype: object
         :return: status request data
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token)
-            ])
+        return (
+            self.request('accounts/set_private/')
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .getResponse(ProfileResponse())
         )
-        return self.request('accounts/set_private/', SignatureUtils.generateSignature(data))[1]
 
     def setPublicAccount(self):
         """
@@ -790,14 +789,13 @@ class Instagram:
         :rtype: object
         :return: status request data
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token)
-            ])
+        return (
+            self.request('accounts/set_public/')
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .getResponse(ProfileResponse())
         )
-        return self.request('accounts/set_public/', SignatureUtils.generateSignature(data))[1]
 
     def getProfileData(self):
         """
