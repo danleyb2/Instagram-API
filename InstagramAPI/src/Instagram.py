@@ -631,7 +631,7 @@ class Instagram:
         :return: edit media data
         """
         return (
-            self.request("usertags/$mediaId/remove/")
+            self.request("usertags/ " + mediaId + "/remove/")
             .addPost('_uuid', self.uuid)
             .addPost('_uid', self.username_id)
             .addPost('_csrftoken', self.token)
@@ -646,16 +646,14 @@ class Instagram:
         :rtype: object
         :return: delete request data
         """
-        data = json.dumps(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('media_id', mediaId)
-            ])
+        return (
+            self.request("media/" + mediaId + "/info/")
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('media_id', mediaId)
+            .getResponse(MediaInfoResponse())
         )
-        return MediaInfoResponse(
-            self.request("media/" + mediaId + "/info/", SignatureUtils.generateSignature(data))[1])
 
     def deleteMedia(self, mediaId):
         """
