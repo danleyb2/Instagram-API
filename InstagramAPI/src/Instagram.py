@@ -1094,16 +1094,12 @@ class Instagram:
         :rtype: object
         :return: Hashtag feed data
         """
-        if maxid == '':
-            endpoint = "feed/tag/" + hashtagString + "/?rank_token=" + self.rank_token + "&ranked_content=true&"
-        else:
-            endpoint = "feed/tag/" + hashtagString + "/?max_id=" \
-                       + maxid + "&rank_token=" + self.rank_token + "&ranked_content=true&"
-        hashtagFeed = self.request(endpoint)[1]
-        if hashtagFeed['status'] != 'ok':
-            raise InstagramException(hashtagFeed['message'] + "\n")
+        hashtagFeed = $this->request("feed/tag/" + hashtagString + "/");
+        if maxid is not None:
+            hashtagFeed.addParams('max_id', maxid)
 
-        return hashtagFeed
+        return hashtagFeed.getResponse(TagFeedResponse())
+
 
     def searchFBLocation(self, query):
         """
