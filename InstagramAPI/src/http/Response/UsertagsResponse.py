@@ -2,7 +2,7 @@ from .Response import Response
 
 
 class UsertagsResponse(Response):
-    def __init__(self, response):
+    def __init__(self):
         self.num_results = None
         self.auto_load_more_enabled = None
         self.items = None

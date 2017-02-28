@@ -946,12 +946,7 @@ class Instagram:
         :rtype: object
         :return:
         """
-        likers = MediaLikersResponse(self.request("media/" + mediaId + "/likers/")[1])
-        if not likers.isOk():
-            raise InstagramException(likers.getMessage() + "\n")
-            # return #fixme unreachable code
-
-        return likers
+        return self.request("media/" + mediaId + "/likers/").getResponse(MediaLikersResponse())
 
     def getGeoMedia(self, usernameId):
         """
