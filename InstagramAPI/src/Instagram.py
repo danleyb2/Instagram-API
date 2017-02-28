@@ -265,14 +265,14 @@ class Instagram:
          .getResponse(autoCompleteUserListResponse()))
 
     def pushRegister(self, gcmToken):
-        deviceToken = json.dumps(
+        deviceToken = json_encode(
             OrderedDict([
                 ('k', gcmToken),
                 ('v', 0),
                 ('t', 'fbns-b64')
             ])
         )
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('guid', self.uuid),
@@ -450,7 +450,7 @@ class Instagram:
         :rtype: object
         :return: Direct Thread Action Data
         """
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
@@ -541,7 +541,7 @@ class Instagram:
                 ('external_source',                         location.getExternalIdSource())
             ])
 
-            (requestData.addPost('location', json.dumps(loc))
+            (requestData.addPost('location', json_encode(loc))
              .addPost('geotag_enabled', true)
              .addPost('media_latitude', location.getLat())
              .addPost('posting_latitude', location.getLat())
@@ -1041,7 +1041,7 @@ class Instagram:
         return (
             self.request('address_book/link/?include=extra_display_name,thumbnails')
             .setSignedPost(False)
-            .addPost('contacts', json.dumps(contacts))
+            .addPost('contacts', json_encode(contacts))
             .getResponse(AddressBookResponse())
         )
 
@@ -1214,7 +1214,7 @@ class Instagram:
         :rtype: object
         :return: status request
         """
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
@@ -1233,7 +1233,7 @@ class Instagram:
         :rtype: object
         :return: status request
         """
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
@@ -1264,7 +1264,7 @@ class Instagram:
         :rtype: object
         :return: Set status data
         """
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
@@ -1333,7 +1333,7 @@ class Instagram:
         :return: Friendship status data
         """
 
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
@@ -1354,7 +1354,7 @@ class Instagram:
         :rtype: object
         :return: Friendship status data
         """
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
@@ -1375,7 +1375,7 @@ class Instagram:
         :return: Friendship status data
         """
 
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
@@ -1396,7 +1396,7 @@ class Instagram:
         :return: Friendship status data
         """
 
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
@@ -1417,7 +1417,7 @@ class Instagram:
         :return: Friendship relationship data
         """
 
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('_uid', self.username_id),
@@ -1514,7 +1514,7 @@ class Request:
             endPoint = self.url
         if self.posts:
             if self.signedPost:
-                post = SignatureUtils.generateSignature(json.dumps(self.posts))
+                post = SignatureUtils.generateSignature(json_encode(self.posts))
             else:
                 post = http_build_query(self.posts)
         else:

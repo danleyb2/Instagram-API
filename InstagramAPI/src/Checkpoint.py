@@ -143,7 +143,7 @@ class Checkpoint(object):
             print("REQUEST: " + endpoint)
             if post is not None:
                 if not isinstance(post, list):
-                    print('DATA: ' + urllib.unquote_plus(json.dumps(post)))
+                    print('DATA: ' + urllib.unquote_plus(json_encode(post)))
             print("RESPONSE: " + body + "\n")
 
         return [header, json_decode(body)]

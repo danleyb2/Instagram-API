@@ -1,5 +1,6 @@
 from PIL import Image
 import hashlib
+import json
 
 # From https://github.com/rg3/youtube-dl/blob/master/youtube_dl/compat.py
 
@@ -38,8 +39,14 @@ def parse_url(url):
     return r
 
 
+def json_encode(data):
+    try:
+        return json.dumps(data)
+    except ValueError:
+        return None
+
+
 def json_decode(json_string):
-    import json
     try:
         return json.loads(json_string)
     except ValueError:

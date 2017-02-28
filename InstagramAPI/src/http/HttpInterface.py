@@ -93,7 +93,7 @@ class HttpInterface(object):
                 print(Utils.colouredString('RESPONSE: ', 'cyan') + body + "\n")
 
         ch.close()
-        return [header, json.loads(body)]
+        return [header, json_decode(body)]
 
     def uploadPhoto(self, photo, caption=None, upload_id=None, customPreview=None, location=None, filter_=None,
                     reel_flag=False):
@@ -183,7 +183,7 @@ class HttpInterface(object):
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
 
         header = resp[0: header_len]
-        upload = UploadPhotoResponse(json.loads(resp[header_len:]))
+        upload = UploadPhotoResponse(json_decode(resp[header_len:]))
 
         ch.close()
 
@@ -270,7 +270,7 @@ class HttpInterface(object):
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
 
         header = resp[0: header_len]
-        body = UploadJobVideoResponse(json.loads(resp[header_len:]))
+        body = UploadJobVideoResponse(json_decode(resp[header_len:]))
 
         uploadUrl = body.getVideoUploadUrl()
         job = body.getVideoUploadJob()
@@ -329,7 +329,7 @@ class HttpInterface(object):
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
 
         header = resp[0: header_len]
-        upload = UploadVideoResponse(json.loads(resp[header_len:]))
+        upload = UploadVideoResponse(json_decode(resp[header_len:]))
 
         ch.close()
 
@@ -347,7 +347,7 @@ class HttpInterface(object):
             print("Photo not valid")
             return
 
-        uData = json.dumps(
+        uData = json_encode(
             OrderedDict([
                 ('_csrftoken', self.parent.token),
                 ('_uuid', self.parent.uuid),
@@ -414,7 +414,7 @@ class HttpInterface(object):
         resp = buffer.getvalue()
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
         header = resp[:header_len]
-        upload = json.loads(resp[header_len:])
+        upload = json_decode(resp[header_len:])
 
         ch.close()
 
@@ -496,7 +496,7 @@ class HttpInterface(object):
         resp = buffer.getvalue()
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
         header = resp[0:header_len]
-        upload = json.loads(resp[header_len:])
+        upload = json_decode(resp[header_len:])
         ch.close()
 
     def direct_message(self, recipients, text):
@@ -572,7 +572,7 @@ class HttpInterface(object):
         resp = buffer.getvalue()
         header_len = ch.getinfo(pycurl.HEADER_SIZE)
         header = resp[0:header_len]
-        upload = json.loads(resp[header_len:])
+        upload = json_decode(resp[header_len:])
         ch.close()
 
     def buildBody(self, bodies, boundary):

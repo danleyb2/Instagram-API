@@ -97,7 +97,7 @@ class InstagramRegistration(object):
         :rtype: object
         :return: Username availability data
         """
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('_uuid', self.uuid),
                 ('username', username),
@@ -111,7 +111,7 @@ class InstagramRegistration(object):
 
     def checkEmail(self, email):
 
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('qe_id', SignatureUtils.generateUUID(True)),
                 ('waterfall_id', SignatureUtils.generateUUID(True)),
@@ -123,7 +123,7 @@ class InstagramRegistration(object):
         return CheckEmailResponse(self.request('users/check_email/', SignatureUtils.generateSignature(data))[1])
 
     def usernameSuggestions(self, email, name):
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('name', SignatureUtils.generateUUID(True)),
                 ('waterfall_id', SignatureUtils.generateUUID(True)),
@@ -150,7 +150,7 @@ class InstagramRegistration(object):
         """
 
         token = self.getCsfrtoken()
-        data = json.dumps(
+        data = json_encode(
             OrderedDict([
                 ('allow_contacts_sync', 'true'),
                 ('phone_id', self.uuid),
