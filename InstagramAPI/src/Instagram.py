@@ -1163,9 +1163,15 @@ class Instagram:
         :rtype: object
         :return: followers data
         """
-        return FollowingResponse(self.request(
-            "friendships/" + usernameId + "/following/?max_id=" + maxid + "&ig_sig_key_version="
-            + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1])
+        requestData = (
+            self.request("friendships/" + usernameId + "/following/")
+            .addParams('rank_token', self.rank_token)
+        )
+
+        if maxid is not '':
+            requestData.addParams('max_id', maxid)
+
+        return requestData.getResponse(FollowerAndFollowingResponse())
 
     def getUserFollowers(self, usernameId, maxid=''):
         """
@@ -1176,9 +1182,14 @@ class Instagram:
         :rtype: object
         :return: followers data
         """
-        return FollowerResponse(self.request(
-            "friendships/" + usernameId + "/followers/?max_id=" + maxid
-            + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION + "&rank_token=" + self.rank_token)[1])
+        requestData = (
+            self.request("friendships/" + usernameId + "/followers/")
+            .addParams('rank_token', self.rank_token)
+        )
+        if maxid is not '':
+            requestData.addParams('max_id', maxid)
+
+        return requestData.getResponse(FollowerAndFollowingResponse())
 
     def getSelfUserFollowers(self):
         """

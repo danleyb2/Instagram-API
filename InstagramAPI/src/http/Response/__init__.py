@@ -13,6 +13,7 @@ from .ExploreResponse import ExploreResponse
 from .ExposeResponse import ExposeResponse
 from .FBSearchResponse import FBSearchResponse
 from .FollowerResponse import FollowerResponse
+from .FollowerAndFollowingResponse import FollowerAndFollowingResponse
 from .FollowingResponse import FollowingResponse
 from .FollowingRecentActivityResponse import FollowingRecentActivityResponse
 from .LocationResponse import LocationResponse
