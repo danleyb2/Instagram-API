@@ -1,3 +1,7 @@
+*Please go through the*
+`contribution guidelines <https://github.com/danleyb2/Instagram-API/blob/master/.github/CONTRIBUTING.md>`_. *This is
+just a translated Python implementation of this PHP* `repository <https://github.com/mgp25/Instagram-API>`_.
+
 |logo| Instagram Python
 #######################
 
@@ -7,20 +11,12 @@
 
 **PYTHON:** |latestpy| |downloadspy|
 
-
-.. note::
-
-    Please go through the
-    `contribution guidelines <https://github.com/danleyb2/Instagram-API/blob/master/.github/CONTRIBUTING.md>`_.
-    This is just a translated Python implementation of this PHP `repository <https://github.com/mgp25/Instagram-API>`_.
-
 This is Instagram's private API. It has all the features the Instagram app has, including media upload.
 
-.. important::
+**Read the** `wiki <https://github.com/danleyb2/Instagram-API/wiki>`_ **and previous issues before opening a new one!**
+Maybe your issue is already answered.
 
-    Read the `wiki <https://github.com/danleyb2/Instagram-API/wiki>`_ and previous issues before opening a new one!
-    Maybe your issue is already answered. Wiki for the PHP code should be 90% applicable too because the code is just
-    translated, not transformed.
+**Wiki for the PHP code should be 90% applicable too because the code is just translated, not transformed.**
 
 **Frequently Asked Questions:** `F.A.Q. <https://github.com/danleyb2/Instagram-API/wiki/FAQ>`_
 
