@@ -1126,18 +1126,11 @@ class Instagram:
         :rtype: object
         :return: Location feed data
         """
-        if maxid is '':
-            endpoint = "feed/location/" + locationId + "/?rank_token=" + self.rank_token + "&ranked_content=true&"
-        else:
-            endpoint = "feed/location/" + locationId + "/?max_id=" \
-                       + maxid + "&rank_token=" + self.rank_token + "&ranked_content=true&"
+        locationFeed = self.request("feed/location/" + locationId + "/")
+        if maxid is not '':
+            locationFeed.addParams('max_id', maxid);
 
-        locationFeed = self.request(endpoint)[1]
-
-        if locationFeed['status'] != 'ok':
-            raise InstagramException(locationFeed['message'] + "\n")
-
-        return locationFeed
+        return locationFeed.getResponse(LocationFeedResponse())
 
     def getSelfUserFeed(self, max_id=None):
         """

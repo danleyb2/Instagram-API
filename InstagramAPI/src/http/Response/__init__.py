@@ -16,6 +16,7 @@ from .FollowerResponse import FollowerResponse
 from .FollowingResponse import FollowingResponse
 from .FollowingRecentActivityResponse import FollowingRecentActivityResponse
 from .LocationResponse import LocationResponse
+from .LocationFeedResponse import LocationFeedResponse
 from .LoginResponse import LoginResponse
 from .LogoutResponse import LogoutResponse
 from .MediaCommentsResponse import MediaCommentsResponse
