@@ -1,3 +1,15 @@
+from PIL import Image
+import hashlib
+import json
+
+# From https://github.com/rg3/youtube-dl/blob/master/youtube_dl/compat.py
+
+try:
+    import urllib.parse as compat_urllib_parse
+except ImportError:  # Python 2
+    import urllib as compat_urllib_parse
+
+
 def file_get_contents(file):
     with open(file, 'rb') as fFile:
         return fFile.read()
@@ -27,9 +39,43 @@ def parse_url(url):
     return r
 
 
+def json_encode(data):
+    try:
+        return json.dumps(data)
+    except ValueError:
+        return None
+
+
 def json_decode(json_string):
-    import json
     try:
         return json.loads(json_string)
     except ValueError:
         return None
+
+
+def getimagesize(photo):
+    return Image.open(photo).size
+
+
+def md5(string):
+    return hashlib.md5(string.encode("utf-8"))
+
+
+def urlencode(string):
+    return compat_urllib_parse.quote_plus(string)
+
+
+def urldecode(string):
+    return compat_urllib_parse.unquote_plus(string)
+
+
+def rawurlencode(string):
+    return compat_urllib_parse.quote(string)
+
+
+def rawurldecode(string):
+    return compat_urllib_parse.unquote(string)
+
+
+def http_build_query(params):
+    return compat_urllib_parse.urlencode(params)

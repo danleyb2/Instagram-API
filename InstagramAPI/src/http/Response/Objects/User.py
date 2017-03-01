@@ -1,8 +1,10 @@
+from InstagramAPI.src.http.Response.Response import Response
 from InstagramAPI.src.http.Response.Objects.FriendshipStatus import FriendshipStatus
 
+class User(Response):
+    def __init__(self):
+        self._types = {}
 
-class User(object):
-    def __init__(self, userData):
         self.username = None
         self.has_anonymous_profile_picture = False
         self.is_favorite = False
@@ -12,50 +14,38 @@ class User(object):
         self.is_verified = False
         self.is_private = False
         self.coeff_weight = 0
+        self._types["friendship_status"] = FriendshipStatus
         self.friendship_status = None
-
-        self.username = userData['username']
-        self.profile_pic_url = userData['profile_pic_url']
-        self.full_name = userData['full_name']
-        self.pk = userData['pk']
-        if 'is_verified' in userData and userData['is_verified']:
-            self.is_verified = userData['is_verified']
-        self.is_private = userData['is_private']
-        if 'has_anonymous_profile_picture' in userData and userData['has_anonymous_profile_picture']:
-            self.has_anonymous_profile_picture = userData['has_anonymous_profile_picture']
-        if 'is_favorite' in userData and userData['is_favorite']:
-            self.is_favorite = userData['is_favorite']
-        if 'coeff_weight' in userData and userData['coeff_weight']:
-            self.coeff_weight = userData['coeff_weight']
-        if 'friendship_status' in userData and userData['friendship_status']:
-            self.friendship_status = FriendshipStatus(userData['friendship_status'])
-
-    def getUsername(self):
-        return self.username
-
-    def getProfilePicUrl(self):
-        return self.profile_pic_url
-
-    def getFullName(self):
-        return self.full_name
-
-    def getUsernameId(self):
-        return self.pk
-
-    def isVerified(self):
-        return self.is_verified
-
-    def isPrivate(self):
-        return self.is_private
-
-    def hasAnonymousProfilePicture(self):
-        return self.has_anonymous_profile_picture
-
-    def isFavorite(self):
-        return self.is_favorite
-
-    def getCoeffWeight(self):
-        return self.coeff_weight
-
-    def getFriendshipStatus(self):
-        return self.friendship_status
+        self.hd_profile_pic_versions = None
+        self.byline = None
+        self.search_social_context = None
+        self.unseen_count = None
+        self.mutual_followers_count = None
+        self.follower_count = None
+        self.social_context = None
+        self.media_count = None
+        self.following_count = None
+        self.is_business = None
+        self.usertags_count = None
+        self.profile_context = None
+        self.biography = None
+        self.geo_media_count = None
+        self.is_unpublished = None
+        self.allow_contacts_sync = None # // login prop
+        self.show_feed_biz_conversion_icon = None # // login prop
+        self.profile_pic_id = None # // Ranked recipents response prop
+        self.auto_expand_chaining = None # // getUsernameInfo prop
+        self.can_boost_post = None # // getUsernameInfo prop
+        self.is_profile_action_needed = None # // getUsernameInfo prop
+        self.has_chaining = None # // getUsernameInfo prop
+        self.include_direct_blacklist_status = None # // getUsernameInfo prop
+        self.can_see_organic_insights = None # // getUsernameInfo prop
+        self.can_convert_to_business = None # // getUsernameInfo prop
+        self.show_business_conversion_icon = None # // getUsernameInfo prop
+        self.show_conversion_edit_entry = None # // getUsernameInfo prop
+        self.show_insights_terms = None # // getUsernameInfo prop
+        self.hd_profile_pic_url_info = None # // getUsernameInfo prop
+        self.usertag_review_enabled = None # // getUsernameInfo prop
+        self.is_needy = None # // getUsernameInfo prop
+        self.external_url = None # // getUsernameInfo prop
+        self.external_lynx_url = None # // getUsernameInfo prop

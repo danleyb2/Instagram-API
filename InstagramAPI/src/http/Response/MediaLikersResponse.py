@@ -3,25 +3,9 @@ from .Response import Response
 
 
 class MediaLikersResponse(Response):
-    def __init__(self, response):
+    def __init__(self):
+        self._types = {}
 
         self.user_count = None
+        self._types["likers"] = [User]
         self.likers = None
-
-        if self.STATUS_OK == response['status']:
-            users = []
-            for user in response['users']:
-                users.append(User(user))
-
-            self.likers = users
-            self.user_count = response['user_count']
-        else:
-            self.setMessage(response['message'])
-
-        self.setStatus(response['status'])
-
-    def getLikers(self):
-        return self.likers
-
-    def getLikeCounter(self):
-        return self.user_count

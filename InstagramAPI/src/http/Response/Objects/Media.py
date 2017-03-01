@@ -1,7 +1,6 @@
 from InstagramAPI.src.http.Response.Response import Response
 
-
-class Position(Response):
+class Media(Response):
     def __init__(self):
-        self.pos1 = None
-        self.pos2 = None
+        self.image = None
+        self.id = None

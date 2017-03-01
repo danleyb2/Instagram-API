@@ -10,14 +10,14 @@ class SignatureUtils:
         hash = hmac.new(Constants.IG_SIG_KEY.encode("utf-8"), data.encode("utf-8"), hashlib.sha256).hexdigest()
 
         return 'ig_sig_key_version=' + Constants.SIG_KEY_VERSION + \
-               '&signed_body=' + hash + '.' + compat_urllib_parse.quote_plus(data)
+               '&signed_body=' + hash + '.' + urlencode(data)
 
     @staticmethod
     def generateDeviceId(seed):
         # // Neutralize username/password -> device correlation
         volatile_seed = '%d' % os.stat(os.path.dirname(os.path.realpath(__file__))).st_mtime
 
-        return 'android-' + str(hashlib.md5((str(seed) + str(volatile_seed)).encode("utf-8")).hexdigest())[16:]
+        return 'android-' + str(md5(str(seed) + str(volatile_seed)).hexdigest())[16:]
 
     @staticmethod
     def generateUUID(type):

@@ -5,7 +5,7 @@ from collections import OrderedDict
 import os
 import re
 
-from InstagramAPI.src.Utils import Settings, json_decode
+from InstagramAPI.src.Utils import Settings, json_decode, json_encode, urldecode, http_build_query
 
 try:
     from io import BytesIO
@@ -127,9 +127,8 @@ class Checkpoint(object):
         ch.setopt(pycurl.COOKIEJAR, self.settingsPath + self.username + '-cookies.dat')
 
         if post:
-            import urllib
             ch.setopt(pycurl.POST, len(post))
-            ch.setopt(pycurl.POSTFIELDS, urllib.urlencode(post))
+            ch.setopt(pycurl.POSTFIELDS, http_build_query(post))
 
         ch.perform()
         resp = buffer.getvalue()
@@ -139,11 +138,10 @@ class Checkpoint(object):
         ch.close()
 
         if self.debug:
-            import urllib
             print("REQUEST: " + endpoint)
             if post is not None:
                 if not isinstance(post, list):
-                    print('DATA: ' + urllib.unquote_plus(json.dumps(post)))
+                    print('DATA: ' + urldecode(json_encode(post)))
             print("RESPONSE: " + body + "\n")
 
         return [header, json_decode(body)]

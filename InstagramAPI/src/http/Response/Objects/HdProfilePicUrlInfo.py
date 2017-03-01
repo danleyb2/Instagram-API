@@ -1,18 +1,7 @@
-class HdProfilePicUrlInfo(object):
-    def __init__(self, response):
+from InstagramAPI.src.http.Response.Response import Response
+
+class HdProfilePicUrlInfo(Response):
+    def __init__(self):
         self.url = None
         self.width = None
         self.height = None
-
-        self.url = response['url']
-        self.width = response['width']
-        self.height = response['height']
-
-    def getUrl(self):
-        return self.url
-
-    def getWidth(self):
-        return self.width
-
-    def getHeight(self):
-        return self.height
