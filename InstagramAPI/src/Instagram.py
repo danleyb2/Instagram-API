@@ -1146,13 +1146,13 @@ class Instagram:
         :rtype: object
         :return: popular feed data
         """
-        popularFeed = self.request("feed/popular/?people_teaser_supported=1&rank_token=" \
-                                        + self.rank_token + "&ranked_content=true&")[1]
-
-        if popularFeed['status'] != 'ok':
-            raise InstagramException(popularFeed['message'] + "\n")
-
-        return popularFeed
+        return (
+            self.request('feed/popular/')
+            .addParams('people_teaser_supported', '1')
+            .addParams('rank_token', self.rank_token)
+            .addParams('ranked_content', 'true')
+            .getResponse(PopularFeedResponse())
+        )
 
     def getUserFollowings(self, usernameId, maxid=''):
         """
