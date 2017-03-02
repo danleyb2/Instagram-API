@@ -1218,15 +1218,14 @@ class Instagram:
         :rtype: object
         :return: status request
         """
-        data = json_encode(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('media_id', mediaId)
-            ])
+        return (
+            self.request("media/" + mediaId + "/like/")
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('media_id', mediaId)
+            .getResponse(Response())
         )
-        return self.request("media/" + mediaId + "/like/", SignatureUtils.generateSignature(data))[1]
 
     def unlike(self, mediaId):
         """
@@ -1237,15 +1236,14 @@ class Instagram:
         :rtype: object
         :return: status request
         """
-        data = json_encode(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('_csrftoken', self.token),
-                ('media_id', mediaId)
-            ])
+        return (
+            self.request("media/" + mediaId + "/unlike/")
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('media_id', mediaId)
+            .getResponse(Response())
         )
-        return self.request("media/" + mediaId + "/unlike/", SignatureUtils.generateSignature(data))[1]
 
     def getMediaComments(self, mediaId, maxid=''):
         """
