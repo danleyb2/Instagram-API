@@ -1270,17 +1270,16 @@ class Instagram:
         :rtype: object
         :return: Set status data
         """
-        data = json_encode(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('first_name', name),
-                ('phone_number', phone),
-                ('_csrftoken', self.token)
-            ])
+        return (
+            self.request('accounts/set_phone_and_name/')
+            .setSignedPost(True)
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('first_name', name)
+            .addPost('phone_number', phone)
+            .getResponse(Response())
         )
-
-        return self.request("accounts/set_phone_and_name/", SignatureUtils.generateSignature(data))[1]
 
     def getDirectShare(self):
         """
