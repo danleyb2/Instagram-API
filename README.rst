@@ -7,9 +7,9 @@ just a translated Python implementation of this PHP* `repository <https://github
 
 |license|
 
-**PHP**: |latestphp| |downloadsphp|
+`PHP <https://pypi.python.org/pypi/instagram-python>`_ |latestphp| |downloadsphp|
 
-**PYTHON:** |latestpy| |downloadspy|
+`PYTHON <https://packagist.org/packages/mgp25/instagram-php>`_ |latestpy| |downloadspy|
 
 This is Instagram's private API. It has all the features the Instagram app has, including media upload.
 
