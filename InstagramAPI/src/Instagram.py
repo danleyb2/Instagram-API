@@ -1414,6 +1414,27 @@ class Instagram:
         """
         return self.request("friendships/show/" + userId + "/").getResponse(FriendshipStatus())
 
+    def usersFriendship(self, userList):
+        """
+        Show Multiple Users Friendship.
+
+        :type userList: str|list
+        :param userList:
+        :rtype: object
+        :return: FriendshipsShowManyResponse
+        """
+        if type(userList) not in [list, tuple]:
+            userList = [userList]
+
+        return (
+            self.request('friendships/show_many/')
+            .setSignedPost(false)
+            .addPost('_uuid', self.uuid)
+            .addPost('user_ids', ','.join(userList))
+            .addPost('_csrftoken', self.token)
+            .getResponse(FriendshipsShowManyResponse())
+        )
+
     def getLikedMedia(self, maxid=None):
         """
         Get liked media.
