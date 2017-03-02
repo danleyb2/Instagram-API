@@ -19,6 +19,7 @@ from .FollowingResponse import FollowingResponse
 from .FollowingRecentActivityResponse import FollowingRecentActivityResponse
 from. FriendshipResponse import FrienshipResponse
 from. FriendshipsShowManyResponse import FriendshipsShowManyResponse
+from .LikeFeedResponse import LikeFeedResponse
 from .LocationResponse import LocationResponse
 from .LocationFeedResponse import LocationFeedResponse
 from .LoginResponse import LoginResponse

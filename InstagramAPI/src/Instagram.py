@@ -1442,8 +1442,10 @@ class Instagram:
         :rtype: object
         :return: Liked media data
         """
-        endpoint = 'feed/liked/?' + (('max_id=' + str(maxid) + '&') if maxid is not None else '')
-        return self.request(endpoint)[1]
+        return (
+            self.request('feed/liked/?' + ('max_id=' + str(maxid) + '&' if maxid is not None else ''))
+            .getResponse(LikeFeedResponse())
+        )
 
     def verifyPeer(self, enable):
         self.http.verifyPeer(enable)
