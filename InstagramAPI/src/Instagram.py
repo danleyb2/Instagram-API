@@ -1412,17 +1412,7 @@ class Instagram:
         :rtype: object
         :return: Friendship relationship data
         """
-
-        data = json_encode(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('user_id', userId),
-                ('_csrftoken', self.token)
-            ])
-        )
-
-        return self.request("friendships/show/" + userId + "/", SignatureUtils.generateSignature(data))[1]
+        return self.request("friendships/show/" + userId + "/").getResponse(FriendshipStatus())
 
     def getLikedMedia(self, maxid=None):
         """
