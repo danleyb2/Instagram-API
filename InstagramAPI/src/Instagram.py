@@ -1340,18 +1340,14 @@ class Instagram:
         :rtype: object
         :return: Friendship status data
         """
-
-        data = json_encode(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('user_id', userId),
-                ('_csrftoken', self.token)
-
-            ])
+        return (
+            self.request("friendships/create/" + userId + "/")
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('user_id', userId)
+            .getResponse(FriendshipResponse())
         )
-
-        return self.request("friendships/create/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def unfollow(self, userId):
         """
@@ -1362,16 +1358,14 @@ class Instagram:
         :rtype: object
         :return: Friendship status data
         """
-        data = json_encode(
-            OrderedDict([
-                ('_uuid', self.uuid),
-                ('_uid', self.username_id),
-                ('user_id', userId),
-                ('_csrftoken', self.token)
-            ])
+        return (
+            self.request("friendships/destroy/" + userId + "/")
+            .addPost('_uuid', self.uuid)
+            .addPost('_uid', self.username_id)
+            .addPost('_csrftoken', self.token)
+            .addPost('user_id', userId)
+            .getResponse(FriendshipResponse())
         )
-
-        return self.request("friendships/destroy/" + userId + "/", SignatureUtils.generateSignature(data))[1]
 
     def block(self, userId):
         """
