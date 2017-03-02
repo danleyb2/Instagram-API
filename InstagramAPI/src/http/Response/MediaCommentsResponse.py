@@ -1,17 +1,20 @@
-from InstagramAPI.src.http.Response.Objects.Item import Item
+from InstagramAPI.src.http.Response.Objects.Comment import Comment
+from InstagramAPI.src.http.Response.Objects.Caption import Caption
 from .Response import Response
 
 
 class MediaCommentsResponse(Response):
     def __init__(self, response):
-        self.item = None
+        self._types = {}
 
-        if self.STATUS_OK == response['status']:
-            if 'media' in response and response['media']:
-                self.item = Item(response['media'])
-        else:
-            self.setMessage(response['message'])
-        self.setStatus(response['status'])
-
-    def getItem(self):
-        return self.taken_at  # Unresolved reference attribute
+        self._types = [Comment]
+        self.comments = []
+        self.comment_count = None
+        self.comment_likes_enabled = None
+        self._types["next_max_id"] = str
+        self.next_max_id = None
+        self._types["caption"] = Caption
+        self.caption = None
+        self.has_more_comments = None
+        self.caption_is_edited = None
+        self.preview_comments = None

@@ -1253,8 +1253,12 @@ class Instagram:
         :rtype: object
         :return: Media comments data
         """
-        return MediaCommentsResponse(self.request("media/" + str(mediaId) + "/comments/?max_id=" + str(maxid)
-                                                       + "&ig_sig_key_version=" + Constants.SIG_KEY_VERSION)[1])
+        return (
+            self.request("media/" + mediaId + "/comments/")
+            .addParams('ig_sig_key_version', Constants.SIG_KEY_VERSION)
+            .addParams('max_id', maxid)
+            .getResponse(MediaCommentsResponse())
+        )
 
     def setNameAndPhone(self, name='', phone=''):
         """
