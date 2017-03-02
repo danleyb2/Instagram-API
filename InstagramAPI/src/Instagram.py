@@ -1538,18 +1538,21 @@ class Request:
             raise InstagramException('No response from server, connection or configure error', ErrorCode.EMPTY_RESPONSE)
 
         # Here we deviate from the PHP function because JsonMapper doesn't exist for python AFAIK
+        def is_primitive(obj):
+            return type(obj) in [str, int, float, bool]
+
         def _map(obj, root):
             if root is None:
                 obj = None
-                return
-            if type(root) in [str, int, float]:
-                obj = root
-                return
+                return obj
             if type(root) is list:
                 keys = list(obj.__dict__.keys())
                 for i in range(len(root)):
                     obj.__dict__[keys[i]] = root[i]
-                return
+                return obj
+            elif is_primitive(root):
+                obj = root
+                return obj
             for key in root:
                 if "_types" in obj.__dict__ and key in obj._types:
                     if type(obj._types[key]) is list:
@@ -1557,12 +1560,13 @@ class Request:
                         # TODO: check if root[key] is list
                         for i in range(len(root[key])):
                             obj.__dict__[key].append(obj._types[key][0]())
-                            _map(obj.__dict__[key][i], root[key][i])
+                            obj.__dict__[key][i] = _map(obj.__dict__[key][i], root[key][i])
                     else:
                         obj.__dict__[key] = obj._types[key]()
-                        _map(obj.__dict__[key], root[key])
+                        obj.__dict__[key] = _map(obj.__dict__[key], root[key])
                 else:
                     obj.__dict__[key] = root[key]
+            return obj
         _map(obj, response[1])
         responseObject = obj
 

@@ -1,5 +1,5 @@
 from .Response import Response
-from .Objects.FriendshipStatus import FrienshipStatus
+from .Objects.FriendshipStatus import FriendshipStatus
 
 
 class FriendshipResponse(Response):
