@@ -9,6 +9,7 @@ from .CommentResponse import CommentResponse
 from .ConfigureResponse import ConfigureResponse
 from .ConfigureVideoResponse import ConfigureVideoResponse
 from .DeleteCommentResponse import DeleteCommentResponse
+from. DirectShareInboxResponse import DirectShareInboxResponse
 from .ExploreResponse import ExploreResponse
 from .ExposeResponse import ExposeResponse
 from .FBSearchResponse import FBSearchResponse

@@ -1288,7 +1288,10 @@ class Instagram:
         :rtype: object
         :return: Direct share data
         """
-        return self.request('direct_share/inbox/?')[1]
+        return (
+            self.request('direct_share/inbox/?')
+            .getResponse(DirectShareInboxResponse())
+        )
 
     def backup(self):
         """
