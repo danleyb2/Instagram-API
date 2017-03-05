@@ -2,6 +2,26 @@ from PIL import Image
 import hashlib
 import json
 from .Compat import *
+import os.path
+import shutil
+
+
+def is_dir(path):
+    return os.path.isdir(path)
+
+
+def mkdir(path):
+    return os.mkdir(path)
+
+
+def copy(src, dest):
+    if "://" in src:
+        file_put_contents(
+            dest,
+            compat_urllib_request.urlopen(src).read()
+        )
+    else:
+        shutil.copy2(src, dest)
 
 
 def file_get_contents(file):

@@ -1299,30 +1299,27 @@ class Instagram:
         Backups all your uploaded photos :).
         """
         go = False
+        myUploads = self.getSelfUserFeed()
         while True:
-            if not go:
-                myUploads = self.getSelfUserFeed()
-            else:
+            if go:
                 myUploads = self.getSelfUserFeed(myUploads.getNextMaxId() if myUploads.getNextMaxId() else None)
-                # fixme local variable `myUploads` might be referenced before assignment
-            if not os.path.isdir(self.IGDataPath + 'backup/'):
-                os.mkdir(self.IGDataPath + 'backup/')
+
+            if not is_dir(self.IGDataPath + 'backup/'):
+                mkdir(self.IGDataPath + 'backup/')
 
             for item in myUploads.getItems():
                 dir_name = self.IGDataPath + 'backup/' + self.username + "-" + time.strftime('%Y-%m-%d')
-                if not os.path.isdir(dir_name):
-                    os.mkdir(dir_name)
+                if not is_dir(dir_name):
+                    mkdir(dir_name)
 
                 if item.getVideoVersions():
-                    file_put_contents(
-                        os.path.join(dir_name, item.getMediaId() + '.mp4'),
-                        urllib.urlopen(item.getVideoVersions()[0].getUrl()).read()
-                    )  # todo test and remove below
+                    copy(item.getVideoVersions()[0].getUrl(),
+                         os.path.join(dir_name, item.getMediaId() + '.mp4'))
+                    # todo test and remove below
                 else:
-                    file_put_contents(
-                        os.path.join(dir_name, item.getMediaId() + '.jpg'),
-                        urllib.urlopen(item.getImageVersions()[0].getUrl()).read()
-                    )  # todo test and remove below
+                    copy(item.getImageVersions()[0].getUrl(),
+                        os.path.join(dir_name, item.getMediaId() + '.jpg'))
+                    # todo test and remove below
 
                     # urllib.urlretrieve(
                     #    item['image_versions2']['candidates'][0]['url'],
