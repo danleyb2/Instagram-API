@@ -1535,41 +1535,16 @@ class Request:
 
         response = instagramObj.http.request(endPoint, post, self.requireLogin_, self.floodWait, False)
 
-        if response[1] == None:
+        mapper = JsonMapper()
+        mapper.bStrictNullTypes = False
+        # FIXME how do we translate this?
+        #if (isset($_GET['debug'])) {
+        #    $mapper->bExceptionOnUndefinedProperty = true;
+        #}
+        if response[1] is None:
             raise InstagramException('No response from server, connection or configure error', ErrorCode.EMPTY_RESPONSE)
 
-        # Here we deviate from the PHP function because JsonMapper doesn't exist for python AFAIK
-        def is_primitive(obj):
-            return type(obj) in [str, int, float, bool]
-
-        def _map(obj, root):
-            if root is None:
-                obj = None
-                return obj
-            if type(root) is list:
-                keys = list(obj.__dict__.keys())
-                for i in range(len(root)):
-                    obj.__dict__[keys[i]] = root[i]
-                return obj
-            elif is_primitive(root):
-                obj = root
-                return obj
-            for key in root:
-                if "_types" in obj.__dict__ and key in obj._types:
-                    if type(obj._types[key]) is list:
-                        obj.__dict__[key] = []
-                        # TODO: check if root[key] is list
-                        for i in range(len(root[key])):
-                            obj.__dict__[key].append(obj._types[key][0]())
-                            obj.__dict__[key][i] = _map(obj.__dict__[key][i], root[key][i])
-                    else:
-                        obj.__dict__[key] = obj._types[key]()
-                        obj.__dict__[key] = _map(obj.__dict__[key], root[key])
-                else:
-                    obj.__dict__[key] = root[key]
-            return obj
-        _map(obj, response[1])
-        responseObject = obj
+        responseObject = mapper.map(response[1], obj)
 
         if self.checkStatus and not responseObject.isOk():
             raise InstagramException(obj.__class__.__name__ + ' : ' + responseObject.getMessage())
