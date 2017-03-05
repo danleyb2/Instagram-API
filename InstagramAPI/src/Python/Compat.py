@@ -10,3 +10,9 @@ try:
     import urllib.request as compat_urllib_request
 except ImportError:  # Python 2
     import urllib as compat_urllib_request
+
+
+try:
+    from io import StringIO
+except ImportError:  # Python 2
+    from StringIO import StringIO

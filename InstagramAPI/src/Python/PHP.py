@@ -74,8 +74,48 @@ def json_decode(json_string):
         return None
 
 
+def imagecreatefromstring(photo):
+    file_jpgdata = StringIO(photo)
+    return Image.open(file_jpgdata)
+
+
 def getimagesize(photo):
     return Image.open(photo).size
+
+
+def imagesx(image):
+    return image.size[0]
+
+
+def imagesy(image):
+    return image.size[1]
+
+
+def imagecreatetruecolor(width, height):
+    return Image.create(Image.RGB, (width, height))
+
+
+def imagecolorallocate(image, r, g, b):
+    return (r, g, b)
+
+
+def imagefill(image, x, y, color):
+    return image.paste(color, (x, y))
+
+
+def imagecopyresized(dst_image, src_image, dst_x, dst_y, src_x, src_y, dst_w, dst_h, src_w, src_h):
+    sbox = (src_x, src_y, src_x + src_w, src_y + src_h)
+    region = src_image.crop(sbox)
+    dbox = (dst_x, dst_y, dst_x + dst_w, dst_y + dst_h)
+    dst_image.paste(region, dbox)
+    return True
+
+
+def imagejpeg(image, to, quality):
+    # TODO: to is ignored
+    output = StringIO()
+    image.save(output, 'jpeg', quality=quality)
+    return output.getvalue()
 
 
 def md5(string):
