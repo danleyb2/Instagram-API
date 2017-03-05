@@ -2,6 +2,7 @@ from PIL import Image
 import hashlib
 import json
 from .Compat import *
+import os
 import os.path
 import shutil
 import hmac
@@ -13,6 +14,10 @@ def is_dir(path):
 
 def mkdir(path):
     return os.mkdir(path)
+
+
+def filemtime(path):
+    return os.stat(path).st_mtime
 
 
 def copy(src, dest):
