@@ -6,6 +6,7 @@ import os
 import os.path
 import shutil
 import hmac
+import sys
 
 
 def is_dir(path):
@@ -107,3 +108,11 @@ def hash_hmac(algo_str, data, key):
         algo = hashlib.sha256
 
     return hmac.new(key.encode("utf-8"), data.encode("utf-8"), algo).hexdigest()
+
+
+def php_sapi_name():
+    return "cli" # FIXME
+
+
+def echo(text):
+    sys.stdout.write(text)
