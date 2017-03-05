@@ -65,8 +65,8 @@ class Instagram:
                 username,
                 ''
             )
-            if not os.path.isdir(self.IGDataPath):
-                os.mkdir(self.IGDataPath, 0o777)
+            if not is_dir(self.IGDataPath):
+                mkdir(self.IGDataPath, 0o777)
 
     def setUser(self, username, password):
         """
@@ -107,7 +107,7 @@ class Instagram:
                 ''
             )
 
-        if not os.path.isdir(self.IGDataPath): os.mkdir(self.IGDataPath, 0o777)
+        if not is_dir(self.IGDataPath): mkdir(self.IGDataPath, 0o777)
 
         self.settings = Settings(
             os.path.join(self.IGDataPath, 'settings-' + username + '.dat')
