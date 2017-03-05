@@ -4,6 +4,7 @@ import json
 from .Compat import *
 import os.path
 import shutil
+import hmac
 
 
 def is_dir(path):
@@ -93,3 +94,11 @@ def rawurldecode(string):
 
 def http_build_query(params):
     return compat_urllib_parse.urlencode(params)
+
+
+def hash_hmac(algo_str, data, key):
+    algo = None
+    if algo_str == "sha256":
+        algo = hashlib.sha256
+
+    return hmac.new(key.encode("utf-8"), data.encode("utf-8"), algo).hexdigest()

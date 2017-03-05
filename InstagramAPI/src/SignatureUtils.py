@@ -1,13 +1,12 @@
-import hmac
-
 from .Constants import Constants
 from .Utils import *
+from .Python import *
 
 
 class SignatureUtils:
     @staticmethod
     def generateSignature(data):
-        hash = hmac.new(Constants.IG_SIG_KEY.encode("utf-8"), data.encode("utf-8"), hashlib.sha256).hexdigest()
+        hash = hash_hmac('sha256', data, Constants.IG_SIG_KEY)
 
         return 'ig_sig_key_version=' + Constants.SIG_KEY_VERSION + \
                '&signed_body=' + hash + '.' + urlencode(data)
