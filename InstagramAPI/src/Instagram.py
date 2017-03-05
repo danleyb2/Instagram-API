@@ -12,6 +12,7 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 from .Utils import *
+from .Python import *
 from .http import HttpInterface, UserAgent
 from .http.Response import *
 

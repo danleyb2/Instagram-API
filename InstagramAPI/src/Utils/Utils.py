@@ -2,8 +2,7 @@ import hashlib
 import os
 from PIL import Image
 from tempfile import mkdtemp
-
-from .php import *
+from InstagramAPI.src.Python import *
 
 
 class Utils:

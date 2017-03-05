@@ -1,5 +1,6 @@
 from InstagramAPI.src import Constants
 from InstagramAPI.src.Utils import *
+from InstagramAPI.src.Python import *
 
 
 class UserAgent:

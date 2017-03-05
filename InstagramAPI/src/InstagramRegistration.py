@@ -19,6 +19,7 @@ except ImportError:
 
 from .Constants import Constants
 from .Utils import *
+from .Python import *
 
 
 class InstagramRegistration(object):

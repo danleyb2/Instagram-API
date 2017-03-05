@@ -16,6 +16,7 @@ from InstagramAPI.src.InstagramException import InstagramException
 from InstagramAPI.src.Constants import Constants
 
 from InstagramAPI.src.Utils import *
+from InstagramAPI.src.Python import *
 from InstagramAPI.src.http.Response import *
 
 
