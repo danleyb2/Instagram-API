@@ -2,6 +2,7 @@ from InstagramAPI.src.http.Response.Response import Response
 from InstagramAPI.src.http.Response.Objects.Image_Versions2 import Image_Versions2
 from InstagramAPI.src.http.Response.Objects.VideoVersions import VideoVersions
 
+
 class CarouselMedia(Response):
     PHOTO = 1
     VIDEO = 2
@@ -9,8 +10,11 @@ class CarouselMedia(Response):
     def __init__(self):
         self._types = {}
 
+        self._types["pk"] = str
         self.pk = None
+        self._types["id"] = str
         self.id = None
+        self._types["carousel_parent_id"] = str
         self.carousel_parent_id = None
         self._types["image_versions2"] = Image_Versions2
         self.image_versions2 = None
