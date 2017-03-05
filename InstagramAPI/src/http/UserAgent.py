@@ -16,9 +16,9 @@ class UserAgent:
         line_of_text = []
         with open(csvfile, 'rb') as file_handle:
             for line in file_handle.readlines():
-                line_of_text.append(line.strip())
+                line_of_text.append(str(line).strip())
         # todo doesn't look like original
-        deviceData = (line_of_text[mt_rand(0, 11867)]).decode("utf-8").split(';')
+        deviceData = (line_of_text[mt_rand(0, 11867)]).split(';')
         return deviceData
 
     def buildUserAgent(self):
