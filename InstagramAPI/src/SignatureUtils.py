@@ -16,7 +16,7 @@ class SignatureUtils:
         # // Neutralize username/password -> device correlation
         volatile_seed = '%d' % filemtime(os.path.dirname(os.path.realpath(__file__)))
 
-        return 'android-' + str(md5(str(seed) + str(volatile_seed)).hexdigest())[16:]
+        return 'android-' + md5(str(seed) + str(volatile_seed))[16:]
 
     @staticmethod
     def generateUUID(type):

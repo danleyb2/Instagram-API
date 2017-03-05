@@ -58,7 +58,7 @@ class Utils:
 
         if ffmpeg:
             # generate thumbnail
-            preview = os.path.join(mkdtemp(), hashlib.md5(file) + '.jpg')
+            preview = os.path.join(mkdtemp(), md5(file) + '.jpg')
 
             try:
                 os.unlink(preview)

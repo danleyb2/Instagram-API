@@ -311,7 +311,7 @@ class Instagram:
             .addPost('_uuid', self.uuid)
             .addPost('device_id', self.device_id)
             .addPost('_csrftoken', self.token)
-            .addPost('uuid', md5(str(int(time.time()))).hexdigest())
+            .addPost('uuid', md5(str(int(time.time()))))
             .getResponse(MegaphoneLogResponse())
         )
 

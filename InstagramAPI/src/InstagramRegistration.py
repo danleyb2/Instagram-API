@@ -159,7 +159,7 @@ class InstagramRegistration(object):
                 ('username', username),
                 ('first_name', name),
                 ('guid', self.uuid),
-                ('device_id', SignatureUtils.generateDeviceId(hashlib.md5(username + password).hexdigest())),
+                ('device_id', SignatureUtils.generateDeviceId(md5(username + password))),
                 ('email', email),
                 ('force_sign_up_code', ''),
                 ('waterfall_id', self.waterfall_id),

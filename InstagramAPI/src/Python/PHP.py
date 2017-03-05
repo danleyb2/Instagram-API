@@ -78,7 +78,7 @@ def getimagesize(photo):
 
 
 def md5(string):
-    return hashlib.md5(string.encode("utf-8"))
+    return str(hashlib.md5(string.encode("utf-8")).hexdigest())
 
 
 def urlencode(string):
