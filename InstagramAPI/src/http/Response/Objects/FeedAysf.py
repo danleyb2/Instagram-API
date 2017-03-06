@@ -3,7 +3,7 @@ from InstagramAPI.src.http.Response.Response import Response
 
 
 class FeedAysf(Response):
-    def __init__(self, data):
+    def __init__(self):
         self._types = {}
 
         self.landing_site_type = None

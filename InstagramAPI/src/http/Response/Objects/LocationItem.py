@@ -1,5 +1,5 @@
-from InstagramAPI.src.http.Response.Response import Response
 from InstagramAPI.src.http.Response.Objects.Location import Location
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class LocationItem(Response):
@@ -8,6 +8,6 @@ class LocationItem(Response):
 
         self.media_bundles = None
         self.subtitle = None
-        self._types["location"] = [Location]
+        self._types["location"] = Location
         self.location = None
         self.title = None

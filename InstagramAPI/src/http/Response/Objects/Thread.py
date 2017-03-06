@@ -1,6 +1,6 @@
-from InstagramAPI.src.http.Response.Response import Response
-from InstagramAPI.src.http.Response.Objects.User import User
 from InstagramAPI.src.http.Response.Objects.ThreadItem import ThreadItem
+from InstagramAPI.src.http.Response.Objects.User import User
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class Thread(Response):
@@ -11,7 +11,9 @@ class Thread(Response):
         self._types["users"] = [User]
         self.users = None
         self.has_newer = None
+        self._types["viewer_id"] = str
         self.viewer_id = None
+        self._types["thread_id"] = str
         self.thread_id = None
         self.last_activity_at = None
         self.newest_cursor = None

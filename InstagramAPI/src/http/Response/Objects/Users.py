@@ -1,13 +1,11 @@
-from InstagramAPI.src.http.Response.Objects.Position import Position
 from InstagramAPI.src.http.Response.Objects.User import User
 from InstagramAPI.src.http.Response.Response import Response
 
 
-class In(Response):
+class Users(Response):
     def __init__(self):
         self._types = {}
 
-        self._types["position"] = Position
         self.position = None
         self._types["user"] = User
         self.user = None

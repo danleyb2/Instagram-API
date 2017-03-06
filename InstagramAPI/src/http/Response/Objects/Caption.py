@@ -1,5 +1,5 @@
-from InstagramAPI.src.http.Response.Response import Response
 from InstagramAPI.src.http.Response.Objects.User import User
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class Caption(Response):

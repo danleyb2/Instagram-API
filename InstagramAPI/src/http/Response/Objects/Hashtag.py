@@ -1,10 +1,11 @@
 from InstagramAPI.src.http.Response.Response import Response
 
 
-class Media(Response):
+class Hashtag(Response):
     def __init__(self):
         self._types = {}
 
-        self.image = None
+        self.media_count = None
+        self.name = None
         self._types["id"] = str
         self.id = None

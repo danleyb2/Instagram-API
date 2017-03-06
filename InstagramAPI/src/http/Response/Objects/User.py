@@ -1,5 +1,6 @@
-from InstagramAPI.src.http.Response.Response import Response
 from InstagramAPI.src.http.Response.Objects.FriendshipStatus import FriendshipStatus
+from InstagramAPI.src.http.Response.Response import Response
+
 
 class User(Response):
     def __init__(self):
@@ -10,6 +11,7 @@ class User(Response):
         self.is_favorite = False
         self.profile_pic_url = None
         self.full_name = None
+        self._types["pk"] = str
         self.pk = None
         self.is_verified = False
         self.is_private = False
@@ -33,6 +35,7 @@ class User(Response):
         self.is_unpublished = None
         self.allow_contacts_sync = None # // login prop
         self.show_feed_biz_conversion_icon = None # // login prop
+        self._types["profile_pic_id"] = str
         self.profile_pic_id = None # // Ranked recipents response prop
         self.auto_expand_chaining = None # // getUsernameInfo prop
         self.can_boost_post = None # // getUsernameInfo prop

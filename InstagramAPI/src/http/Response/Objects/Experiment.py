@@ -1,5 +1,5 @@
-from InstagramAPI.src.http.Response.Response import Response
 from InstagramAPI.src.http.Response.Objects.Param import Param
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class Experiment(Response):

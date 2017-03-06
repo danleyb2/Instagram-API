@@ -3,6 +3,8 @@ from InstagramAPI.src.http.Response.Response import Response
 
 class FriendshipStatus(Response):
     def __init__(self):
+        self._types = {}
+
         self.following = None
         self.followed_by = None
         self.incoming_request = None

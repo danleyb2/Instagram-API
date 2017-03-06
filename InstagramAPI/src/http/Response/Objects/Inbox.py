@@ -1,6 +1,5 @@
-from InstagramAPI.src.http.Response.Response import Response
 from InstagramAPI.src.http.Response.Objects.Thread import Thread
-
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class Inbox(Response):
