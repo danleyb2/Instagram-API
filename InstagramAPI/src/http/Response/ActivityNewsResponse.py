@@ -13,6 +13,5 @@ class ActivityNewsResponse(Response):
         self.continuation = None
         self.friend_request_stories = None
         self.counts = None
-        self._types["subscription"] = mixed
         self.subscription = None
         self.continuation_token = None
