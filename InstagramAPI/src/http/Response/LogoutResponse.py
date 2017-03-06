@@ -1,12 +1,7 @@
-from .Response import Response
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class LogoutResponse(Response):
-    def __init__(self, response):
+    def __init__(self):
+        self._types = {}
 
-        if self.STATUS_OK == response['status']:
-            pass
-        else:
-            self.setMessage(response['message'])
-
-        self.setStatus(response['status'])

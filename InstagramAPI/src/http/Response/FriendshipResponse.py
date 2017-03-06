@@ -1,5 +1,5 @@
-from .Response import Response
-from .Objects.FriendshipStatus import FriendshipStatus
+from InstagramAPI.src.http.Response.Objects.FriendshipStatus import FriendshipStatus
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class FriendshipResponse(Response):

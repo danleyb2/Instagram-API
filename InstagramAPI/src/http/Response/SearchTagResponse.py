@@ -1,5 +1,5 @@
-from .Response import Response
-from .Objects.Tag import Tag
+from InstagramAPI.src.http.Response.Objects.Tag import Tag
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class SearchTagResponse(Response):

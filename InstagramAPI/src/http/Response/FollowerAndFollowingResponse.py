@@ -1,5 +1,5 @@
-from .Response import Response
-from .Objects.User import User
+from InstagramAPI.src.http.Response.Objects.User import User
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class FollowerAndFollowingResponse(Response):
@@ -8,4 +8,5 @@ class FollowerAndFollowingResponse(Response):
 
         self._types["users"] = [User]
         self.users = None
+        self._types["next_max_id"] = str
         self.next_max_id = None

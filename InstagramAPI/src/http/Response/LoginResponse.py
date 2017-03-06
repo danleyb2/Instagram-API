@@ -1,5 +1,5 @@
-from .Response import Response
-from .Objects.User import User
+from InstagramAPI.src.http.Response.Objects.User import User
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class LoginResponse(Response):
@@ -9,8 +9,10 @@ class LoginResponse(Response):
         self.username = None
         self.has_anonymous_profile_picture = None
         self.profile_pic_url = None
+        self._types["profile_pic_id"] = str
         self.profile_pic_id = None
         self.full_name = None
+        self._types["pk"] = str
         self.pk = None
         self.is_private = None
         self.error_title = None # // on wrong pass

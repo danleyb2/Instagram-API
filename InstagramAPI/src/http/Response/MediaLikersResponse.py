@@ -1,5 +1,5 @@
 from InstagramAPI.src.http.Response.Objects.User import User
-from .Response import Response
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class MediaLikersResponse(Response):
@@ -7,5 +7,5 @@ class MediaLikersResponse(Response):
         self._types = {}
 
         self.user_count = None
-        self._types["likers"] = [User]
-        self.likers = None
+        self._types["users"] = [User]
+        self.users = None

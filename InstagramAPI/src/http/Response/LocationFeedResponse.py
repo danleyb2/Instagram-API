@@ -1,5 +1,5 @@
-from .Response import Response
-from .Objects.Item import Item
+from InstagramAPI.src.http.Response.Objects.Item import Item
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class LocationFeedResponse(Response):
@@ -14,4 +14,5 @@ class LocationFeedResponse(Response):
         self._types["ranked_items"] = [Item]
         self.ranked_items = None
         self.more_available = None
+        self._types["next_max_id"] = str
         self.next_max_id = None

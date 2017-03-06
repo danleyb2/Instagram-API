@@ -1,5 +1,5 @@
 from InstagramAPI.src.http.Response.Objects.Item import Item
-from .Response import Response
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class TagFeedResponse(Response):
@@ -13,4 +13,5 @@ class TagFeedResponse(Response):
         self._types["items"] = [Item]
         self.items = None
         self.more_available = None
+        self._types["next_max_id"] = str
         self.next_max_id = None

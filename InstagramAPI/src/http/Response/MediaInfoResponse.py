@@ -1,5 +1,5 @@
-from .Objects.Item import Item
-from .Response import Response
+from InstagramAPI.src.http.Response.Objects.Item import Item
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class MediaInfoResponse(Response):

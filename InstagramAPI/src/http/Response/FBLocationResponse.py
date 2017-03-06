@@ -1,4 +1,5 @@
-from .Response import Response
+from InstagramAPI.src.http.Response.Objects.LocationItem import LocationItem
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class FBLocationResponse(Response):

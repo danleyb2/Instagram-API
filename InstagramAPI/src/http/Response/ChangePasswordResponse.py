@@ -1,6 +1,7 @@
-from .Response import Response
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class ChangePasswordResponse(Response):
     def __init__(self):
-        pass
+        self._types = {}
+

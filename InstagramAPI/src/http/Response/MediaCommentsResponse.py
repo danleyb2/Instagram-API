@@ -1,13 +1,13 @@
-from InstagramAPI.src.http.Response.Objects.Comment import Comment
 from InstagramAPI.src.http.Response.Objects.Caption import Caption
-from .Response import Response
+from InstagramAPI.src.http.Response.Objects.Comment import Comment
+from InstagramAPI.src.http.Response.Response import Response
 
 
 class MediaCommentsResponse(Response):
-    def __init__(self, response):
+    def __init__(self):
         self._types = {}
 
-        self._types = [Comment]
+        self._types["comments"] = [Comment]
         self.comments = []
         self.comment_count = None
         self.comment_likes_enabled = None
