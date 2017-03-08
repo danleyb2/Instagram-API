@@ -264,6 +264,9 @@ class Instagram:
             )
 
     def autoCompleteUserList(self):
+        """
+        :rtype: autoCompleteUserListResponse
+        """
         (self.request('friendships/autocomplete_user_list/')
          .setCheckStatus(False)
          .addParams('version', '2')
