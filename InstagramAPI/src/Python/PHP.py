@@ -7,6 +7,8 @@ import os.path
 import shutil
 import hmac
 import sys
+import datetime
+import time
 
 
 def is_dir(path):
@@ -156,3 +158,10 @@ def php_sapi_name():
 
 def echo(text):
     sys.stdout.write(text)
+
+
+def date(format='%m/%d/%Y %H:%M', unixtime=None):
+    if unixtime is None:
+        unixtime = time.time()
+    d = datetime.datetime.fromtimestamp(unixtime)
+    return d.strftime(format)

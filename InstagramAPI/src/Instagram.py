@@ -314,6 +314,22 @@ class Instagram:
 
         return request.getResponse(TimelineFeedResponse())
 
+    def insights(self, day=None):
+        """
+        Get insights.
+
+        :rtype: InsightsResponse
+        """
+        if not day:
+            day = date("%d")
+        request = (
+            self.request('insights/account_organic_insights')
+            .addParams('show_promotions_in_landing_page', 'true')
+            .addParams('first', day)
+        )
+
+        return request.getResponse(InsightsResponse())
+
     def megaphoneLog(self):
         return (
             self.request('megaphone/log/')
