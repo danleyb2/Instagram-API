@@ -298,6 +298,12 @@ class Instagram:
         )[1]
 
     def timelineFeed(self, maxId=None):
+        """
+        Get timeline feed.
+
+        :raises: InstagramException
+        :rtype: TimelineFeedResponse
+        """
         request = (
             self.request('feed/timeline')
             .addParams('rank_token', self.rank_token)
