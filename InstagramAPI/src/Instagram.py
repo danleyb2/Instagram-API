@@ -240,6 +240,10 @@ class Instagram:
             return self.explore()
 
     def syncFeatures(self, prelogin=False):
+        """
+        :type bool: prelogin
+        :rtype: SyncResponse
+        """
         if prelogin:
             return (
                 self.request('qe/sync/')
