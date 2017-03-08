@@ -431,6 +431,9 @@ class Instagram:
         return self.request('discover/channels_home/').getResponse(DiscoverChannelsResponse())
 
     def expose(self):
+        """
+        :rtype: ExposeResponse
+        """
         return (
             self.request('qe/expose/')
             .addPost('_uuid', self.uuid)
