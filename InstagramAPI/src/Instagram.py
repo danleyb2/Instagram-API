@@ -330,6 +330,19 @@ class Instagram:
 
         return request.getResponse(InsightsResponse())
 
+    def mediaInsights(self, media_id):
+        """
+        Get media insights.
+
+        :rtype: MediaInsightsResponse
+        """
+        request = (
+            self.request("insights/media_organic_insights/" + media_id)
+            .setSignedPost(True)
+            .addParams('ig_sig_key_version', Constants.SIG_KEY_VERSION)
+        )
+        return request.getResponse(MediaInsightsResponse())
+
     def megaphoneLog(self):
         return (
             self.request('megaphone/log/')
