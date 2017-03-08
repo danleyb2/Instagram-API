@@ -266,11 +266,25 @@ class Instagram:
     def autoCompleteUserList(self):
         """
         :rtype: autoCompleteUserListResponse
+        :return: Will be None if throttled by Instagram
         """
-        (self.request('friendships/autocomplete_user_list/')
-         .setCheckStatus(False)
-         .addParams('version', '2')
-         .getResponse(autoCompleteUserListResponse()))
+        # // NOTE: This is a special, very heavily throttled API endpoint.
+        # // Instagram REQUIRES that you wait several minutes between calls to it.
+        try:
+            request = (
+                self.request('friendships/autocomplete_user_list/')
+                .setCheckStatus(False)
+                .addParams('version', '2')
+            )
+
+            return request.getResponse(autoCompleteUserListResponse())
+        except InstagramException as e:
+            # // Throttling is so common that we'll simply return NULL in that case.
+            if e.getCode() == ErrorCode.INTERNAL_API_THROTTLED:
+                return None
+
+            # // Simply re-throw the original exception in all other cases.
+            raise e
 
     def pushRegister(self, gcmToken):
         deviceToken = json_encode(
@@ -344,6 +358,9 @@ class Instagram:
         return request.getResponse(MediaInsightsResponse())
 
     def megaphoneLog(self):
+        """
+        :rtype: MediaInsightsResponse
+        """
         return (
             self.request('megaphone/log/')
             .setSignedPost(False)
