@@ -421,6 +421,15 @@ class Instagram:
         """
         return self.request('discover/explore/').getResponse(ExploreResponse())
 
+    def discoverChannels(self):
+        """
+        Home Channel.
+
+        :raise: InstagramException
+        :rtype: DiscoverChannelResponse:
+        """
+        return self.request('discover/channels_home/').getResponse(DiscoverChannelsResponse())
+
     def expose(self):
         return (
             self.request('qe/expose/')
