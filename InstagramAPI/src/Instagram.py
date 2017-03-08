@@ -402,6 +402,7 @@ class Instagram:
         """
         Recent recipients.
 
+        :raise: InstagramException
         :rtype: list
         :return: Ranked recipients Data
         """
