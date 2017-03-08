@@ -413,8 +413,9 @@ class Instagram:
 
     def explore(self):
         """
-        Explore Tab
+        Explore Tab.
 
+        :raise: InstagramException
         :rtype: object
         :return: Explore data
         """
