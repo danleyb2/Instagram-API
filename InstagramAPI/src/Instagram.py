@@ -378,6 +378,7 @@ class Instagram:
         """
         Pending Inbox
 
+        :raise: InstagramException
         :rtype: object
         :return: Pending Inbox Data
         """
