@@ -388,6 +388,7 @@ class Instagram:
         """
         Ranked recipients.
 
+        :raise: InstagramException
         :rtype:list
         :return: Ranked recipients Data
         """
