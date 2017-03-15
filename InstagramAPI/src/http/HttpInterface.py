@@ -543,7 +543,7 @@ class HttpInterface(object):
             'Proxy-Connection: keep-alive',
             'Connection: keep-alive',
             'Accept: */*',
-            'Content-type: multipart/form-data boundary=' + boundary,
+            'Content-type: multipart/form-data; boundary=' + boundary,
             'Accept-Language: en-en',
         ]
 
