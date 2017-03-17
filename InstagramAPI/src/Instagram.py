@@ -1223,9 +1223,9 @@ class Instagram:
         :return: Location feed data
         """
         if not maxid:
-            endpoint = "feed/location/" + locationId + "/"
+            endpoint = "feed/location/" + str(locationId) + "/"
         else:
-            endpoint = "feed/location/" + locationId + "/?max_id=" + maxid
+            endpoint = "feed/location/" + str(locationId) + "/?max_id=" + maxid
 
         locationFeed = self.http.request(endpoint)[1]
 
