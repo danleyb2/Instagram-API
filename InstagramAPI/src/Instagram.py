@@ -1214,7 +1214,7 @@ class Instagram:
 
         return locationFeed
 
-    def getLocationFeed(self, locationId, maxid=''):
+    def getLocationFeed(self, locationId, maxid=None):
         """
         Get location feed.
         :type locationId: str
@@ -1222,11 +1222,10 @@ class Instagram:
         :rtype: object
         :return: Location feed data
         """
-        if maxid is '':
-            endpoint = "feed/location/" + locationId + "/?rank_token=" + self.rank_token + "&ranked_content=true&"
+        if not maxid:
+            endpoint = "feed/location/" + locationId + "/"
         else:
-            endpoint = "feed/location/" + locationId + "/?max_id=" \
-                       + maxid + "&rank_token=" + self.rank_token + "&ranked_content=true&"
+            endpoint = "feed/location/" + locationId + "/?max_id=" + maxid
 
         locationFeed = self.http.request(endpoint)[1]
 
