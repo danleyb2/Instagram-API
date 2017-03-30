@@ -32,6 +32,7 @@ class UsernameInfoResponse(Response):
         self.is_favorite = None
         self.is_verified = None
 
+        self.setFullResponse(response)
         if self.STATUS_OK == response['status']:
             self.usertags_count = response['user']['usertags_count']
             self.has_anonymous_profile_picture = response['user']['has_anonymous_profile_picture']
