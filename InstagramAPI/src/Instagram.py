@@ -1256,7 +1256,7 @@ class Instagram:
 
         return popularFeed
 
-    def getUserFollowings(self, usernameId, maxid=''):
+    def getUserFollowings(self, usernameId, maxid=None):
         """
         Get user followings.
         :type usernameId: str
@@ -1265,8 +1265,12 @@ class Instagram:
         :rtype: object
         :return: followers data
         """
-        return self.http.request(
-            "friendships/" + usernameId + "/following/?max_id=" + maxid)[1]
+
+        url = "friendships/" + usernameId + "/following/?rank_token=" + self.rank_token
+        if maxid:
+            url += ('&max_id=' + maxid)
+
+        return self.http.request(url)[1]
 
     def getUserFollowers(self, usernameId, maxid=''):
         """
