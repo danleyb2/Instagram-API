@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from InstagramAPI.src.Python import *
 from .Utils import Utils
 
