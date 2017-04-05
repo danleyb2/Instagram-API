@@ -1,11 +1,10 @@
 import json
 import pycurl
+import re
 from collections import OrderedDict
 
-import re
-
 from InstagramAPI.src import InstagramException
-from InstagramAPI.src import SignatureUtils
+from InstagramAPI.src.SignatureUtils import SignatureUtils
 from InstagramAPI.src.http.Response import ChallengeResponse
 from InstagramAPI.src.http.Response.AccountCreationResponse import AccountCreationResponse
 from InstagramAPI.src.http.Response.CheckEmailResponse import CheckEmailResponse
