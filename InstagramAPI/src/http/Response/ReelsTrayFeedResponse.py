@@ -10,10 +10,10 @@ class ReelsTrayFeedResponse(Response):
 
         if self.STATUS_OK == response['status']:
             trays = []
-            if 'tray' in response and len(response['tray']):
+            if 'tray' in response and isinstance(response['tray'], list):
                 for tray in response['tray']:
                     items = []
-                    if 'items' in tray and len(tray['items']):
+                    if 'items' in tray and isinstance(tray['items'], list):
                         for item in tray['items']:
                             items.append(Item(item))
 
