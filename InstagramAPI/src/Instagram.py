@@ -75,6 +75,48 @@ class Instagram:
 
         self.setUser(username, password)
 
+
+    def getUserLive(self, usernameId):
+        """
+        https://i.instagram.com/api/v1/live/
+        Get user story.
+        :type usernameId: str
+        :param usernameId: Username id
+        :return: User feed data
+        :raises: InstagramException
+        """
+        # //feed/reels_tray/https://i.instagram.com/api/v1/
+
+        userFeed = self.http.request("feed/reels_tray/")[1]
+
+        # ;
+        # "feed/live/")[1]
+        # "feed/user/"+str(usernameId)+"/reel_media/"
+        # + str(usernameId) + "/live/?rank_token=" + self.rank_token)[1]
+
+        if userFeed['status'] != 'ok':
+            raise InstagramException(userFeed['message'] + "\n")
+
+        return userFeed
+
+        #   Evil Funct
+
+    def getUserStory(self, usernameId):
+        """
+
+        Get user story.
+        :type usernameId: str
+        :param usernameId: Username id
+        :return: User feed data
+        :raises: InstagramException
+        """
+        userFeed = self.http.request("feed/user/" + str(usernameId) + "/story/?rank_token=" + self.rank_token)[1]
+
+        if userFeed['status'] != 'ok':
+            raise InstagramException(userFeed['message'] + "\n")
+
+        return userFeed
+
     def setUser(self, username, password):
         """
          Set the user. Manage multiple accounts.
