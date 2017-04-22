@@ -1196,7 +1196,7 @@ class Instagram:
         return feed
 
     def getUserFeed(self, usernameId, maxid=None, minTimestamp=None):
-        """
+		"""
         Get user feed.
         :type usernameId: str
         :param usernameId: Username id
@@ -1208,17 +1208,17 @@ class Instagram:
         :return: User feed data
         :raises: InstagramException
         """
-        userFeed = UserFeedResponse(self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
-                                                      + (("&max_id=" + str(maxid)) if maxid is not None else '') \
-                                                      + (("&min_timestamp=" + str(
-            minTimestamp)) if minTimestamp is not None else '') \
-                                                      + "&ranked_content=true"
-                                                      )[1])
+        userFeed = self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
+                                     + (("&max_id=" + str(maxid)) if maxid is not None else '') \
+                                     + (("&minTimestamp=" + str(minTimestamp)) if minTimestamp is not None else '') \
+                                     + "&ranked_content=true"
+                                     )[1]
 
-        if not userFeed.isOk():
-            raise InstagramException(userFeed.getMessage() + "\n")
+        if userFeed['status'] != 'ok':
+            raise InstagramException(userFeed['message'] + "\n")
 
         return userFeed
+        
 
     def getHashtagFeed(self, hashtagString, maxid=''):
         """
