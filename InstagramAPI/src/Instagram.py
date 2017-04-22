@@ -1208,9 +1208,7 @@ class Instagram:
         :return: User feed data
         :raises: InstagramException
         """
-        userFeed = self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token + (("&max_id=" + str(maxid)) if maxid is not None else '') \
-                                     + (("&minTimestamp=" + str(minTimestamp)) if minTimestamp is not None else '') \
-                                     + "&ranked_content=true")[1]
+        userFeed = self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token + (("&max_id=" + str(maxid)) if maxid is not None else '') + (("&minTimestamp=" + str(minTimestamp)) if minTimestamp is not None else '') + "&ranked_content=true")[1]
 
         if userFeed['status'] != 'ok':
             raise InstagramException(userFeed['message'] + "\n")
