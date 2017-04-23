@@ -64,8 +64,12 @@ class Item(object):
                 images.append(HdProfilePicUrlInfo(image))
 
         self.image_versions2 = images
-        self.original_width = item['original_width']
-        self.original_height = item['original_height']
+
+        if 'original_width' in item:
+            self.original_width = item['original_width']
+        if 'original_height' in item:
+            self.original_height = item['original_height']
+
         if 'view_count' in item and item['view_count']:
             self.view_count = item['view_count']
 
