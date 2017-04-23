@@ -76,12 +76,10 @@ class Instagram:
         self.setUser(username, password)
 
 
-    def getUserLive(self, usernameId):
+    def getUserLive(self):
         """
         https://i.instagram.com/api/v1/live/
-        Get user story.
-        :type usernameId: str
-        :param usernameId: Username id
+        Get user reels.                
         :return: User feed data
         :raises: InstagramException
         """
