@@ -9,7 +9,7 @@ class V2InboxResponse(Response):
         self.pending_requests_users = None
         self.inbox = None
         self.subscription = None
-        print self
+        dir (self)
         if self.STATUS_OK == response['status']:
             self.pending_requests_total = response['pending_requests_total']
             self.seq_id = response['seq_id']
