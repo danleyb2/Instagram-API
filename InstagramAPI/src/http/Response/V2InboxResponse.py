@@ -9,16 +9,15 @@ class V2InboxResponse(Response):
         self.pending_requests_users = None
         self.inbox = None
         self.subscription = None
-        dir (self)
         if self.STATUS_OK == response['status']:
             self.pending_requests_total = response['pending_requests_total']
             self.seq_id = response['seq_id']
             self.pending_requests_users = response['pending_requests_users']
             self.inbox = Inbox(response['inbox'])
+            print response['subscription']
             self.subscription = response['subscription']
         else:
             self.setMessage(response['message'])
-
         self.setStatus(response['status'])
 
     def getPendingRequestsTotal(self):
