@@ -67,7 +67,7 @@ class Instagram:
                 ''
             )
             if not os.path.isdir(self.IGDataPath):
-                os.mkdir(self.IGDataPath, 0o777)
+                os.mkdir(self.IGDataPath, 0777)
 
         self.checkSettings(username)
 
@@ -79,7 +79,7 @@ class Instagram:
     def getUserLive(self):
         """
         https://i.instagram.com/api/v1/live/
-        Get user reels.                
+        Get user reels.
         :return: User feed data
         :raises: InstagramException
         """
