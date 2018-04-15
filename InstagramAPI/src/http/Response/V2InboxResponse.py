@@ -12,7 +12,7 @@ class V2InboxResponse(Response):
         if self.STATUS_OK == response['status']:
             self.pending_requests_total = response['pending_requests_total']
             self.seq_id = response['seq_id']
-            self.pending_requests_users = response['pending_requests_users']
+            #self.pending_requests_users = response['pending_requests_users']
             self.inbox = Inbox(response['inbox'])
             #self.subscription = response['subscription']
         else:
