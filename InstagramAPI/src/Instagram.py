@@ -259,7 +259,7 @@ class Instagram:
             #self.getv2Inbox()
             self.getRecentActivity()
             self.getReelsTrayFeed()
-            self.explore()
+            #self.explore()
 
             return response
 
@@ -277,7 +277,7 @@ class Instagram:
         self.megaphoneLog()
         #self.getv2Inbox()
         self.getRecentActivity()
-        self.explore()
+        #self.explore()
 
     def syncFeatures(self, prelogin=False):
         if prelogin:
