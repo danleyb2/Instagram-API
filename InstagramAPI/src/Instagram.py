@@ -253,13 +253,13 @@ class Instagram:
             self.syncFeatures()
             self.autoCompleteUserList()
             self.timelineFeed()
-            #self.getRankedRecipients()
-            #self.getRecentRecipients()
-            #self.megaphoneLog()
-            #self.getv2Inbox()
+            self.getRankedRecipients()
+            self.getRecentRecipients()
+            self.megaphoneLog()
+            self.getv2Inbox()
             self.getRecentActivity()
             self.getReelsTrayFeed()
-            #self.explore()
+            self.explore()
 
             return response
 
@@ -270,14 +270,14 @@ class Instagram:
 
         self.autoCompleteUserList()
         self.getReelsTrayFeed()
-        #self.getRankedRecipients()
+        self.getRankedRecipients()
         # push register
-        #self.getRecentRecipients()
+        self.getRecentRecipients()
         # push register
         self.megaphoneLog()
-        #self.getv2Inbox()
+        self.getv2Inbox()
         self.getRecentActivity()
-        #self.explore()
+        self.explore()
 
     def syncFeatures(self, prelogin=False):
         if prelogin:
@@ -367,6 +367,8 @@ class Instagram:
         :rtype:list
         :return: Ranked recipients Data
         """
+        print self.http.request('direct_v2/ranked_recipients/?show_threads=true')
+
         ranked_recipients = RankedRecipientsResponse(
             self.http.request('direct_v2/ranked_recipients/?show_threads=true')[1]
         )
