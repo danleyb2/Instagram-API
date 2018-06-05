@@ -255,7 +255,7 @@ class Instagram:
             self.timelineFeed()
             #self.getRankedRecipients()
             #self.getRecentRecipients()
-            self.megaphoneLog()
+            #self.megaphoneLog()
             #self.getv2Inbox()
             self.getRecentActivity()
             self.getReelsTrayFeed()
@@ -270,12 +270,12 @@ class Instagram:
 
         self.autoCompleteUserList()
         self.getReelsTrayFeed()
-        self.getRankedRecipients()
+        #self.getRankedRecipients()
         # push register
-        self.getRecentRecipients()
+        #self.getRecentRecipients()
         # push register
         self.megaphoneLog()
-        self.getv2Inbox()
+        #self.getv2Inbox()
         self.getRecentActivity()
         self.explore()
 
