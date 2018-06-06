@@ -1,4 +1,4 @@
-*Please go through the [contribution guidelines](https://github.com/danleyb2/Instagram-API/blob/master/.github/CONTRIBUTING.md)*,  
+*Please go through the [contribution guidelines](https://github.com/danleyb2/Instagram-API/blob/master/.github/CONTRIBUTING.md)*,
 *just a translated Python implementation of this PHP [repository](https://github.com/mgp25/Instagram-API)*
 
 # ![logo](/examples/assets/instagram.png) Instagram Python [![License](https://poser.pugx.org/mgp25/instagram-php/license)](https://packagist.org/packages/mgp25/instagram-php)
@@ -9,9 +9,9 @@ PYTHON [![Latest Stable Version](http://img.shields.io/pypi/v/instagram-python.s
 
 
 
-This is Instagram's private API. It has all the features the Instagram app has, including media upload.
+This is Instagram's private API. It has all the features the Instagram app has, including media upload. NEW
 
-**Read the [wiki](https://github.com/danleyb2/Instagram-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.  
+**Read the [wiki](https://github.com/danleyb2/Instagram-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.
 **Wiki for the PHP code should be 90% applicable too because the code is just translated, not transformed**
 
 **Frequently Asked Questions:** [F.A.Q.](https://github.com/danleyb2/Instagram-API/wiki/FAQ)
@@ -23,6 +23,8 @@ This is Instagram's private API. It has all the features the Instagram app has, 
 ## Installation
 
 ### PYPI
+
+This is unofficial fork from danleyb2/Instagram-API
 
 ```sh
 pip install instagram-python
@@ -37,7 +39,13 @@ instagram = Instagram();
 If you want to test code that is in the master branch, which hasn't been pushed as a release, you can use Github.
 
 ```sh
-pip install https://github.com/danleyb2/Instagram-API/archive/master.zip
+pip install https://github.com/EvilTatur/Instagram-API/archive/master.zip
+```
+
+for upgrade:
+
+```sh
+pip install https://github.com/EvilTatur/Instagram-API/archive/master.zip --upgrade
 ```
 
 ## Examples
@@ -45,9 +53,9 @@ pip install https://github.com/danleyb2/Instagram-API/archive/master.zip
 All examples can be found [here](https://github.com/danleyb2/Instagram-API/tree/master/examples)
 
 ## Why did i do the API?
-For me,  
-*i love writing code*,  
-for him  
+For me,
+*i love writing code*,
+for him
 *After legal measures, Facebook, WhatsApp and Instagram blocked my accounts. In order to use Instagram
  on my phone i needed a new phone, as they banned my UDID, so that is basically why i made this API.*
 

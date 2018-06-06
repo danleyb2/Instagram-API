@@ -67,13 +67,53 @@ class Instagram:
                 ''
             )
             if not os.path.isdir(self.IGDataPath):
-                os.mkdir(self.IGDataPath, 0o777)
+                os.mkdir(self.IGDataPath, 0777)
 
         self.checkSettings(username)
 
         self.http = HttpInterface(self)
 
         self.setUser(username, password)
+
+
+    def getUserLive(self):
+        """
+        https://i.instagram.com/api/v1/live/
+        Get user reels.
+        :return: User feed data
+        :raises: InstagramException
+        """
+        # //feed/reels_tray/https://i.instagram.com/api/v1/
+
+        userFeed = self.http.request("feed/reels_tray/")[1]
+
+        # ;
+        # "feed/live/")[1]
+        # "feed/user/"+str(usernameId)+"/reel_media/"
+        # + str(usernameId) + "/live/?rank_token=" + self.rank_token)[1]
+
+        if userFeed['status'] != 'ok':
+            raise InstagramException(userFeed['message'] + "\n")
+
+        return userFeed
+
+        #   Evil Funct
+
+    def getUserStory(self, usernameId):
+        """
+
+        Get user story.
+        :type usernameId: str
+        :param usernameId: Username id
+        :return: User feed data
+        :raises: InstagramException
+        """
+        userFeed = self.http.request("feed/user/" + str(usernameId) + "/story/?rank_token=" + self.rank_token)[1]
+
+        if userFeed['status'] != 'ok':
+            raise InstagramException(userFeed['message'] + "\n")
+
+        return userFeed
 
     def setUser(self, username, password):
         """
@@ -327,6 +367,8 @@ class Instagram:
         :rtype:list
         :return: Ranked recipients Data
         """
+        print self.http.request('direct_v2/ranked_recipients/?show_threads=true')
+
         ranked_recipients = RankedRecipientsResponse(
             self.http.request('direct_v2/ranked_recipients/?show_threads=true')[1]
         )
@@ -1166,17 +1208,17 @@ class Instagram:
         :return: User feed data
         :raises: InstagramException
         """
-        userFeed = UserFeedResponse(self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
-                                                      + (("&max_id=" + str(maxid)) if maxid is not None else '') \
-                                                      + (("&min_timestamp=" + str(
-            minTimestamp)) if minTimestamp is not None else '') \
-                                                      + "&ranked_content=true"
-                                                      )[1])
+        userFeed = self.http.request("feed/user/" + str(usernameId) + "/?rank_token=" + self.rank_token
+                                     + (("&max_id=" + str(maxid)) if maxid is not None else '') \
+                                     + (("&minTimestamp=" + str(minTimestamp)) if minTimestamp is not None else '') \
+                                     + "&ranked_content=true"
+                                     )[1]
 
-        if not userFeed.isOk():
-            raise InstagramException(userFeed.getMessage() + "\n")
+        if userFeed['status'] != 'ok':
+            raise InstagramException(userFeed['message'] + "\n")
 
         return userFeed
+
 
     def getHashtagFeed(self, hashtagString, maxid=''):
         """

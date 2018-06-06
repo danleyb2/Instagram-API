@@ -15,8 +15,10 @@ class ExploreResponse(Response):
             self.num_results = response['num_results']
             self.auto_load_more_enabled = response['auto_load_more_enabled']
             self.more_available = response['more_available']
-            self.next_max_id = response['next_max_id']
-            self.max_id = response['max_id']
+            if 'next_max_id' in response:
+                self.next_max_id = response['next_max_id']
+            if 'max_id' in response:
+                self.max_id = response['max_id']
             items = []
             for item in response['items']:
                 if 'media' in item and item['media']:
