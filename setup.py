@@ -25,7 +25,7 @@ setuptools.setup(
     author_email='ndieksman@gmail.com',
     install_requires=[
         'pycurl==7.43.0',
-        'Pillow==3.4.2',
+        'Pillow==9.0.1',
     ],
     classifiers=[
         # 'Development Status :: 1 - Alpha',
